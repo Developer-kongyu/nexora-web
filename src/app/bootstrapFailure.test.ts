@@ -27,16 +27,22 @@ describe('renderBootstrapFailure', () => {
   });
 
   it('creates the fallback tree in the root owner document', () => {
-    const ownerDocument = document.implementation.createHTMLDocument('isolated');
-    const root = ownerDocument.createElement('div');
-    ownerDocument.body.append(root);
+    const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus');
+    try {
+      const ownerDocument = document.implementation.createHTMLDocument('isolated');
+      const root = ownerDocument.createElement('div');
+      ownerDocument.body.append(root);
 
-    renderBootstrapFailure(root, { onRetry: () => undefined });
+      renderBootstrapFailure(root, { onRetry: () => undefined });
 
-    const page = root.firstElementChild;
-    const retryButton = root.querySelector('button');
-    expect(page?.ownerDocument).toBe(ownerDocument);
-    expect(retryButton?.ownerDocument).toBe(ownerDocument);
-    expect(ownerDocument.activeElement).toBe(retryButton);
+      const page = root.firstElementChild;
+      const retryButton = root.querySelector('button');
+      expect(page?.ownerDocument).toBe(ownerDocument);
+      expect(retryButton?.ownerDocument).toBe(ownerDocument);
+      expect(focusSpy).toHaveBeenCalledOnce();
+      expect(focusSpy.mock.instances[0]).toBe(retryButton);
+    } finally {
+      focusSpy.mockRestore();
+    }
   });
 });
