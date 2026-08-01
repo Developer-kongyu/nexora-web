@@ -1,0 +1,138 @@
+﻿{
+  "schemaVersion": 1,
+  "stage": "015",
+  "status": "pass",
+  "capturedAt": "2026-08-02T00:05:21.5892680+08:00",
+  "verification": {
+    "kind": "fresh-git-clone",
+    "sourceCommit": "7f403400d401f3b13880522b62766b4681e066cc",
+    "branch": "stage-015-formal-toolchain-green",
+    "clonePath": "C:\\Users\\lct_f\\Desktop\\X项目前端\\lct-web-stage015-clean-verify-7f40340",
+    "initialGitStatusClean": true,
+    "finalGitStatusClean": true,
+    "packageLockUnchanged": true,
+    "packageLockSha256": "7BDC336A65C78927B27C81E1311DD16059DD68B84128F52E2EF72AC901B99C53"
+  },
+  "environment": {
+    "os": "Microsoft Windows 11 Home China 10.0.26200 build 26200 64-bit",
+    "node": "v22.17.0",
+    "npm": "10.9.2",
+    "registry": "https://registry.npmjs.org/",
+    "playwright": "1.61.1",
+    "browser": "Google Chrome 150.0.7871.188",
+    "browserExecutable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+  },
+  "commands": [
+    {
+      "sequence": 0,
+      "command": "npm ci --registry=https://registry.npmjs.org/ --no-audit --no-fund",
+      "exitCode": 0,
+      "durationSeconds": 26.535,
+      "log": "reports/stage-015/clean-verification/00-npm-ci.log",
+      "category": "dependency"
+    },
+    {
+      "sequence": 1,
+      "command": "npm ls --depth=0",
+      "exitCode": 0,
+      "durationSeconds": 0.99,
+      "log": "reports/stage-015/clean-verification/00-npm-ls.log",
+      "category": "dependency"
+    },
+    {
+      "sequence": 2,
+      "command": "npm run reuse:check",
+      "exitCode": 0,
+      "durationSeconds": 1.212,
+      "log": "reports/stage-015/clean-verification/00-reuse-check.log",
+      "category": "reuse"
+    },
+    {
+      "sequence": 3,
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "durationSeconds": 8.649,
+      "log": "reports/stage-015/clean-verification/01-format-check.log",
+      "category": "formal-toolchain"
+    },
+    {
+      "sequence": 4,
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "durationSeconds": 27.872,
+      "log": "reports/stage-015/clean-verification/02-typecheck.log",
+      "category": "formal-toolchain"
+    },
+    {
+      "sequence": 5,
+      "command": "npm run lint",
+      "exitCode": 0,
+      "durationSeconds": 61.052,
+      "log": "reports/stage-015/clean-verification/03-eslint.log",
+      "category": "formal-toolchain"
+    },
+    {
+      "sequence": 6,
+      "command": "npm run lint:css",
+      "exitCode": 0,
+      "durationSeconds": 11.261,
+      "log": "reports/stage-015/clean-verification/04-stylelint.log",
+      "category": "formal-toolchain"
+    },
+    {
+      "sequence": 7,
+      "command": "npm run test",
+      "exitCode": 0,
+      "durationSeconds": 55.118,
+      "log": "reports/stage-015/clean-verification/05-vitest.log",
+      "category": "formal-toolchain"
+    },
+    {
+      "sequence": 8,
+      "command": "npm run build",
+      "exitCode": 0,
+      "durationSeconds": 19.556,
+      "log": "reports/stage-015/clean-verification/06-vite-build.log",
+      "category": "formal-toolchain"
+    },
+    {
+      "sequence": 9,
+      "command": "npm run storybook:build",
+      "exitCode": 0,
+      "durationSeconds": 11.082,
+      "log": "reports/stage-015/clean-verification/07-storybook-build.log",
+      "category": "formal-toolchain"
+    },
+    {
+      "sequence": 10,
+      "command": "npm run test:e2e",
+      "exitCode": 0,
+      "durationSeconds": 19.121,
+      "log": "reports/stage-015/clean-verification/08-playwright.log",
+      "category": "formal-toolchain"
+    }
+  ],
+  "totals": {
+    "commands": 11,
+    "passed": 11,
+    "failed": 0,
+    "formalCommands": 8,
+    "formalPassed": 8,
+    "durationSeconds": 242.45
+  },
+  "testResults": {
+    "vitest": {
+      "files": 45,
+      "filesPassed": 45,
+      "tests": 132,
+      "passed": 132,
+      "failed": 0
+    },
+    "playwright": {
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "project": "chromium"
+    }
+  }
+}

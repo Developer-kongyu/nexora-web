@@ -1,0 +1,113 @@
+﻿{
+  "schemaVersion": 1,
+  "stage": "015",
+  "title": "Formal Toolchain Green",
+  "status": "pass",
+  "capturedAt": "2026-08-02T00:05:21.5892680+08:00",
+  "branch": "stage-015-formal-toolchain-green",
+  "verifiedSourceCommit": "7f403400d401f3b13880522b62766b4681e066cc",
+  "finalTag": "stage-015-formal-toolchain-green",
+  "checkpoints": [
+    "checkpoint-stage-015-start",
+    "checkpoint-stage-015a-dependencies",
+    "checkpoint-stage-015b-format-typecheck",
+    "checkpoint-stage-015c-eslint-stylelint",
+    "checkpoint-stage-015d-vitest-build",
+    "checkpoint-stage-015e-storybook-playwright"
+  ],
+  "baseline": {
+    "gitHistoryInitiallyPresent": false,
+    "initializedBaselineCommit": "051694953e269c38d32e92783b8c4a6073539df4",
+    "packageJsonSha256": "07CDC2F25D541ACA872FB72E0A0B340A26A1E3B72D2393AD8B38EC58305231C7",
+    "packageLockSha256": "9FA770AF0488109E3002638DE22AE2538AD2104AD2034E8D2D1FE8D6E7A87790"
+  },
+  "final": {
+    "packageJsonChanged": false,
+    "packageJsonSha256": "07CDC2F25D541ACA872FB72E0A0B340A26A1E3B72D2393AD8B38EC58305231C7",
+    "packageLockChanged": true,
+    "packageLockSha256": "7BDC336A65C78927B27C81E1311DD16059DD68B84128F52E2EF72AC901B99C53",
+    "trackedSourceFilesBeforeReports": 402,
+    "cleanVerificationStatus": "pass"
+  },
+  "environment": {
+    "os": "Microsoft Windows 11 Home China 10.0.26200 build 26200 64-bit",
+    "node": "v22.17.0",
+    "npm": "10.9.2",
+    "registry": "https://registry.npmjs.org/",
+    "playwright": "1.61.1",
+    "browser": "Google Chrome 150.0.7871.188",
+    "browserExecutable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+  },
+  "dependencyRepairs": [
+    {
+      "scope": "package-lock.json",
+      "change": "Replaced one internal Artifactory tarball URL for @vitejs/plugin-react@6.0.3 with its verified registry.npmjs.org URL; integrity unchanged."
+    },
+    {
+      "scope": "package-lock.json",
+      "change": "Restored Windows x64 optional native package nodes for rolldown, esbuild, lightningcss, oxc-parser, and oxc-resolver using official versions, tarballs, and integrity values."
+    }
+  ],
+  "diagnostics": [
+    {
+      "tool": "Prettier",
+      "rootCause": "153 baseline files were not in project Prettier form.",
+      "resolution": "Ran the project format script and retained semantic CSS/TS structure; final check passes."
+    },
+    {
+      "tool": "TypeScript",
+      "rootCause": "Storybook files were outside project-service coverage; once included, Storybook 10 rejected legacy docs.autodocs.",
+      "resolution": "Included .storybook/**/*.ts and removed the obsolete field; Story meta already owns the autodocs tag."
+    },
+    {
+      "tool": "ESLint",
+      "rootCause": "Floating navigation promises, unstable Hook dependencies, React Hook Form watch usage, ref cleanup captures, test callbacks returning timer helpers, and render-time form/ref coupling.",
+      "resolution": "Made fire-and-forget intent explicit, used useWatch/useMemo, stabilized cleanup ownership, and moved ComposeEditor validation/ref reads into event time. No rules disabled."
+    },
+    {
+      "tool": "Stylelint",
+      "rootCause": "One missing blank line before the token custom-property group.",
+      "resolution": "Added the required separation; no rule disabled."
+    },
+    {
+      "tool": "Vitest",
+      "rootCause": "A detached createHTMLDocument has no browsing context, so JSDOM does not update activeElement despite focus() being called.",
+      "resolution": "Kept the main-document activeElement assertion and made the detached-document test assert the focus call and receiver. 132/132 pass."
+    },
+    {
+      "tool": "Vite",
+      "rootCause": "The Linux-authored lock contained only Linux native optional nodes.",
+      "resolution": "Added verified Windows x64 lock nodes; npm ci reconstructs them and production build passes."
+    },
+    {
+      "tool": "Storybook",
+      "rootCause": "No remaining blocking diagnostic after config/native fixes.",
+      "resolution": "Static build succeeds with the existing PostCard stories and providers."
+    },
+    {
+      "tool": "Playwright",
+      "rootCause": "The password label locator also matched the show/hide-password button under strict mode.",
+      "resolution": "Used exact label matching. The first failure report/screenshot is archived; final 2/2 tests pass."
+    }
+  ],
+  "artifacts": {
+    "vite": "dist",
+    "storybook": "storybook-static",
+    "playwrightReport": "playwright-report/index.html",
+    "failureArchive": "reports/stage-015/failures/playwright-attempt-1.zip",
+    "cleanVerificationLogs": "reports/stage-015/clean-verification"
+  },
+  "archiveMethodProof": {
+    "commit": "7f403400d401f3b13880522b62766b4681e066cc",
+    "trackedFiles": 402,
+    "archiveFiles": 402,
+    "missing": 0,
+    "extra": 0,
+    "contentMismatches": 0
+  },
+  "warnings": [
+    "Vite production build reports plugin timing concentration in vite:css-post and vite:css.",
+    "Storybook reports plugin timing concentration and two framework chunks above 500 kB (axe and iframe); thresholds were not raised.",
+    "Playwright-managed Chromium download stalled without output; the project-supported executablePath used installed Google Chrome 150.0.7871.188 instead."
+  ]
+}
