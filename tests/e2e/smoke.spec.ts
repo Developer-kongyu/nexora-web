@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('mock login opens home feed', async ({ page }) => {
   await page.goto('/auth/login');
   await page.getByLabel('账号').fill('zhiqiu');
-  await page.getByLabel('密码').fill('Passw0rd!');
+  await page.getByLabel('密码', { exact: true }).fill('Passw0rd!');
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await expect(page).toHaveURL(/\/home/);
   await expect(page.getByRole('link', { name: '首页', exact: true })).toBeVisible();
