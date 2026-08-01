@@ -22,12 +22,7 @@ export type NotificationType =
   | 'AUTH_SECURITY_ALERT'
   | 'SYSTEM';
 
-export type NotificationListTab =
-  | 'ALL'
-  | 'MENTIONS'
-  | 'INTERACTIONS'
-  | 'COMMUNITIES'
-  | 'SYSTEM';
+export type NotificationListTab = 'ALL' | 'MENTIONS' | 'INTERACTIONS' | 'COMMUNITIES' | 'SYSTEM';
 
 export interface ListNotificationsInput {
   tab?: NotificationListTab;

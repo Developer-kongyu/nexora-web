@@ -63,10 +63,7 @@ describe('compose editor model', () => {
   });
 
   it('orders persisted media by the canonical sort order', () => {
-    expect(getDraftMediaAssetIds(draftDetail().composeSnapshot)).toEqual([
-      'media-a',
-      'media-b',
-    ]);
+    expect(getDraftMediaAssetIds(draftDetail().composeSnapshot)).toEqual(['media-a', 'media-b']);
   });
 
   it('normalizes optional select values and supplies stable defaults', () => {

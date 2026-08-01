@@ -50,7 +50,7 @@
 }
 
 .control span::after {
-  content: "";
+  content: '';
   display: block;
   width: 18px;
   height: 18px;

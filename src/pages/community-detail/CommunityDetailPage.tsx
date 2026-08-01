@@ -65,8 +65,7 @@ export function CommunityDetailPage() {
         tone: 'success',
         title: nextJoined ? '已加入社群' : '已退出社群',
       }),
-    onError: () =>
-      showToast({ tone: 'error', title: '操作失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '操作失败', description: '请稍后重试。' }),
   });
   const joined = membership.value;
 
@@ -86,7 +85,7 @@ export function CommunityDetailPage() {
       });
       return;
     }
-    navigate(paths.communityManage(communityId));
+    void navigate(paths.communityManage(communityId));
   };
 
   const communityPosts = posts.data?.list ?? [];
@@ -99,8 +98,8 @@ export function CommunityDetailPage() {
             <p>{community.data?.description || '围绕主题展开高质量讨论。'}</p>
             <ul style={{ marginTop: 12 }}>
               <li>
-                <UsersRound size={13} />{' '}
-                {community.data?.membersCount.toLocaleString() || '12,800'} 位成员
+                <UsersRound size={13} /> {community.data?.membersCount.toLocaleString() || '12,800'}{' '}
+                位成员
               </li>
               <li>
                 <ShieldCheck size={13} />{' '}
@@ -160,8 +159,8 @@ export function CommunityDetailPage() {
                 <span>/{community.data.slug}</span>
                 <p>{community.data.description}</p>
                 <small>
-                  <UsersRound size={13} /> {community.data.membersCount.toLocaleString()} 成员 · 今天
-                  86 条新讨论
+                  <UsersRound size={13} /> {community.data.membersCount.toLocaleString()} 成员 ·
+                  今天 86 条新讨论
                 </small>
               </div>
               <div className={styles.actions}>
@@ -206,7 +205,7 @@ export function CommunityDetailPage() {
                 size="sm"
                 disabled={!joined}
                 onClick={() => {
-                  if (community.data) navigate(paths.composeForCommunity(community.data.id));
+                  if (community.data) void navigate(paths.composeForCommunity(community.data.id));
                 }}
               >
                 <span>{joined ? '在社群发帖' : '加入后发帖'}</span>
@@ -301,7 +300,11 @@ export function CommunityDetailPage() {
                       @{member.handle} · {member.role} · 本月 {member.posts} 次贡献
                     </p>
                   </div>
-                  <Button size="sm" variant="secondary" onClick={() => navigate(paths.profile(member.handle))}>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => navigate(paths.profile(member.handle))}
+                  >
                     查看资料
                   </Button>
                 </article>
@@ -315,7 +318,10 @@ export function CommunityDetailPage() {
             <Info size={28} />
             <h2>社群介绍与规则</h2>
             <p>{community.data?.description}</p>
-            <ol className={styles.rules} style={{ width: '100%', marginTop: 14, textAlign: 'left' }}>
+            <ol
+              className={styles.rules}
+              style={{ width: '100%', marginTop: 14, textAlign: 'left' }}
+            >
               {community.data?.rules.map((rule, index) => (
                 <li key={`about-${rule}`}>
                   <span>{index + 1}</span>
@@ -324,10 +330,7 @@ export function CommunityDetailPage() {
               ))}
             </ol>
             {slug === 'ai-product' ? (
-              <Button
-                variant="secondary"
-                onClick={openManagement}
-              >
+              <Button variant="secondary" onClick={openManagement}>
                 <Settings size={15} /> 打开管理台
               </Button>
             ) : null}
@@ -353,10 +356,7 @@ export function CommunityDetailPage() {
             <Copy size={15} /> 复制社群链接
           </Button>
           {slug === 'ai-product' ? (
-            <Button
-              variant="secondary"
-              onClick={openManagement}
-            >
+            <Button variant="secondary" onClick={openManagement}>
               <Settings size={15} /> 进入管理台
             </Button>
           ) : null}

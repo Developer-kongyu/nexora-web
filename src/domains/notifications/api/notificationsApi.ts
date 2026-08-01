@@ -22,8 +22,7 @@ export const notificationsApi = {
       signal,
     }),
 
-  unread: () =>
-    apiClient.request<UnreadSummary>({ path: '/api/notifications/unread-summary' }),
+  unread: () => apiClient.request<UnreadSummary>({ path: '/api/notifications/unread-summary' }),
 
   markRead: (notificationIds: string[]) =>
     apiClient.request<MarkNotificationsReadResult, { notificationIds: string[] }>({

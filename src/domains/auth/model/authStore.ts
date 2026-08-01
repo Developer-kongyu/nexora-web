@@ -8,11 +8,7 @@ interface AuthState {
   user: UserSummary | null;
   onboardingCompleted: boolean;
   setSession: (token: string, user: UserSummary, onboardingCompleted: boolean) => void;
-  setRefreshedSession: (
-    token: string,
-    user: UserSummary,
-    onboardingCompleted: boolean,
-  ) => void;
+  setRefreshedSession: (token: string, user: UserSummary, onboardingCompleted: boolean) => void;
   updateUser: (patch: Partial<UserSummary>) => void;
   setAnonymous: () => void;
   setBootstrapping: () => void;

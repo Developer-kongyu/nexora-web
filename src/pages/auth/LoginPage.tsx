@@ -68,7 +68,7 @@ export function LoginPage() {
 
     showToast({ tone: 'success', title: '登录成功', description: '欢迎回到 LCT Circle' });
     const from = (location.state as { from?: string } | null)?.from || '/home';
-    navigate(from, { replace: true });
+    void navigate(from, { replace: true });
   });
 
   const loginError = passwordLogin.error || codeLogin.error || requestCode.error;

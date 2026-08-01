@@ -1,12 +1,5 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  AlertCircle,
-  Ban,
-  EyeOff,
-  Search,
-  ShieldCheck,
-  VolumeX,
-} from 'lucide-react';
+import { AlertCircle, Ban, EyeOff, Search, ShieldCheck, VolumeX } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { userKeys, usersApi } from '@/domains/users';
@@ -83,11 +76,7 @@ function SafetyUserRow({
     <article className={styles.safetyUserRow} data-placeholder={isPlaceholder}>
       {item.handle && !isPlaceholder ? (
         <Link className={styles.safetyAvatarLink} to={paths.profile(item.handle)}>
-          <Avatar
-            fallback={displayName.slice(0, 1)}
-            alt={displayName}
-            src={item.avatarUrl}
-          />
+          <Avatar fallback={displayName.slice(0, 1)} alt={displayName} src={item.avatarUrl} />
         </Link>
       ) : (
         <Avatar fallback="?" alt={displayName} src={item.avatarUrl} />
@@ -207,16 +196,14 @@ export function SafetySettingsPage() {
 
   const mutedQuery = useInfiniteQuery({
     queryKey: userKeys.mutes,
-    queryFn: ({ pageParam, signal }) =>
-      usersApi.mutedUsers(pageParam, PAGE_SIZE, signal),
+    queryFn: ({ pageParam, signal }) => usersApi.mutedUsers(pageParam, PAGE_SIZE, signal),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: getNextCursorPageParam,
   });
 
   const blockedQuery = useInfiniteQuery({
     queryKey: userKeys.blocks,
-    queryFn: ({ pageParam, signal }) =>
-      usersApi.blockedUsers(pageParam, PAGE_SIZE, signal),
+    queryFn: ({ pageParam, signal }) => usersApi.blockedUsers(pageParam, PAGE_SIZE, signal),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: getNextCursorPageParam,
   });
@@ -240,9 +227,7 @@ export function SafetySettingsPage() {
 
   const cancelMutation = useMutation({
     mutationFn: (input: CancelSafetyInput) =>
-      input.kind === 'mute'
-        ? usersApi.unmute(input.handle)
-        : usersApi.unblock(input.handle),
+      input.kind === 'mute' ? usersApi.unmute(input.handle) : usersApi.unblock(input.handle),
     onSuccess: (result, input) => {
       void queryClient.invalidateQueries({ queryKey: userKeys.all });
       showToast({
@@ -271,7 +256,7 @@ export function SafetySettingsPage() {
   });
 
   const cancelingUserId = cancelMutation.isPending
-    ? cancelMutation.variables?.userId ?? null
+    ? (cancelMutation.variables?.userId ?? null)
     : null;
 
   return (

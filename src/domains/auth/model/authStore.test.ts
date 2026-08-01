@@ -25,9 +25,7 @@ describe('authStore session commits', () => {
   it('keeps the current refresh generation active when committing its result', async () => {
     const refreshHandler = vi.fn(({ isCurrent }: AuthRefreshContext) => {
       expect(isCurrent()).toBe(true);
-      useAuthStore
-        .getState()
-        .setRefreshedSession('refreshed-token', refreshedUser, true);
+      useAuthStore.getState().setRefreshedSession('refreshed-token', refreshedUser, true);
       expect(isCurrent()).toBe(true);
       return Promise.resolve('refreshed-token');
     });
@@ -51,9 +49,7 @@ describe('authStore session commits', () => {
           resolveRefresh = () => {
             if (isCurrent()) {
               staleCommitAttempted = true;
-              useAuthStore
-                .getState()
-                .setRefreshedSession('stale-token', refreshedUser, false);
+              useAuthStore.getState().setRefreshedSession('stale-token', refreshedUser, false);
             }
             resolve('stale-token');
           };

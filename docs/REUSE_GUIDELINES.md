@@ -11,27 +11,27 @@
 
 ## 2. 权威实现位置
 
-| 能力 | 唯一实现 | 使用约束 |
-| --- | --- | --- |
-| 查询参数拼接 | `src/shared/api/query.ts` | 领域 API 不得自行创建 `URLSearchParams` |
-| cursor 请求、页面与合并 | `src/shared/api/pagination.ts` | 新 cursor 列表使用 `CursorRequest`、`CursorPageView<T>` 和共享 next-page 解析 |
-| Infinite Query 列表修改 | `src/shared/api/infiniteData.ts` | 删除或过滤缓存项不得在页面重复遍历 page 结构 |
-| 通用键选择状态 | `src/shared/hooks/useKeySelection.ts` | 列表选择、全选、反选和清理统一由该 Hook 管理 |
-| 乐观布尔写操作 | `src/shared/hooks/useOptimisticBooleanMutation.ts` | 点赞、加入、关注等同构切换不得各自复制回滚状态机 |
-| 剪贴板、日期、Set、文本、URL | `src/shared/lib/*` | 页面和领域优先调用共享纯函数，不复制兼容分支 |
-| 认证字段校验 | `src/domains/auth/model/validation.ts` | 注册、找回与重置密码复用验证码、密码强度和确认匹配规则 |
-| 通用用户摘要 | `src/shared/model/userIdentity.ts` | 只在确属同一展示语义时复用；owner DTO 仍保留在对应领域 |
-| 通用媒体解析状态 | `src/shared/model/media.ts` | 不在帖子、通知和用户领域重复声明同一媒体状态联合 |
-| Select 选项模型 | `src/shared/model/options.ts`、`src/shared/ui/Select/SelectOptions.tsx` | 枚举标签和选项由领域 presentation 层集中生成 |
-| 图片类型、大小和校验 | `src/domains/media/lib/imageSelection.ts` | 页面不得重复 MIME、大小上限或错误文案 |
-| 单图上传状态机 | `src/domains/media/lib/uploadMediaImageSelection.ts` | 资料和社群图片共用 B05 上传、确认、重试与 READY 编排 |
-| 双图片选择 | `src/pages/_shared/useMediaImagePairSelection.ts` | 同时管理头像/封面的页面复用该组合 Hook |
-| 社群枚举标签和选项 | `src/domains/communities/lib/presentation.ts` | 创建、管理和卡片展示不各自维护角色/策略文案 |
-| 草稿列表选择 | `src/domains/posts/hooks/useDraftListSelection.ts` | 内容中心和草稿箱复用同一 draft ID 选择规则 |
-| 草稿批量删除汇总 | `src/domains/library/model/draftBatch.ts` | 逐项成功/失败归并只保留一份实现 |
-| 收藏/历史不可用文案 | `src/domains/library/model/presentation.ts` | PLACEHOLDER 原因到文案的映射集中维护 |
-| Query Keys | 各领域 `model/queryKeys.ts` | 页面、Provider、Hook 和 Mutation 禁止手写同领域根 key |
-| 页面标题 | `src/shared/ui/PageHeader` | `PageTitle` 仅作为兼容别名，不再维护第二套结构与样式 |
+| 能力                         | 唯一实现                                                                | 使用约束                                                                      |
+| ---------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 查询参数拼接                 | `src/shared/api/query.ts`                                               | 领域 API 不得自行创建 `URLSearchParams`                                       |
+| cursor 请求、页面与合并      | `src/shared/api/pagination.ts`                                          | 新 cursor 列表使用 `CursorRequest`、`CursorPageView<T>` 和共享 next-page 解析 |
+| Infinite Query 列表修改      | `src/shared/api/infiniteData.ts`                                        | 删除或过滤缓存项不得在页面重复遍历 page 结构                                  |
+| 通用键选择状态               | `src/shared/hooks/useKeySelection.ts`                                   | 列表选择、全选、反选和清理统一由该 Hook 管理                                  |
+| 乐观布尔写操作               | `src/shared/hooks/useOptimisticBooleanMutation.ts`                      | 点赞、加入、关注等同构切换不得各自复制回滚状态机                              |
+| 剪贴板、日期、Set、文本、URL | `src/shared/lib/*`                                                      | 页面和领域优先调用共享纯函数，不复制兼容分支                                  |
+| 认证字段校验                 | `src/domains/auth/model/validation.ts`                                  | 注册、找回与重置密码复用验证码、密码强度和确认匹配规则                        |
+| 通用用户摘要                 | `src/shared/model/userIdentity.ts`                                      | 只在确属同一展示语义时复用；owner DTO 仍保留在对应领域                        |
+| 通用媒体解析状态             | `src/shared/model/media.ts`                                             | 不在帖子、通知和用户领域重复声明同一媒体状态联合                              |
+| Select 选项模型              | `src/shared/model/options.ts`、`src/shared/ui/Select/SelectOptions.tsx` | 枚举标签和选项由领域 presentation 层集中生成                                  |
+| 图片类型、大小和校验         | `src/domains/media/lib/imageSelection.ts`                               | 页面不得重复 MIME、大小上限或错误文案                                         |
+| 单图上传状态机               | `src/domains/media/lib/uploadMediaImageSelection.ts`                    | 资料和社群图片共用 B05 上传、确认、重试与 READY 编排                          |
+| 双图片选择                   | `src/pages/_shared/useMediaImagePairSelection.ts`                       | 同时管理头像/封面的页面复用该组合 Hook                                        |
+| 社群枚举标签和选项           | `src/domains/communities/lib/presentation.ts`                           | 创建、管理和卡片展示不各自维护角色/策略文案                                   |
+| 草稿列表选择                 | `src/domains/posts/hooks/useDraftListSelection.ts`                      | 内容中心和草稿箱复用同一 draft ID 选择规则                                    |
+| 草稿批量删除汇总             | `src/domains/library/model/draftBatch.ts`                               | 逐项成功/失败归并只保留一份实现                                               |
+| 收藏/历史不可用文案          | `src/domains/library/model/presentation.ts`                             | PLACEHOLDER 原因到文案的映射集中维护                                          |
+| Query Keys                   | 各领域 `model/queryKeys.ts`                                             | 页面、Provider、Hook 和 Mutation 禁止手写同领域根 key                         |
+| 页面标题                     | `src/shared/ui/PageHeader`                                              | `PageTitle` 仅作为兼容别名，不再维护第二套结构与样式                          |
 
 ## 3. 类型、枚举与常量规则
 

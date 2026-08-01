@@ -26,10 +26,7 @@ describe('postsApi comment contract', () => {
   });
 
   it('creates, replies to, and deletes a comment through the public routes', async () => {
-    const created = await postsApi.createComment(
-      'post-1',
-      createTextEngagementInput('新建根评论'),
-    );
+    const created = await postsApi.createComment('post-1', createTextEngagementInput('新建根评论'));
 
     expect(created.comment.parentCommentId).toBeNull();
     expect(created.comment.topLevelCommentId).toBeNull();

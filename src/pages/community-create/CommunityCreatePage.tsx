@@ -1,17 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import {
-  Camera,
-  Check,
-  ImagePlus,
-  Plus,
-  ShieldCheck,
-  Tags,
-  UsersRound,
-  X,
-} from 'lucide-react';
+import { Camera, Check, ImagePlus, Plus, ShieldCheck, Tags, UsersRound, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import {
   COMMUNITY_COMMENT_ROLE_MIN_OPTIONS,
@@ -23,10 +14,7 @@ import {
   communitiesApi,
   type CreateCommunityInput,
 } from '@/domains/communities';
-import {
-  isMediaUploadError,
-  uploadMediaImageSelection,
-} from '@/domains/media';
+import { isMediaUploadError, uploadMediaImageSelection } from '@/domains/media';
 import { paths } from '@/shared/config/paths';
 import { isApiError } from '@/shared/api/errors';
 import { createAbortError, getErrorMessage, toError } from '@/shared/lib/error';
@@ -80,7 +68,7 @@ export function CommunityCreatePage() {
     mode: 'onChange',
   });
   const rules = useFieldArray({ control: form.control, name: 'rules' });
-  const [name, slug] = form.watch(['name', 'slug']);
+  const [name, slug] = useWatch({ control: form.control, name: ['name', 'slug'] });
 
   useEffect(
     () => () => {
@@ -134,14 +122,16 @@ export function CommunityCreatePage() {
         title: '社群创建成功',
         description: '你已成为该社群的所有者。',
       });
-      navigate(paths.community(community.slug));
+      void navigate(paths.community(community.slug));
     },
     onError: (error) => {
       if (
         isApiError(error) &&
-        ['COMMUNITY_SLUG_INVALID', 'COMMUNITY_SLUG_RESERVED', 'COMMUNITY_SLUG_ALREADY_EXISTS'].includes(
-          error.code,
-        )
+        [
+          'COMMUNITY_SLUG_INVALID',
+          'COMMUNITY_SLUG_RESERVED',
+          'COMMUNITY_SLUG_ALREADY_EXISTS',
+        ].includes(error.code)
       ) {
         form.setError(
           'slug',
@@ -192,7 +182,8 @@ export function CommunityCreatePage() {
                   {basicsDone ? <Check size={13} /> : <Camera size={13} />} 基础信息
                 </span>
                 <span data-done={form.formState.isValid}>
-                  {form.formState.isValid ? <Check size={13} /> : <ShieldCheck size={13} />} 规则与权限
+                  {form.formState.isValid ? <Check size={13} /> : <ShieldCheck size={13} />}{' '}
+                  规则与权限
                 </span>
                 <span data-done={mediaDone}>
                   {mediaDone ? <Check size={13} /> : <ImagePlus size={13} />} 媒体处理

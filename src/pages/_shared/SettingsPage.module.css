@@ -86,7 +86,8 @@
   font-size: 13px;
 }
 
-.aside p, .aside li {
+.aside p,
+.aside li {
   color: var(--color-muted);
   font-size: 10px;
   line-height: 1.65;
@@ -108,7 +109,7 @@
 }
 
 .aside li::before {
-  content: "";
+  content: '';
   flex: 0 0 auto;
   width: 5px;
   height: 5px;
@@ -147,7 +148,8 @@
     overflow-x: auto;
   }
 
-  .navTitle, .nav > p {
+  .navTitle,
+  .nav > p {
     display: none;
   }
 

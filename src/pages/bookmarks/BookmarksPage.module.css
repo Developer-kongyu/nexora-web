@@ -87,7 +87,7 @@
   background: var(--color-surface-soft);
 }
 
-.directory nav > button[data-active="true"] {
+.directory nav > button[data-active='true'] {
   color: var(--color-primary);
   background: var(--color-primary-soft);
 }
@@ -107,7 +107,8 @@
   min-width: 0;
 }
 
-.directory nav strong, .directory nav small {
+.directory nav strong,
+.directory nav small {
   overflow: hidden;
   color: inherit;
   text-overflow: ellipsis;
@@ -229,7 +230,7 @@
   transition: border-color var(--transition);
 }
 
-.selectable[data-selected="true"] {
+.selectable[data-selected='true'] {
   border-color: var(--color-primary);
 }
 
@@ -384,11 +385,15 @@
     right: 50px;
   }
 
-  .placeholderCard, .errorCard, .unavailable {
+  .placeholderCard,
+  .errorCard,
+  .unavailable {
     grid-template-columns: auto minmax(0, 1fr);
   }
 
-  .placeholderCard > button, .errorCard > button, .unavailable > button {
+  .placeholderCard > button,
+  .errorCard > button,
+  .unavailable > button {
     grid-column: 2;
     justify-self: start;
   }

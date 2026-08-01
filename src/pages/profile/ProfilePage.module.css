@@ -16,7 +16,7 @@
   background:
     radial-gradient(circle at 78% 38%, rgb(255 255 255 / 60%), transparent 25%),
     linear-gradient(120deg, transparent 40%, rgb(255 255 255 / 18%));
-  content: "";
+  content: '';
 }
 
 .coverImage {
@@ -92,7 +92,8 @@
   font-size: 11px;
 }
 
-.meta span, .meta a {
+.meta span,
+.meta a {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -129,7 +130,7 @@
   height: 3px;
   background: var(--gradient-brand);
   border-radius: 3px 3px 0 0;
-  content: "";
+  content: '';
 }
 
 .feed {
@@ -178,7 +179,7 @@
   border-radius: 10px;
 }
 
-.relationStatus > span[data-blocked="true"] {
+.relationStatus > span[data-blocked='true'] {
   color: var(--color-danger);
   background: var(--color-danger-soft);
 }

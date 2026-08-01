@@ -70,9 +70,7 @@ export function getPostAvailabilityPlaceholderMessage(
   surface: LibraryPlaceholderSurface,
 ): string {
   if (reason === 'DENY_COMMUNITY_POST_MUST_BE_PUBLIC') {
-    return surface === 'bookmark'
-      ? '该社群内容不可在收藏页展示'
-      : '该社群内容不可在历史页展示';
+    return surface === 'bookmark' ? '该社群内容不可在收藏页展示' : '该社群内容不可在历史页展示';
   }
   return commonPlaceholderMessages[reason];
 }

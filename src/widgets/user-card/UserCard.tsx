@@ -33,9 +33,7 @@ export function UserCard({
     onSuccess: (_, nextFollowing) =>
       showToast({
         tone: 'success',
-        title: nextFollowing
-          ? `已关注 ${user.displayName}`
-          : `已取消关注 ${user.displayName}`,
+        title: nextFollowing ? `已关注 ${user.displayName}` : `已取消关注 ${user.displayName}`,
       }),
     onError: (_, attemptedFollowing) =>
       showToast({
@@ -63,18 +61,12 @@ export function UserCard({
         {!compact && user.bio ? <p>{user.bio}</p> : null}
         {!compact ? (
           <small>
-            <MapPin size={12} /> 上海 · {user.followersCount?.toLocaleString('zh-CN') || 0}{' '}
-            位关注者
+            <MapPin size={12} /> 上海 · {user.followersCount?.toLocaleString('zh-CN') || 0} 位关注者
           </small>
         ) : null}
       </div>
       {selectable ? (
-        <button
-          type="button"
-          className={styles.select}
-          data-selected={selected}
-          onClick={onSelect}
-        >
+        <button type="button" className={styles.select} data-selected={selected} onClick={onSelect}>
           {selected ? '已选择' : '选择'}
         </button>
       ) : (

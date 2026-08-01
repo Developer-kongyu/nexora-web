@@ -14,11 +14,13 @@
 在 Figma 新建 Design 文件后，将 `LCT_MVP_HiFi_All_Screens_Figma_Import.svg` 拖入画布；如需逐页编辑，可导入 `svg/` 目录中的单页 SVG。SVG 中的文本与矢量形状可在 Figma 中继续调整。
 
 欢迎引导页已拆分为 3 个连续页面，不再保留单独的 `04_onboarding` 单页：
+
 - `04_01_onboarding_interests`：兴趣标签
 - `04_02_onboarding_follow`：推荐关注
 - `04_03_onboarding_communities`：推荐社群
 
 本轮修正点：
+
 - 前两页补齐 `跳过 / 完成 / 提交 / 下一步` 四个按钮
 - 选中项统一改为“颜色高亮 + 对号”表现，不再出现“已选”按钮
 - 推荐关注 / 推荐社群条目不再出现单独“关注 / 加入”按钮

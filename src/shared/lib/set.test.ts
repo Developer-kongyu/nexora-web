@@ -21,10 +21,7 @@ describe('Set helpers', () => {
   });
 
   it('retains only allowed values', () => {
-    expect([...retainSetValues(new Set(['a', 'b', 'c']), ['b', 'c', 'd'])]).toEqual([
-      'b',
-      'c',
-    ]);
+    expect([...retainSetValues(new Set(['a', 'b', 'c']), ['b', 'c', 'd'])]).toEqual(['b', 'c']);
   });
 
   it('keeps the first item for each stable key', () => {

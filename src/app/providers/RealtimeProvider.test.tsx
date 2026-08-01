@@ -5,7 +5,7 @@ import { RealtimeProvider } from './RealtimeProvider';
 const mocks = vi.hoisted(() => ({
   connect: vi.fn<() => Promise<() => void>>(),
   invalidateQueries: vi.fn(() => Promise.resolve()),
-  status: 'authenticated' as 'anonymous' | 'authenticated',
+  status: 'authenticated',
 }));
 
 vi.mock('@tanstack/react-query', () => ({

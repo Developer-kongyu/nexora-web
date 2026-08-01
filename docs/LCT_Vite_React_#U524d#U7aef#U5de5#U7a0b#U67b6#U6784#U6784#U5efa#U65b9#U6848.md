@@ -71,28 +71,28 @@
 
 ## 3. 技术栈建议
 
-| 分类 | 选型 | 用途与约束 |
-|---|---|---|
-| 运行时 | Node.js 22.22+ | 同时满足当前 React Router 8 和 Vite 8 的现代 ESM 基线 |
-| 构建工具 | Vite 8.x | 开发服务器、构建、环境变量和资源处理；锁定 lockfile 中的精确版本 |
-| UI 框架 | React 19.2.x | 组件与并发交互基础 |
-| 路由 | React Router 8.x，Data Mode | 嵌套路由、loader、错误边界、路由级懒加载、滚动恢复 |
-| 语言 | TypeScript 5.x，`strict: true` | 全量严格类型；禁止业务代码滥用 `any` |
-| 服务端状态 | `@tanstack/react-query` 5.x | 请求缓存、cursor 列表、失效、乐观更新、预取 |
-| 客户端状态 | Zustand | 仅保存非服务端真相的跨页面临时状态 |
-| 表单 | React Hook Form | 表单性能、字段状态、复杂表单拆分 |
-| 运行时校验 | Zod 4.x | 表单 schema、关键接口边界校验、环境变量校验 |
-| 实时通信 | `socket.io-client` | B11 通知实时连接、心跳与重连 |
-| 图标 | `lucide-react` | 统一图标来源；业务图标封装后使用 |
-| 无样式基础组件 | Radix Primitives（按需） | Dialog、Popover、Dropdown、Tabs、Tooltip 等可访问性基础能力 |
-| 日期 | `date-fns` 或同等轻量库 | 相对时间、时区与格式化；项目只保留一种日期库 |
-| 样式 | CSS Modules + PostCSS + CSS Variables | 高保真、作用域、设计令牌、响应式与主题 |
-| 单元/组件测试 | Vitest + React Testing Library | hooks、组件、领域逻辑和交互测试 |
-| 接口模拟 | MSW | 开发模拟、组件测试、异常场景与契约样例 |
-| E2E | Playwright | 登录、发帖、上传、互动、社群、通知等主链路 |
-| 组件文档 | Storybook React + Vite | 设计系统、所有状态、视觉回归 |
-| 代码规范 | ESLint + Prettier + Stylelint | TS/React/CSS 统一检查 |
-| 接口类型 | `openapi-typescript` | 从后端 OpenAPI 生成类型；业务 hooks 仍手写以保证缓存语义清晰 |
+| 分类           | 选型                                  | 用途与约束                                                       |
+| -------------- | ------------------------------------- | ---------------------------------------------------------------- |
+| 运行时         | Node.js 22.22+                        | 同时满足当前 React Router 8 和 Vite 8 的现代 ESM 基线            |
+| 构建工具       | Vite 8.x                              | 开发服务器、构建、环境变量和资源处理；锁定 lockfile 中的精确版本 |
+| UI 框架        | React 19.2.x                          | 组件与并发交互基础                                               |
+| 路由           | React Router 8.x，Data Mode           | 嵌套路由、loader、错误边界、路由级懒加载、滚动恢复               |
+| 语言           | TypeScript 5.x，`strict: true`        | 全量严格类型；禁止业务代码滥用 `any`                             |
+| 服务端状态     | `@tanstack/react-query` 5.x           | 请求缓存、cursor 列表、失效、乐观更新、预取                      |
+| 客户端状态     | Zustand                               | 仅保存非服务端真相的跨页面临时状态                               |
+| 表单           | React Hook Form                       | 表单性能、字段状态、复杂表单拆分                                 |
+| 运行时校验     | Zod 4.x                               | 表单 schema、关键接口边界校验、环境变量校验                      |
+| 实时通信       | `socket.io-client`                    | B11 通知实时连接、心跳与重连                                     |
+| 图标           | `lucide-react`                        | 统一图标来源；业务图标封装后使用                                 |
+| 无样式基础组件 | Radix Primitives（按需）              | Dialog、Popover、Dropdown、Tabs、Tooltip 等可访问性基础能力      |
+| 日期           | `date-fns` 或同等轻量库               | 相对时间、时区与格式化；项目只保留一种日期库                     |
+| 样式           | CSS Modules + PostCSS + CSS Variables | 高保真、作用域、设计令牌、响应式与主题                           |
+| 单元/组件测试  | Vitest + React Testing Library        | hooks、组件、领域逻辑和交互测试                                  |
+| 接口模拟       | MSW                                   | 开发模拟、组件测试、异常场景与契约样例                           |
+| E2E            | Playwright                            | 登录、发帖、上传、互动、社群、通知等主链路                       |
+| 组件文档       | Storybook React + Vite                | 设计系统、所有状态、视觉回归                                     |
+| 代码规范       | ESLint + Prettier + Stylelint         | TS/React/CSS 统一检查                                            |
+| 接口类型       | `openapi-typescript`                  | 从后端 OpenAPI 生成类型；业务 hooks 仍手写以保证缓存语义清晰     |
 
 ### 3.1 暂不建议的选型
 
@@ -150,21 +150,21 @@ app -> pages -> widgets -> domains -> shared
 
 ### 4.2 与后端模块的映射
 
-| 前端领域 | 后端 owner | 主要内容 |
-|---|---|---|
-| `domains/auth` | B01 | 注册、登录、刷新、会话、密码、身份绑定、onboarding |
-| `domains/users` | B02 | 用户资料、关注、粉丝、关注请求、静音、屏蔽 |
-| `domains/permissions` | B03 | 隐私策略、互动权限预览、无权限状态 |
-| `domains/posts` | B04 | 草稿、帖子、评论、回复、引用、转发、删除 |
-| `domains/media` | B05 | 上传会话、确认上传、重试、媒体状态、链接预览 |
-| `domains/engagement` | B06/B04 公共写口 | 点赞、计数、曝光；评论/引用/转发公共写链按 B04 owner 路由 |
-| `domains/library` | B07 | 收藏夹、内容中心、历史 |
-| `domains/communities` | B08 | 社群资料、成员、加入、规则、管理台 |
-| `domains/feed` | B09 | Following、For You、Explore、刷新提示 |
-| `domains/search` | B10 | 统一搜索与筛选 |
-| `domains/notifications` | B11 | 通知列表、未读、目标解析、实时连接 |
-| `domains/settings` | B12 + owner 聚合 | 通知、推荐、搜索、兴趣设置；账号/资料/隐私写入调用对应 owner |
-| `shared/observability` | B13/基础设施 | requestId、日志、埋点、性能、错误监控 |
+| 前端领域                | 后端 owner       | 主要内容                                                     |
+| ----------------------- | ---------------- | ------------------------------------------------------------ |
+| `domains/auth`          | B01              | 注册、登录、刷新、会话、密码、身份绑定、onboarding           |
+| `domains/users`         | B02              | 用户资料、关注、粉丝、关注请求、静音、屏蔽                   |
+| `domains/permissions`   | B03              | 隐私策略、互动权限预览、无权限状态                           |
+| `domains/posts`         | B04              | 草稿、帖子、评论、回复、引用、转发、删除                     |
+| `domains/media`         | B05              | 上传会话、确认上传、重试、媒体状态、链接预览                 |
+| `domains/engagement`    | B06/B04 公共写口 | 点赞、计数、曝光；评论/引用/转发公共写链按 B04 owner 路由    |
+| `domains/library`       | B07              | 收藏夹、内容中心、历史                                       |
+| `domains/communities`   | B08              | 社群资料、成员、加入、规则、管理台                           |
+| `domains/feed`          | B09              | Following、For You、Explore、刷新提示                        |
+| `domains/search`        | B10              | 统一搜索与筛选                                               |
+| `domains/notifications` | B11              | 通知列表、未读、目标解析、实时连接                           |
+| `domains/settings`      | B12 + owner 聚合 | 通知、推荐、搜索、兴趣设置；账号/资料/隐私写入调用对应 owner |
+| `shared/observability`  | B13/基础设施     | requestId、日志、埋点、性能、错误监控                        |
 
 前端目录不需要机械复制后端 controller/service/repo 层，但要尊重 owner：例如“设置账号”页面可以同时调用 B01、B02、B03、B12，不应为了页面方便制造一个错误的“前端 settings 万能服务”。
 
@@ -314,40 +314,40 @@ domains/posts/
 
 ### 6.2 页面与 URL 映射
 
-| UI 页 | 建议 URL | 页面组件 | 主要后端模块 |
-|---|---|---|---|
-| 01 应用壳 | 布局，不单独作为业务页 | `AppShellLayout` | B01/B02/B11 |
-| 02 登录 | `/auth/login` | `LoginPage` | B01 |
-| 03 注册/重置/Google | `/auth/register`、`/auth/password/forgot`、`/auth/password/reset`、`/auth/google/complete` | 对应页面 | B01 |
-| 04-01 兴趣 | `/onboarding/interests` | `OnboardingInterestsPage` | B01/B12 |
-| 04-02 推荐关注 | `/onboarding/follow` | `OnboardingFollowPage` | B01/B02/B09 |
-| 04-03 推荐社群 | `/onboarding/communities` | `OnboardingCommunitiesPage` | B01/B08/B09 |
-| 05 首页 | `/home?tab=following|for-you` | `HomePage` | B09/B04/B06 |
-| 06 发现 | `/explore?tab=hot|image|video` | `ExplorePage` | B09 |
-| 07 搜索 | `/search?q=&tab=posts|users|communities&sort=` | `SearchPage` | B10 |
-| 08 发布 | `/compose`、`/compose/:draftId` | `ComposePage` | B04/B05/B03 |
-| 09 草稿箱 | `/content/drafts` | `DraftsPage` | B04/B07 |
-| 10 帖子详情 | `/posts/:postId` | `PostDetailPage` | B04/B06 |
-| 11 媒体查看器 | `/posts/:postId/media/:mediaIndex` | `MediaViewerRoute` | B04/B05 |
-| 12 用户主页 | `/users/:handle` | `ProfilePage` | B02/B04 |
-| 13 编辑资料 | `/settings/profile` | `ProfileEditPage` | B02/B01 |
-| 14 关注/粉丝 | `/users/:handle/followers`、`/users/:handle/following` | `FollowListPage` | B02 |
-| 15 | 已删除 | 不创建 | — |
-| 16 收藏夹 | `/bookmarks`、`/bookmarks/:collectionId` | `BookmarksPage` | B07 |
-| 17 内容中心 | `/content?tab=published|drafts|deleted` | `ContentCenterPage` | B07/B04 |
-| 18 社群发现 | `/communities` | `CommunitiesDiscoverPage` | B08/B09 |
-| 19 社群详情 | `/communities/:slug` | `CommunityDetailPage` | B08/B04 |
-| 20 创建社群 | `/communities/new` | `CommunityCreatePage` | B08 |
-| 21 社群管理 | `/communities/:communityId/manage/:section?` | `CommunityManagePage` | B08 |
-| 22 通知 | `/notifications?tab=` | `NotificationsPage` | B11 |
-| 23 设置总览 | `/settings` | `SettingsOverviewPage` | B12 + 各 owner |
-| 24 账号 | `/settings/account` | `AccountSettingsPage` | B01 |
-| 25 隐私 | `/settings/privacy` | `PrivacySettingsPage` | B03 |
-| 26 通知设置 | `/settings/notifications` | `NotificationSettingsPage` | B12 |
-| 27 偏好 | `/settings/preferences` | `PreferenceSettingsPage` | B12 |
-| 28 安全/屏蔽 | `/settings/safety` | `SafetySettingsPage` | B02 |
-| 29 系统状态 | 开发态 `/__dev/states` | `SystemStatesDevPage` | 无业务接口 |
-| 30 浏览历史 | `/history` | `BrowsingHistoryPage` | B07 |
+| UI 页               | 建议 URL                                                                                   | 页面组件                    | 主要后端模块       |
+| ------------------- | ------------------------------------------------------------------------------------------ | --------------------------- | ------------------ |
+| 01 应用壳           | 布局，不单独作为业务页                                                                     | `AppShellLayout`            | B01/B02/B11        |
+| 02 登录             | `/auth/login`                                                                              | `LoginPage`                 | B01                |
+| 03 注册/重置/Google | `/auth/register`、`/auth/password/forgot`、`/auth/password/reset`、`/auth/google/complete` | 对应页面                    | B01                |
+| 04-01 兴趣          | `/onboarding/interests`                                                                    | `OnboardingInterestsPage`   | B01/B12            |
+| 04-02 推荐关注      | `/onboarding/follow`                                                                       | `OnboardingFollowPage`      | B01/B02/B09        |
+| 04-03 推荐社群      | `/onboarding/communities`                                                                  | `OnboardingCommunitiesPage` | B01/B08/B09        |
+| 05 首页             | `/home?tab=following                                                                       | for-you`                    | `HomePage`         | B09/B04/B06         |
+| 06 发现             | `/explore?tab=hot                                                                          | image                       | video`             | `ExplorePage`       | B09     |
+| 07 搜索             | `/search?q=&tab=posts                                                                      | users                       | communities&sort=` | `SearchPage`        | B10     |
+| 08 发布             | `/compose`、`/compose/:draftId`                                                            | `ComposePage`               | B04/B05/B03        |
+| 09 草稿箱           | `/content/drafts`                                                                          | `DraftsPage`                | B04/B07            |
+| 10 帖子详情         | `/posts/:postId`                                                                           | `PostDetailPage`            | B04/B06            |
+| 11 媒体查看器       | `/posts/:postId/media/:mediaIndex`                                                         | `MediaViewerRoute`          | B04/B05            |
+| 12 用户主页         | `/users/:handle`                                                                           | `ProfilePage`               | B02/B04            |
+| 13 编辑资料         | `/settings/profile`                                                                        | `ProfileEditPage`           | B02/B01            |
+| 14 关注/粉丝        | `/users/:handle/followers`、`/users/:handle/following`                                     | `FollowListPage`            | B02                |
+| 15                  | 已删除                                                                                     | 不创建                      | —                  |
+| 16 收藏夹           | `/bookmarks`、`/bookmarks/:collectionId`                                                   | `BookmarksPage`             | B07                |
+| 17 内容中心         | `/content?tab=published                                                                    | drafts                      | deleted`           | `ContentCenterPage` | B07/B04 |
+| 18 社群发现         | `/communities`                                                                             | `CommunitiesDiscoverPage`   | B08/B09            |
+| 19 社群详情         | `/communities/:slug`                                                                       | `CommunityDetailPage`       | B08/B04            |
+| 20 创建社群         | `/communities/new`                                                                         | `CommunityCreatePage`       | B08                |
+| 21 社群管理         | `/communities/:communityId/manage/:section?`                                               | `CommunityManagePage`       | B08                |
+| 22 通知             | `/notifications?tab=`                                                                      | `NotificationsPage`         | B11                |
+| 23 设置总览         | `/settings`                                                                                | `SettingsOverviewPage`      | B12 + 各 owner     |
+| 24 账号             | `/settings/account`                                                                        | `AccountSettingsPage`       | B01                |
+| 25 隐私             | `/settings/privacy`                                                                        | `PrivacySettingsPage`       | B03                |
+| 26 通知设置         | `/settings/notifications`                                                                  | `NotificationSettingsPage`  | B12                |
+| 27 偏好             | `/settings/preferences`                                                                    | `PreferenceSettingsPage`    | B12                |
+| 28 安全/屏蔽        | `/settings/safety`                                                                         | `SafetySettingsPage`        | B02                |
+| 29 系统状态         | 开发态 `/__dev/states`                                                                     | `SystemStatesDevPage`       | 无业务接口         |
+| 30 浏览历史         | `/history`                                                                                 | `BrowsingHistoryPage`       | B07                |
 
 ### 6.3 Router 实现策略
 
@@ -362,15 +362,15 @@ domains/posts/
 
 ## 7. 状态管理边界
 
-| 状态类型 | 存放位置 | 示例 |
-|---|---|---|
-| 路由状态 | URL / React Router | 搜索词、tab、排序、设置 section、媒体 index |
-| 服务端状态 | TanStack Query | feed、帖子、用户、社群、通知、设置、收藏夹 |
-| 表单状态 | React Hook Form | 注册、发帖、编辑资料、创建社群、设置表单 |
-| 跨页面临时状态 | Zustand | Access Token 内存态、侧栏折叠、上传队列、查看器 UI、socket 状态 |
-| 组件局部状态 | `useState/useReducer` | 菜单展开、悬停、当前弹窗 |
-| 非敏感持久化偏好 | localStorage | 主题、侧栏折叠、最后使用的非敏感 UI 选项 |
-| 临时本地恢复 | IndexedDB（可选） | 发布编辑器本地备份、未完成上传的展示元数据 |
+| 状态类型         | 存放位置              | 示例                                                            |
+| ---------------- | --------------------- | --------------------------------------------------------------- |
+| 路由状态         | URL / React Router    | 搜索词、tab、排序、设置 section、媒体 index                     |
+| 服务端状态       | TanStack Query        | feed、帖子、用户、社群、通知、设置、收藏夹                      |
+| 表单状态         | React Hook Form       | 注册、发帖、编辑资料、创建社群、设置表单                        |
+| 跨页面临时状态   | Zustand               | Access Token 内存态、侧栏折叠、上传队列、查看器 UI、socket 状态 |
+| 组件局部状态     | `useState/useReducer` | 菜单展开、悬停、当前弹窗                                        |
+| 非敏感持久化偏好 | localStorage          | 主题、侧栏折叠、最后使用的非敏感 UI 选项                        |
+| 临时本地恢复     | IndexedDB（可选）     | 发布编辑器本地备份、未完成上传的展示元数据                      |
 
 禁止事项：
 
@@ -599,16 +599,16 @@ export const postKeys = {
 
 ### 10.2 缓存建议
 
-| 数据 | 建议 staleTime | 说明 |
-|---|---:|---|
-| 当前用户与设置总览 | 1–5 分钟 | 修改后精确 patch/失效 |
-| 用户公开卡 | 1 分钟 | 关系变化后失效 |
-| 帖子详情 | 30 秒 | 互动可局部更新 |
-| Following/For You | 15–30 秒 | 不因 socket 事件直接打乱当前列表 |
-| Explore | 1 分钟 | 热门数据可稍旧 |
-| 搜索 | 30 秒 | key 包含 q/tab/sort/filter |
-| 通知列表 | 15 秒 | 实时事件插入或失效 |
-| 静态选项/兴趣标签 | 10 分钟 | 后端版本变化后失效 |
+| 数据               | 建议 staleTime | 说明                             |
+| ------------------ | -------------: | -------------------------------- |
+| 当前用户与设置总览 |       1–5 分钟 | 修改后精确 patch/失效            |
+| 用户公开卡         |         1 分钟 | 关系变化后失效                   |
+| 帖子详情           |          30 秒 | 互动可局部更新                   |
+| Following/For You  |       15–30 秒 | 不因 socket 事件直接打乱当前列表 |
+| Explore            |         1 分钟 | 热门数据可稍旧                   |
+| 搜索               |          30 秒 | key 包含 q/tab/sort/filter       |
+| 通知列表           |          15 秒 | 实时事件插入或失效               |
+| 静态选项/兴趣标签  |        10 分钟 | 后端版本变化后失效               |
 
 这些是初始值，必须通过真实流量和后端缓存策略调整。
 
@@ -935,12 +935,12 @@ Zustand 只保存文件对象、上传进度、AbortController 和临时预览 U
 
 ### 12.3 响应式策略
 
-| 宽度 | 布局 |
-|---|---|
-| ≥ 1280px | 左导航 + 主内容 + 可选右栏 |
-| 960–1279px | 左导航缩窄；右栏折叠到主内容下方或 Drawer |
-| 768–959px | 单主列；左导航为可展开侧栏 |
-| < 768px | 移动单列；底部或抽屉导航；帖子互动栏降级为图标 + 数量 |
+| 宽度       | 布局                                                  |
+| ---------- | ----------------------------------------------------- |
+| ≥ 1280px   | 左导航 + 主内容 + 可选右栏                            |
+| 960–1279px | 左导航缩窄；右栏折叠到主内容下方或 Drawer             |
+| 768–959px  | 单主列；左导航为可展开侧栏                            |
+| < 768px    | 移动单列；底部或抽屉导航；帖子互动栏降级为图标 + 数量 |
 
 高保真稿主要是桌面版，但组件不得依赖绝对画布坐标。所有卡片使用内容流、grid/flex、`min-width: 0`、文本截断和容器查询，避免再次出现溢出与重叠。
 
@@ -975,17 +975,17 @@ Zustand 只保存文件对象、上传进度、AbortController 和临时预览 U
 
 错误处理策略：
 
-| HTTP/错误 | 前端行为 |
-|---|---|
-| 400/422 | 映射到字段或表单顶部，保留用户输入 |
-| 401 access expired | 单飞 refresh 后重试一次 |
-| refresh fatal code | 清内存 token，跳登录并保留安全的 returnTo |
-| 403 | 展示无权限状态；不自动登出 |
-| 404 | 区分不存在、已删除、不可路由；按后端 code 展示 |
-| 409 | 展示版本/幂等/状态冲突，并提供恢复动作 |
-| 429 | 根据 Retry-After 禁用提交并倒计时 |
-| 5xx | 展示 requestId、重试按钮，记录监控 |
-| 网络中断 | 保留本地输入和上传队列，等待用户重试 |
+| HTTP/错误          | 前端行为                                       |
+| ------------------ | ---------------------------------------------- |
+| 400/422            | 映射到字段或表单顶部，保留用户输入             |
+| 401 access expired | 单飞 refresh 后重试一次                        |
+| refresh fatal code | 清内存 token，跳登录并保留安全的 returnTo      |
+| 403                | 展示无权限状态；不自动登出                     |
+| 404                | 区分不存在、已删除、不可路由；按后端 code 展示 |
+| 409                | 展示版本/幂等/状态冲突，并提供恢复动作         |
+| 429                | 根据 Retry-After 禁用提交并倒计时              |
+| 5xx                | 展示 requestId、重试按钮，记录监控             |
+| 网络中断           | 保留本地输入和上传队列，等待用户重试           |
 
 第 29 页中的系统状态应转为 Storybook stories 和 Playwright 快照，用作全局状态规范。
 
@@ -995,14 +995,14 @@ Zustand 只保存文件对象、上传进度、AbortController 和临时预览 U
 
 ### 14.1 测试金字塔
 
-| 层级 | 工具 | 覆盖内容 |
-|---|---|---|
-| 纯函数单测 | Vitest | mapper、schema、query key、权限展示映射、计数格式化 |
+| 层级          | 工具                           | 覆盖内容                                            |
+| ------------- | ------------------------------ | --------------------------------------------------- |
+| 纯函数单测    | Vitest                         | mapper、schema、query key、权限展示映射、计数格式化 |
 | Hook/组件测试 | Vitest + Testing Library + MSW | 表单、PostActionBar、乐观更新、错误状态、上传状态机 |
-| 组件视觉测试 | Storybook + 截图 | 卡片、长文、各断点、所有系统状态 |
-| API 契约测试 | OpenAPI + schema fixtures | envelope、cursor、错误码、nullable、枚举 |
-| E2E | Playwright | 关键业务链路 |
-| 视觉回归 | Playwright screenshot | 31 张画布对应页面及核心弹窗 |
+| 组件视觉测试  | Storybook + 截图               | 卡片、长文、各断点、所有系统状态                    |
+| API 契约测试  | OpenAPI + schema fixtures      | envelope、cursor、错误码、nullable、枚举            |
+| E2E           | Playwright                     | 关键业务链路                                        |
+| 视觉回归      | Playwright screenshot          | 31 张画布对应页面及核心弹窗                         |
 
 ### 14.2 必测 E2E 主链路
 
@@ -1063,13 +1063,13 @@ Zustand 只保存文件对象、上传进度、AbortController 和临时预览 U
 
 建议初始预算：
 
-| 指标 | 目标 |
-|---|---|
-| 初始 JS（gzip，不含按需页） | ≤ 220 KB，按实际依赖校准 |
-| LCP（75 分位，良好网络） | < 2.5s |
-| CLS | < 0.1 |
-| INP | < 200ms |
-| 路由切换 | 有缓存时 < 300ms 可感知反馈 |
+| 指标                        | 目标                        |
+| --------------------------- | --------------------------- |
+| 初始 JS（gzip，不含按需页） | ≤ 220 KB，按实际依赖校准    |
+| LCP（75 分位，良好网络）    | < 2.5s                      |
+| CLS                         | < 0.1                       |
+| INP                         | < 200ms                     |
+| 路由切换                    | 有缓存时 < 300ms 可感知反馈 |
 
 ---
 
@@ -1455,18 +1455,18 @@ pnpm dlx storybook@latest init
 
 ## 24. 主要风险与应对
 
-| 风险 | 影响 | 应对 |
-|---|---|---|
-| 后端文档完整但缺少可执行 OpenAPI | 前端手写类型漂移 | Phase 0 强制产出 OpenAPI；CI 生成校验 |
-| refresh rotation 多标签竞争 | 用户被误判重放而掉线 | Web Locks + BroadcastChannel + 单飞刷新 |
-| 页面各自实现帖子卡 | 重叠、溢出、交互不一致反复出现 | 强制统一 PostCard/PostActionBar + 视觉测试 |
-| 媒体上传异步状态复杂 | 发帖失败、重复上传、草稿丢媒体 | 明确状态机、clientUploadId、Abort/Retry、后台状态轮询/事件 |
-| 权限规则在前端复制 | 数据泄露或显示错误 | 后端 B03 为真相；前端只展示返回能力和错误码 |
-| B10 非 active 接口被 UI 依赖 | 联调阻塞 | MVP 隐藏或本地降级；后端激活后再开 feature flag |
-| Socket 事件乱序/重复 | 通知计数错误 | event id/stream seq 去重，reconnect 后 delta 校准 |
-| 高保真稿用绝对坐标实现 | 响应式破版 | 设计令牌、文档流、grid/flex、容器测试 |
-| 设置页跨多个 owner | API 调用与缓存失效混乱 | 页面编排多个领域 mutation，不造万能 settings API 层 |
-| 过早性能优化 | 架构复杂、难调试 | 先监测，再按 bundle/report 和真实指标优化 |
+| 风险                             | 影响                           | 应对                                                       |
+| -------------------------------- | ------------------------------ | ---------------------------------------------------------- |
+| 后端文档完整但缺少可执行 OpenAPI | 前端手写类型漂移               | Phase 0 强制产出 OpenAPI；CI 生成校验                      |
+| refresh rotation 多标签竞争      | 用户被误判重放而掉线           | Web Locks + BroadcastChannel + 单飞刷新                    |
+| 页面各自实现帖子卡               | 重叠、溢出、交互不一致反复出现 | 强制统一 PostCard/PostActionBar + 视觉测试                 |
+| 媒体上传异步状态复杂             | 发帖失败、重复上传、草稿丢媒体 | 明确状态机、clientUploadId、Abort/Retry、后台状态轮询/事件 |
+| 权限规则在前端复制               | 数据泄露或显示错误             | 后端 B03 为真相；前端只展示返回能力和错误码                |
+| B10 非 active 接口被 UI 依赖     | 联调阻塞                       | MVP 隐藏或本地降级；后端激活后再开 feature flag            |
+| Socket 事件乱序/重复             | 通知计数错误                   | event id/stream seq 去重，reconnect 后 delta 校准          |
+| 高保真稿用绝对坐标实现           | 响应式破版                     | 设计令牌、文档流、grid/flex、容器测试                      |
+| 设置页跨多个 owner               | API 调用与缓存失效混乱         | 页面编排多个领域 mutation，不造万能 settings API 层        |
+| 过早性能优化                     | 架构复杂、难调试               | 先监测，再按 bundle/report 和真实指标优化                  |
 
 ---
 

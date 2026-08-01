@@ -10,8 +10,7 @@ const PASSWORD_RESET_PATH = '/auth/password/reset';
 const profilePath = (handle: string) => `/users/${encodePathSegment(handle)}`;
 const postPath = (postId: string) => `/posts/${encodePathSegment(postId)}`;
 const communityPath = (slug: string) => `/communities/${encodePathSegment(slug)}`;
-const communityManagePath = (communityId: string) =>
-  `${communityPath(communityId)}/manage`;
+const communityManagePath = (communityId: string) => `${communityPath(communityId)}/manage`;
 
 export const paths = {
   login: '/auth/login',
@@ -39,8 +38,7 @@ export const paths = {
   passwordResetFor: (identifier: string) =>
     `${PASSWORD_RESET_PATH}?identifier=${encodeURIComponent(identifier)}`,
   post: postPath,
-  postMedia: (postId: string, mediaIndex: number) =>
-    `${postPath(postId)}/media/${mediaIndex}`,
+  postMedia: (postId: string, mediaIndex: number) => `${postPath(postId)}/media/${mediaIndex}`,
   profile: profilePath,
   profileFollowers: (handle: string) => `${profilePath(handle)}/followers`,
   profileFollowing: (handle: string) => `${profilePath(handle)}/following`,

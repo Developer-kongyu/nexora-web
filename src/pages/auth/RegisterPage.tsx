@@ -64,7 +64,7 @@ export function RegisterPage() {
       password: values.password,
     });
     showToast({ tone: 'success', title: '账号创建成功', description: '接下来设置你的兴趣偏好' });
-    navigate('/onboarding/interests', { replace: true });
+    void navigate('/onboarding/interests', { replace: true });
   });
 
   const error = registerMutation.error || requestCode.error;

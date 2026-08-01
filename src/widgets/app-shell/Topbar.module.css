@@ -137,7 +137,9 @@
 }
 
 @media (max-width: 900px) {
-  .ai, .profile > span, .search kbd {
+  .ai,
+  .profile > span,
+  .search kbd {
     display: none;
   }
 
@@ -159,7 +161,8 @@
     border-radius: 16px;
   }
 
-  .actions > .ai, .actions > .profile {
+  .actions > .ai,
+  .actions > .profile {
     display: none;
   }
 

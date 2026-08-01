@@ -22,10 +22,7 @@ describe('authSession', () => {
 
     expect(refreshHandler).toHaveBeenCalledTimes(1);
     resolveRefresh?.('fresh-token');
-    await expect(Promise.all([first, second])).resolves.toEqual([
-      'fresh-token',
-      'fresh-token',
-    ]);
+    await expect(Promise.all([first, second])).resolves.toEqual(['fresh-token', 'fresh-token']);
   });
 
   it('releases a failed in-flight refresh so the next request can retry', async () => {

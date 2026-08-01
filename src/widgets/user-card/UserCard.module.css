@@ -46,12 +46,12 @@
   cursor: pointer;
 }
 
-.select[data-selected="true"] {
+.select[data-selected='true'] {
   color: #fff;
   background: var(--gradient-brand);
 }
 
-.card[data-compact="true"] {
+.card[data-compact='true'] {
   padding: 10px 0;
   border: 0;
   border-bottom: 1px solid var(--color-border);
@@ -59,7 +59,7 @@
   box-shadow: none;
 }
 
-.card[data-compact="true"]:last-child {
+.card[data-compact='true']:last-child {
   border-bottom: 0;
 }
 
@@ -68,7 +68,8 @@
     align-items: start;
   }
 
-  .copy p, .copy small {
+  .copy p,
+  .copy small {
     display: none;
   }
 }
@@ -93,7 +94,8 @@
   margin-top: 6px;
 }
 
-.relationMeta span, .relationMeta time {
+.relationMeta span,
+.relationMeta time {
   display: inline-flex;
   align-items: center;
   gap: 4px;

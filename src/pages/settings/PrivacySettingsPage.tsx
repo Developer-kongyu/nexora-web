@@ -44,8 +44,7 @@ export function PrivacySettingsPage() {
   const previewMutation = useMutation({
     mutationFn: () => permissionsApi.preview(policy),
     onSuccess: () => setPreviewOpen(true),
-    onError: () =>
-      showToast({ tone: 'error', title: '预览失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '预览失败', description: '请稍后重试。' }),
   });
 
   const saveMutation = useMutation({
@@ -63,7 +62,9 @@ export function PrivacySettingsPage() {
       <div className={styles.stack}>
         <Card className={styles.section}>
           <header>
-            <span><UserRound size={18} /></span>
+            <span>
+              <UserRound size={18} />
+            </span>
             <div>
               <h2>账号可见性</h2>
               <p>决定谁可以查看你的完整资料和内容。</p>
@@ -95,7 +96,9 @@ export function PrivacySettingsPage() {
 
         <Card className={styles.section}>
           <header>
-            <span><Search size={18} /></span>
+            <span>
+              <Search size={18} />
+            </span>
             <div>
               <h2>发现与搜索</h2>
               <p>控制其他人通过哪些信息找到你。</p>
@@ -125,7 +128,9 @@ export function PrivacySettingsPage() {
 
         <Card className={styles.section}>
           <header>
-            <span><MessageCircle size={18} /></span>
+            <span>
+              <MessageCircle size={18} />
+            </span>
             <div>
               <h2>默认互动权限</h2>
               <p>新发布内容默认使用以下设置，发布时仍可单独调整。</p>
@@ -136,7 +141,10 @@ export function PrivacySettingsPage() {
               label="谁可以评论"
               value={policy.allowComments}
               onChange={(event) =>
-                updatePolicy('allowComments', event.target.value as PermissionPolicy['allowComments'])
+                updatePolicy(
+                  'allowComments',
+                  event.target.value as PermissionPolicy['allowComments'],
+                )
               }
             >
               <option value="everyone">所有人</option>
@@ -148,7 +156,10 @@ export function PrivacySettingsPage() {
               label="谁可以提及我"
               value={policy.allowMentions}
               onChange={(event) =>
-                updatePolicy('allowMentions', event.target.value as PermissionPolicy['allowMentions'])
+                updatePolicy(
+                  'allowMentions',
+                  event.target.value as PermissionPolicy['allowMentions'],
+                )
               }
             >
               <option value="everyone">所有人</option>
@@ -170,7 +181,10 @@ export function PrivacySettingsPage() {
               label="谁可以给我发消息"
               value={policy.allowMessages}
               onChange={(event) =>
-                updatePolicy('allowMessages', event.target.value as PermissionPolicy['allowMessages'])
+                updatePolicy(
+                  'allowMessages',
+                  event.target.value as PermissionPolicy['allowMessages'],
+                )
               }
             >
               <option value="following">我关注的人</option>
@@ -181,7 +195,9 @@ export function PrivacySettingsPage() {
         </Card>
 
         <Card className={styles.previewBar}>
-          <span><Eye size={19} /></span>
+          <span>
+            <Eye size={19} />
+          </span>
           <div>
             <strong>保存前预览影响范围</strong>
             <p>查看这些设置会如何影响资料、内容和互动入口。</p>
@@ -206,7 +222,9 @@ export function PrivacySettingsPage() {
         onClose={() => setPreviewOpen(false)}
         footer={
           <>
-            <Button variant="secondary" onClick={() => setPreviewOpen(false)}>返回修改</Button>
+            <Button variant="secondary" onClick={() => setPreviewOpen(false)}>
+              返回修改
+            </Button>
             <Button loading={saveMutation.isPending} onClick={() => saveMutation.mutate()}>
               确认并保存
             </Button>
@@ -217,7 +235,9 @@ export function PrivacySettingsPage() {
           <div>
             <Shield size={18} />
             <span>
-              <strong>{policy.profileVisibility === 'private' ? '账号将设为私密' : '账号保持公开'}</strong>
+              <strong>
+                {policy.profileVisibility === 'private' ? '账号将设为私密' : '账号保持公开'}
+              </strong>
               <p>
                 {policy.profileVisibility === 'private'
                   ? '新关注者需要经过你的批准。'
@@ -235,7 +255,9 @@ export function PrivacySettingsPage() {
           <div>
             <Repeat2 size={18} />
             <span>
-              <strong>{policy.searchEngineIndexing ? '允许公开资料被收录' : '不允许搜索引擎收录'}</strong>
+              <strong>
+                {policy.searchEngineIndexing ? '允许公开资料被收录' : '不允许搜索引擎收录'}
+              </strong>
               <p>
                 邮箱发现{policy.discoverByEmail ? '开启' : '关闭'}，手机号发现
                 {policy.discoverByPhone ? '开启' : '关闭'}。

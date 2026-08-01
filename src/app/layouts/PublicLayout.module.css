@@ -5,8 +5,7 @@
   padding: 38px 32px;
   background:
     radial-gradient(circle at 10% 12%, #eef2ff 0, transparent 34%),
-    radial-gradient(circle at 88% 88%, #ecfeff 0, transparent 32%),
-    var(--color-bg);
+    radial-gradient(circle at 88% 88%, #ecfeff 0, transparent 32%), var(--color-bg);
 }
 
 .shell {
@@ -31,8 +30,9 @@
   overflow: hidden;
 }
 
-.brand::before, .brand::after {
-  content: "";
+.brand::before,
+.brand::after {
+  content: '';
   position: absolute;
   border-radius: 50%;
   filter: blur(1px);
@@ -112,7 +112,7 @@
   margin-top: 18px;
   font-size: 40px;
   line-height: 1.18;
-  letter-spacing: -.04em;
+  letter-spacing: -0.04em;
 }
 
 .hero p {

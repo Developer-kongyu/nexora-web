@@ -10,7 +10,15 @@ import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
 import { EmptyPanel, LoadingRows, SideCard } from '../_shared/PageParts';
 import styles from './CommunitiesDiscoverPage.module.css';
 
-const categories = ['全部分类', '产品与设计', '人工智能', '摄影与旅行', '软件开发', '生活方式', '阅读与写作'];
+const categories = [
+  '全部分类',
+  '产品与设计',
+  '人工智能',
+  '摄影与旅行',
+  '软件开发',
+  '生活方式',
+  '阅读与写作',
+];
 
 export function CommunitiesDiscoverPage() {
   const navigate = useNavigate();
@@ -25,8 +33,8 @@ export function CommunitiesDiscoverPage() {
     getNextPageParam: getNextCursorPageParam,
   });
 
-  const allCommunities = query.data?.pages.flatMap((page) => page.list) ?? [];
   const communities = useMemo(() => {
+    const allCommunities = query.data?.pages.flatMap((page) => page.list) ?? [];
     const categoryByIndex = ['人工智能', '产品与设计', '摄影与旅行'];
     const normalized = keyword.trim().toLowerCase();
     let result = allCommunities.filter((community, index) => {
@@ -43,7 +51,7 @@ export function CommunitiesDiscoverPage() {
     if (tab === '热门') result = [...result].sort((a, b) => b.membersCount - a.membersCount);
     if (tab === '最新') result = [...result].reverse();
     return result;
-  }, [allCommunities, category, keyword, tab]);
+  }, [category, keyword, query.data, tab]);
 
   return (
     <PageLayout

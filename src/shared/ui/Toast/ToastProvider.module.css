@@ -23,19 +23,19 @@
   animation: enter 0.22s ease both;
 }
 
-.toast[data-tone="success"] > svg {
+.toast[data-tone='success'] > svg {
   color: var(--color-success);
 }
 
-.toast[data-tone="error"] > svg {
+.toast[data-tone='error'] > svg {
   color: var(--color-danger);
 }
 
-.toast[data-tone="info"] > svg {
+.toast[data-tone='info'] > svg {
   color: var(--color-primary);
 }
 
-.toast[data-tone="warning"] > svg {
+.toast[data-tone='warning'] > svg {
   color: var(--color-warning);
 }
 

@@ -50,7 +50,7 @@ export function ResetPasswordPage() {
       password: values.password,
     });
     showToast({ tone: 'success', title: '密码已更新', description: '请使用新密码重新登录' });
-    navigate('/auth/login', { replace: true });
+    void navigate('/auth/login', { replace: true });
   });
 
   return (

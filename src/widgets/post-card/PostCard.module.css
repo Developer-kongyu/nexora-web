@@ -1,7 +1,9 @@
 .card {
   overflow: visible;
   border-radius: 16px;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
 }
 
 .card:hover {
@@ -130,19 +132,20 @@
   border-radius: 13px;
 }
 
-.mediaGrid[data-count="1"] {
+.mediaGrid[data-count='1'] {
   grid-template-columns: 1fr;
 }
 
-.mediaGrid[data-count="2"] {
+.mediaGrid[data-count='2'] {
   grid-template-columns: 1fr 1fr;
 }
 
-.mediaGrid[data-count="3"], .mediaGrid[data-count="4"] {
+.mediaGrid[data-count='3'],
+.mediaGrid[data-count='4'] {
   grid-template-columns: 1fr 1fr;
 }
 
-.mediaGrid[data-count="3"] .media:first-child {
+.mediaGrid[data-count='3'] .media:first-child {
   grid-row: span 2;
 }
 
@@ -242,7 +245,9 @@
   border-top: 1px solid var(--color-border);
 }
 
-.actionItem, .actionActive, .actionMetric {
+.actionItem,
+.actionActive,
+.actionMetric {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,7 +259,9 @@
   background: transparent;
   border-radius: 9px;
   cursor: pointer;
-  transition: color var(--transition), background var(--transition);
+  transition:
+    color var(--transition),
+    background var(--transition);
 }
 
 .actionItem:hover {
@@ -270,7 +277,9 @@
   cursor: default;
 }
 
-.actionItem em, .actionActive em, .actionMetric em {
+.actionItem em,
+.actionActive em,
+.actionMetric em {
   display: none;
   font-style: normal;
 }
@@ -308,7 +317,9 @@
     grid-template-columns: repeat(6, 1fr);
   }
 
-  .actionItem, .actionActive, .actionMetric {
+  .actionItem,
+  .actionActive,
+  .actionMetric {
     gap: 3px;
   }
 

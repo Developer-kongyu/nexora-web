@@ -46,16 +46,8 @@ describe('post media contract', () => {
   });
 
   it('rejects oversized and unsupported files with actionable messages', () => {
-    const oversizedImage = fileWithSize(
-      'large.png',
-      'image/png',
-      MEDIA_POST_IMAGE_MAX_BYTES + 1,
-    );
-    const oversizedVideo = fileWithSize(
-      'large.mp4',
-      'video/mp4',
-      MEDIA_POST_VIDEO_MAX_BYTES + 1,
-    );
+    const oversizedImage = fileWithSize('large.png', 'image/png', MEDIA_POST_IMAGE_MAX_BYTES + 1);
+    const oversizedVideo = fileWithSize('large.mp4', 'video/mp4', MEDIA_POST_VIDEO_MAX_BYTES + 1);
     const unsupported = fileWithSize('notes.txt', 'text/plain', 100);
 
     expect(validatePostMediaFile(oversizedImage)).toMatchObject({

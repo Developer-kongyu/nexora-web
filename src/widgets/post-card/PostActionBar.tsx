@@ -217,7 +217,9 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
       count: post.stats.comments,
       icon: MessageCircle,
       disabled: !post.permissions.canComment,
-      action: () => navigate(paths.post(post.id)),
+      action: () => {
+        void navigate(paths.post(post.id));
+      },
     },
     {
       key: 'like',

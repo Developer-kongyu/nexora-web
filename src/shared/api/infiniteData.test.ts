@@ -23,10 +23,7 @@ const source: InfiniteData<Page, string | undefined> = {
 describe('InfiniteData list helpers', () => {
   it('filters each page without changing pagination metadata', () => {
     const filtered = filterInfiniteDataItems(source, (item) => item.id !== 'b');
-    expect(filtered?.pages.map((page) => page.list.map((item) => item.id))).toEqual([
-      ['a'],
-      ['c'],
-    ]);
+    expect(filtered?.pages.map((page) => page.list.map((item) => item.id))).toEqual([['a'], ['c']]);
     expect(filtered?.pageParams).toEqual(source.pageParams);
     expect(requireArrayItem(source.pages, 0, 'source page').list.map((item) => item.id)).toEqual([
       'a',
@@ -36,10 +33,7 @@ describe('InfiniteData list helpers', () => {
 
   it('removes selected keys across pages', () => {
     const filtered = removeInfiniteDataItemsByKey(source, new Set(['a', 'c']), (item) => item.id);
-    expect(filtered?.pages.map((page) => page.list.map((item) => item.id))).toEqual([
-      ['b'],
-      [],
-    ]);
+    expect(filtered?.pages.map((page) => page.list.map((item) => item.id))).toEqual([['b'], []]);
   });
 
   it('merges pages and keeps the first item for each key', () => {

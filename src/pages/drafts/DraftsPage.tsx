@@ -32,10 +32,7 @@ import {
   useDraftListSelection,
   type PublishPostFromDraftResult,
 } from '@/domains/posts';
-import {
-  mergeInfiniteDataItemsBy,
-  removeInfiniteDataItemsByKey,
-} from '@/shared/api/infiniteData';
+import { mergeInfiniteDataItemsBy, removeInfiniteDataItemsByKey } from '@/shared/api/infiniteData';
 import { paths } from '@/shared/config/paths';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
 import { requireArrayItem } from '@/shared/lib/array';
@@ -74,9 +71,7 @@ async function deleteDraftIds(draftIds: string[]): Promise<BatchDeleteOwnDraftsR
   return libraryApi.batchDeleteDrafts(draftIds);
 }
 
-function publishResultSummary(
-  results: SettledBatchItem<string, PublishPostFromDraftResult>[],
-): {
+function publishResultSummary(results: SettledBatchItem<string, PublishPostFromDraftResult>[]): {
   succeeded: FulfilledPublishItem[];
   failedIds: string[];
   queuedCount: number;
@@ -84,9 +79,7 @@ function publishResultSummary(
   const succeeded = results.filter(
     (item): item is FulfilledPublishItem => item.status === 'fulfilled',
   );
-  const failedIds = results
-    .filter((item) => item.status === 'rejected')
-    .map((item) => item.input);
+  const failedIds = results.filter((item) => item.status === 'rejected').map((item) => item.input);
   return {
     succeeded,
     failedIds,
@@ -126,9 +119,8 @@ export function DraftsPage() {
 
   const removeSucceededDrafts = (draftIds: ReadonlySet<string>) => {
     DRAFT_LIST_QUERY_KEYS.forEach((queryKey) => {
-      queryClient.setQueryData<InfiniteData<ContentCenterDraftPageView>>(
-        queryKey,
-        (data) => removeInfiniteDataItemsByKey(data, draftIds, (draft) => draft.draftId),
+      queryClient.setQueryData<InfiniteData<ContentCenterDraftPageView>>(queryKey, (data) =>
+        removeInfiniteDataItemsByKey(data, draftIds, (draft) => draft.draftId),
       );
     });
   };
@@ -165,8 +157,7 @@ export function DraftsPage() {
     mutationFn: (ids: string[]) =>
       settleBatch(
         ids,
-        (draftId) =>
-          postsApi.publishDraft(draftId, { allowWaitingMediaPublish: true }),
+        (draftId) => postsApi.publishDraft(draftId, { allowWaitingMediaPublish: true }),
         PUBLISH_CONCURRENCY,
       ),
     onSuccess: (results) => {
@@ -196,7 +187,7 @@ export function DraftsPage() {
         const published = requireArrayItem(succeeded, 0, 'published draft result');
         const result = published.value;
         if (result.publishState === 'PUBLISHED') {
-          navigate(paths.post(result.postId));
+          void navigate(paths.post(result.postId));
         }
       }
     },
@@ -265,9 +256,7 @@ export function DraftsPage() {
                   type="checkbox"
                   checked={allLoadedSelected}
                   disabled={isMutating}
-                  onChange={(event) =>
-                    draftSelection.setAll(draftIds, event.target.checked)
-                  }
+                  onChange={(event) => draftSelection.setAll(draftIds, event.target.checked)}
                 />
                 <CheckSquare size={15} /> 全选已加载草稿
               </label>

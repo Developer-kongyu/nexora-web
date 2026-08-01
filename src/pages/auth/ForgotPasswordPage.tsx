@@ -61,10 +61,7 @@ export function ForgotPasswordPage() {
           {sentTo ? '重新发送验证码' : '发送重置验证码'}
         </Button>
         {sentTo ? (
-          <Link
-            className={styles.continueLink}
-            to={paths.passwordResetFor(sentTo)}
-          >
+          <Link className={styles.continueLink} to={paths.passwordResetFor(sentTo)}>
             继续验证并设置新密码
             <ArrowRight size={17} />
           </Link>

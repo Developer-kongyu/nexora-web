@@ -191,8 +191,7 @@ async function waitUntilReady(input: {
         retryResult.assetKind !== input.assetKind ||
         (input.assetKind === 'IMAGE' &&
           retryResult.requeuedCommand === 'VIDEO_TRANSCODE_REQUESTED') ||
-        (input.assetKind === 'VIDEO' &&
-          retryResult.requeuedCommand === 'IMAGE_PROCESS_REQUESTED')
+        (input.assetKind === 'VIDEO' && retryResult.requeuedCommand === 'IMAGE_PROCESS_REQUESTED')
       ) {
         throw new MediaUploadError({
           code: 'MEDIA_PROCESSING_RETRY_RESULT_INVALID',

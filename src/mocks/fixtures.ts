@@ -82,14 +82,14 @@ export const userProfileHeaders: Record<string, UserProfileHeaderView> = Object.
       handle: user.handle,
       displayName: user.displayName,
       bio: user.bio ?? null,
-      location: user.id === currentUser.id ? currentUser.location ?? null : null,
-      websiteUrl: user.id === currentUser.id ? currentUser.website ?? null : null,
+      location: user.id === currentUser.id ? (currentUser.location ?? null) : null,
+      websiteUrl: user.id === currentUser.id ? (currentUser.website ?? null) : null,
       birthday: null,
       avatarUrl: user.avatarUrl,
       coverUrl: user.id === currentUser.id ? currentUser.coverUrl : null,
       stats: {
         followersCount: user.followersCount ?? 0,
-        followingCount: user.id === currentUser.id ? currentUser.followingCount ?? 0 : 0,
+        followingCount: user.id === currentUser.id ? (currentUser.followingCount ?? 0) : 0,
       },
       pinnedPostIds: user.id === currentUser.id ? ['post-1'] : [],
       relationship:

@@ -75,8 +75,7 @@ export function RelationUserCard({ user }: { user: UserListItemView }) {
         title: describeUserRelationshipActionResult(result),
       });
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '关系操作失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '关系操作失败', description: '请稍后重试。' }),
   });
 
   return (

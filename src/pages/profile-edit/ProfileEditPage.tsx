@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, AlertTriangle, CheckCircle2, Clock3, LoaderCircle } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useRef, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { useAuthStore } from '@/domains/auth';
 import {
   isMediaUploadError,
@@ -87,10 +87,7 @@ export function ProfileEditPage() {
             <EmptyPanel
               icon={<AlertCircle size={30} />}
               title="个人资料加载失败"
-              description={getErrorMessage(
-                profileQuery.error,
-                '请检查登录状态和网络连接后重试。',
-              )}
+              description={getErrorMessage(profileQuery.error, '请检查登录状态和网络连接后重试。')}
               action={<Button onClick={() => void profileQuery.refetch()}>重新加载</Button>}
             />
           </Card>
@@ -125,17 +122,14 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
     mode: 'onChange',
   });
 
-  const resetToProfile = useCallback(
-    (nextProfile: UserProfileEditableView) => {
-      form.reset(profileToFormValues(nextProfile));
-      void form.trigger();
-      avatar.clear();
-      cover.clear();
-      setRemoveAvatar(false);
-      setRemoveCover(false);
-    },
-    [avatar.clear, cover.clear, form],
-  );
+  const resetToProfile = (nextProfile: UserProfileEditableView) => {
+    form.reset(profileToFormValues(nextProfile));
+    void form.trigger();
+    avatar.clear();
+    cover.clear();
+    setRemoveAvatar(false);
+    setRemoveCover(false);
+  };
 
   useEffect(
     () => () => {
@@ -214,23 +208,13 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
       const networkError = isApiError(error) && error.code === 'NETWORK_ERROR';
       setSaveFeedback({
         kind: 'error',
-        title: mediaError
-          ? '头像或封面上传失败'
-          : networkError
-            ? '网络连接失败'
-            : '资料保存失败',
-        description: getErrorMessage(
-          error,
-          '请检查资料内容、媒体状态和网络连接后重试。',
-        ),
+        title: mediaError ? '头像或封面上传失败' : networkError ? '网络连接失败' : '资料保存失败',
+        description: getErrorMessage(error, '请检查资料内容、媒体状态和网络连接后重试。'),
       });
       showToast({
         tone: 'error',
         title: mediaError ? '图片尚未准备完成' : '资料保存失败',
-        description: getErrorMessage(
-          error,
-          '请检查资料内容、媒体状态和网络连接后重试。',
-        ),
+        description: getErrorMessage(error, '请检查资料内容、媒体状态和网络连接后重试。'),
       });
       if (isApiError(error) && error.code === 'USER_PROFILE_NOT_FOUND') {
         onProfileMissing();
@@ -238,18 +222,12 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
     },
   });
 
-  const selectAvatar = useCallback(
-    (file: File) => {
-      if (avatar.select(file)) setRemoveAvatar(false);
-    },
-    [avatar.select],
-  );
-  const selectCover = useCallback(
-    (file: File) => {
-      if (cover.select(file)) setRemoveCover(false);
-    },
-    [cover.select],
-  );
+  const selectAvatar = (file: File) => {
+    if (avatar.select(file)) setRemoveAvatar(false);
+  };
+  const selectCover = (file: File) => {
+    if (cover.select(file)) setRemoveCover(false);
+  };
 
   const submit = form.handleSubmit(
     (values) => {
@@ -276,7 +254,7 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
     showToast({ tone: 'info', title: '未保存更改已撤销' });
   };
 
-  const watched = form.watch();
+  const displayName = useWatch({ control: form.control, name: 'displayName' });
   const mediaDirty = Boolean(avatar.selection || cover.selection || removeAvatar || removeCover);
   const hasUnsavedChanges = form.formState.isDirty || mediaDirty;
   const saving = updateProfile.isPending;
@@ -331,7 +309,7 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
               </header>
               <ProfileImageField
                 kind="cover"
-                displayName={watched.displayName || profile.displayName}
+                displayName={displayName || profile.displayName}
                 currentUrl={profile.coverUrl}
                 currentStorageKey={profile.coverStorageKey}
                 currentMediaState={profile.coverMediaState}
@@ -349,7 +327,7 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
               <div className={styles.avatarRow}>
                 <ProfileImageField
                   kind="avatar"
-                  displayName={watched.displayName || profile.displayName}
+                  displayName={displayName || profile.displayName}
                   currentUrl={profile.avatarUrl}
                   currentStorageKey={profile.avatarStorageKey}
                   currentMediaState={profile.avatarMediaState}

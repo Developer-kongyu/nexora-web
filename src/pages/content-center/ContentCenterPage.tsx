@@ -30,10 +30,7 @@ import {
   type PostDeletedListItemView,
 } from '@/domains/posts';
 import { postCardBriefToViewModel } from '@/domains/posts/lib/postCardAdapter';
-import {
-  mergeInfiniteDataItemsBy,
-  removeInfiniteDataItemsByKey,
-} from '@/shared/api/infiniteData';
+import { mergeInfiniteDataItemsBy, removeInfiniteDataItemsByKey } from '@/shared/api/infiniteData';
 import { paths } from '@/shared/config/paths';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
 import { formatDateTime } from '@/shared/lib/format';
@@ -122,8 +119,7 @@ export function ContentCenterPage() {
 
       queryClient.setQueryData<InfiniteData<ContentCenterDraftPageView>>(
         libraryKeys.contentCenterDrafts,
-        (data) =>
-          removeInfiniteDataItemsByKey(data, succeededIds, (item) => item.draftId),
+        (data) => removeInfiniteDataItemsByKey(data, succeededIds, (item) => item.draftId),
       );
       draftSelection.replace(failedIds);
       setConfirmDraftDelete(false);
@@ -147,8 +143,7 @@ export function ContentCenterPage() {
     },
   });
 
-  const activeQuery =
-    tab === 'drafts' ? drafts : tab === 'deleted' ? deleted : published;
+  const activeQuery = tab === 'drafts' ? drafts : tab === 'deleted' ? deleted : published;
 
   return (
     <PageLayout
@@ -226,9 +221,7 @@ export function ContentCenterPage() {
                 type="checkbox"
                 checked={allLoadedDraftsSelected}
                 disabled={deleteDrafts.isPending}
-                onChange={(event) =>
-                  draftSelection.setAll(draftIds, event.target.checked)
-                }
+                onChange={(event) => draftSelection.setAll(draftIds, event.target.checked)}
               />
               全选已加载草稿
             </label>
@@ -276,10 +269,7 @@ export function ContentCenterPage() {
               ) : null}
               <div className={styles.postList}>
                 {publishedItems.map((post) => (
-                  <PostCard
-                    key={post.postId}
-                    post={postCardBriefToViewModel(post, 'profile')}
-                  />
+                  <PostCard key={post.postId} post={postCardBriefToViewModel(post, 'profile')} />
                 ))}
               </div>
               {published.hasNextPage ? (
@@ -352,12 +342,7 @@ export function ContentCenterPage() {
                       </div>
                     </div>
                     <div className={styles.rowActions}>
-                      <Button
-                        size="sm"
-                        onClick={() =>
-                          navigate(paths.composeDraft(draft.draftId))
-                        }
-                      >
+                      <Button size="sm" onClick={() => navigate(paths.composeDraft(draft.draftId))}>
                         继续编辑
                       </Button>
                     </div>
@@ -393,11 +378,7 @@ export function ContentCenterPage() {
               deletedItems.map((item) => (
                 <article key={item.postId} className={styles.deletedRow}>
                   <span className={styles.deletedIcon}>
-                    {item.postKind === 'ORIGINAL' ? (
-                      <Archive size={18} />
-                    ) : (
-                      <Trash2 size={18} />
-                    )}
+                    {item.postKind === 'ORIGINAL' ? <Archive size={18} /> : <Trash2 size={18} />}
                   </span>
                   <div className={styles.itemCopy}>
                     <strong>{item.bodyTextPreview?.trim() || '无文字摘要的已删除内容'}</strong>

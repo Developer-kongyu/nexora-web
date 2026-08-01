@@ -6,9 +6,7 @@ describe('settleBatch', () => {
     const result = await settleBatch(
       ['a', 'b', 'c'],
       (value) =>
-        value === 'b'
-          ? Promise.reject(new Error('failed'))
-          : Promise.resolve(value.toUpperCase()),
+        value === 'b' ? Promise.reject(new Error('failed')) : Promise.resolve(value.toUpperCase()),
       2,
     );
 
@@ -18,7 +16,9 @@ describe('settleBatch', () => {
   });
 
   it('rejects invalid concurrency instead of silently running unbounded', async () => {
-    await expect(settleBatch([1], (value) => Promise.resolve(value), 0)).rejects.toThrow(RangeError);
+    await expect(settleBatch([1], (value) => Promise.resolve(value), 0)).rejects.toThrow(
+      RangeError,
+    );
   });
 
   it('rejects sparse input instead of silently skipping later work', async () => {
@@ -26,6 +26,8 @@ describe('settleBatch', () => {
     sparse.length = 2;
     sparse[1] = 'second';
 
-    await expect(settleBatch(sparse, (value) => Promise.resolve(value), 1)).rejects.toThrow(RangeError);
+    await expect(settleBatch(sparse, (value) => Promise.resolve(value), 1)).rejects.toThrow(
+      RangeError,
+    );
   });
 });

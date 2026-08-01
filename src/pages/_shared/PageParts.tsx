@@ -36,10 +36,7 @@ export function LoadingRows({ count = 3, compact = false }: LoadingRowsProps) {
   return (
     <div style={{ display: 'grid', gap: 12 }}>
       {Array.from({ length: count }, (_, index) => (
-        <div
-          key={index}
-          className={cn(styles.skeleton, compact && styles.compactSkeleton)}
-        />
+        <div key={index} className={cn(styles.skeleton, compact && styles.compactSkeleton)} />
       ))}
     </div>
   );
@@ -53,10 +50,7 @@ export function QuickCompose() {
 
   return (
     <section className={styles.quickCompose}>
-      <Avatar
-        fallback={currentUser.avatarFallback}
-        alt={currentUser.displayName}
-      />
+      <Avatar fallback={currentUser.avatarFallback} alt={currentUser.displayName} />
       <button type="button" className={styles.prompt} onClick={openCompose}>
         分享此刻的想法、发现或作品…
       </button>

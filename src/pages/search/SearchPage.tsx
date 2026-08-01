@@ -52,9 +52,7 @@ export function SearchPage() {
       return matchesTime && matchesMedia && matchesFollowing;
     });
 
-    const users = data.users.list.filter(
-      (user) => !followingOnly || Boolean(user.isFollowing),
-    );
+    const users = data.users.list.filter((user) => !followingOnly || Boolean(user.isFollowing));
 
     return {
       posts,
@@ -128,12 +126,7 @@ export function SearchPage() {
           </SideCard>
           <SideCard title="没有找到？">
             <p>尝试更短的关键词，或清除发布时间、语言和关系筛选。</p>
-            <Button
-              size="sm"
-              variant="secondary"
-              style={{ marginTop: 12 }}
-              onClick={clearFilters}
-            >
+            <Button size="sm" variant="secondary" style={{ marginTop: 12 }} onClick={clearFilters}>
               清除全部筛选
             </Button>
           </SideCard>

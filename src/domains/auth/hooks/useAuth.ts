@@ -9,7 +9,9 @@ import type {
   RegisterInput,
 } from '../model/types';
 
-function useSessionMutation<TInput>(mutationFn: (input: TInput) => ReturnType<typeof authApi.login>) {
+function useSessionMutation<TInput>(
+  mutationFn: (input: TInput) => ReturnType<typeof authApi.login>,
+) {
   const setSession = useAuthStore((state) => state.setSession);
   return useMutation({
     mutationFn,

@@ -10,22 +10,12 @@ export interface MediaImageFileInputProps extends NativeInputProps {
   onFileSelected: (file: File) => void;
 }
 
-export function MediaImageFileInput({
-  onFileSelected,
-  ...inputProps
-}: MediaImageFileInputProps) {
+export function MediaImageFileInput({ onFileSelected, ...inputProps }: MediaImageFileInputProps) {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (file) onFileSelected(file);
   };
 
-  return (
-    <input
-      {...inputProps}
-      type="file"
-      accept={MEDIA_IMAGE_ACCEPT}
-      onChange={handleChange}
-    />
-  );
+  return <input {...inputProps} type="file" accept={MEDIA_IMAGE_ACCEPT} onChange={handleChange} />;
 }

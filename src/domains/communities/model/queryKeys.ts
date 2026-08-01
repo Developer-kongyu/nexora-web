@@ -43,8 +43,7 @@ export const communityManageKeys = {
   ) => [...communityManageKeys.membersRoot(communityId), role ?? 'ALL', page, pageSize] as const,
   pinned: (communityId: string) =>
     [...communityManageKeys.root(communityId), 'pinned-posts'] as const,
-  logsRoot: (communityId: string) =>
-    [...communityManageKeys.root(communityId), 'logs'] as const,
+  logsRoot: (communityId: string) => [...communityManageKeys.root(communityId), 'logs'] as const,
   logs: (
     communityId: string,
     actionType: CommunityModerationActionType | null,

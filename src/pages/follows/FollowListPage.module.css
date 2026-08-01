@@ -50,12 +50,13 @@
   bottom: -1px;
   left: 12px;
   height: 2px;
-  content: "";
+  content: '';
   background: transparent;
   border-radius: 999px 999px 0 0;
 }
 
-.relationshipTabs a:hover, .relationshipTabs a.activeTab {
+.relationshipTabs a:hover,
+.relationshipTabs a.activeTab {
   color: var(--color-primary);
 }
 

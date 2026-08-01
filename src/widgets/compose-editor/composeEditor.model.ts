@@ -11,14 +11,8 @@ import {
 } from '@/domains/posts/model';
 
 const optionalVisibilitySchema = z.union([z.literal(''), z.enum(POST_VISIBILITIES)]);
-const optionalGeneralPermissionSchema = z.union([
-  z.literal(''),
-  z.enum(POST_GENERAL_PERMISSIONS),
-]);
-const optionalSourcePermissionSchema = z.union([
-  z.literal(''),
-  z.enum(POST_SOURCE_PERMISSIONS),
-]);
+const optionalGeneralPermissionSchema = z.union([z.literal(''), z.enum(POST_GENERAL_PERMISSIONS)]);
+const optionalSourcePermissionSchema = z.union([z.literal(''), z.enum(POST_SOURCE_PERMISSIONS)]);
 
 export const composeEditorSchema = z.object({
   content: z.string().max(1000, '最多 1000 个字符'),
@@ -40,9 +34,7 @@ export const DEFAULT_COMPOSE_EDITOR_VALUES: ComposeEditorValues = {
   repostPermission: '',
 };
 
-export function draftComposeToEditorValues(
-  compose: PostDraftComposeView,
-): ComposeEditorValues {
+export function draftComposeToEditorValues(compose: PostDraftComposeView): ComposeEditorValues {
   return {
     content: compose.bodyText ?? '',
     communityId: compose.communityId ?? '',
@@ -53,7 +45,9 @@ export function draftComposeToEditorValues(
   };
 }
 
-export function optionalVisibility(value: ComposeEditorValues['visibility']): PostVisibility | null {
+export function optionalVisibility(
+  value: ComposeEditorValues['visibility'],
+): PostVisibility | null {
   return value || null;
 }
 

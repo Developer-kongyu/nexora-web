@@ -52,18 +52,9 @@ export const COMMUNITY_COMMENT_ROLES = ['VISITOR', ...COMMUNITY_POST_ROLES] as c
 export type CommunityCommentRole = (typeof COMMUNITY_COMMENT_ROLES)[number];
 export type CommunityPermissionRole = CommunityCommentRole;
 export type CommunityMembershipStatusView =
-  | 'NONE'
-  | 'PENDING'
-  | 'ACTIVE'
-  | 'LEFT'
-  | 'REMOVED'
-  | 'BANNED';
+  'NONE' | 'PENDING' | 'ACTIVE' | 'LEFT' | 'REMOVED' | 'BANNED';
 export type CommunityJoinRequestStatus =
-  | 'PENDING'
-  | 'APPROVED'
-  | 'REJECTED'
-  | 'CANCELLED'
-  | 'EXPIRED';
+  'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'EXPIRED';
 export type CommunityPinType = 'NORMAL' | 'ANNOUNCEMENT';
 
 export interface PageResult<T> {
@@ -274,8 +265,7 @@ export const COMMUNITY_MODERATION_ACTION_TYPES = [
   'COMMUNITY_DELETED',
 ] as const;
 
-export type CommunityModerationActionType =
-  (typeof COMMUNITY_MODERATION_ACTION_TYPES)[number];
+export type CommunityModerationActionType = (typeof COMMUNITY_MODERATION_ACTION_TYPES)[number];
 
 export type CommunityMembershipStatusRecord = 'ACTIVE' | 'LEFT' | 'REMOVED' | 'BANNED';
 

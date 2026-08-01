@@ -9,16 +9,7 @@ import {
   type CommunityPinnedPostListItemView,
 } from '@/domains/communities';
 import { paths } from '@/shared/config/paths';
-import {
-  Badge,
-  Button,
-  Card,
-  IconButton,
-  Modal,
-  Select,
-  TextField,
-  useToast,
-} from '@/shared/ui';
+import { Badge, Button, Card, IconButton, Modal, Select, TextField, useToast } from '@/shared/ui';
 import { EmptyPanel, LoadingRows, Notice } from '@/pages/_shared/PageParts';
 import {
   formatCommunityManageDateTime,
@@ -85,7 +76,11 @@ export function PinnedPostsSection({ communityId }: CommunityManageSectionProps)
       void refreshManagementData();
     },
     onError: () =>
-      showToast({ tone: 'error', title: '排序失败', description: '帖子状态或置顶槽位可能已变化。' }),
+      showToast({
+        tone: 'error',
+        title: '排序失败',
+        description: '帖子状态或置顶槽位可能已变化。',
+      }),
   });
 
   const unpin = useMutation({
@@ -267,7 +262,11 @@ export function PinnedPostsSection({ communityId }: CommunityManageSectionProps)
         }}
         footer={
           <>
-            <Button variant="secondary" disabled={unpin.isPending} onClick={() => setUnpinning(null)}>
+            <Button
+              variant="secondary"
+              disabled={unpin.isPending}
+              onClick={() => setUnpinning(null)}
+            >
               取消
             </Button>
             <Button

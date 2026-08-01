@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-export const verificationCodeSchema = z
-  .string()
-  .regex(/^\d{6}$/, '请输入 6 位数字验证码');
+export const verificationCodeSchema = z.string().regex(/^\d{6}$/, '请输入 6 位数字验证码');
 
 export const strongPasswordSchema = z
   .string()

@@ -88,7 +88,10 @@ export function RulesSection({ communityId, detail }: CommunityManageDetailSecti
             ))}
           </div>
         ) : (
-          <EmptyPanel title="当前没有社群规则" description={`可以保持空规则，也可以添加最多 ${COMMUNITY_MAX_RULE_COUNT} 条规则。`} />
+          <EmptyPanel
+            title="当前没有社群规则"
+            description={`可以保持空规则，也可以添加最多 ${COMMUNITY_MAX_RULE_COUNT} 条规则。`}
+          />
         )}
 
         <div className={styles.ruleActions}>

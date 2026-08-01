@@ -116,14 +116,11 @@ export const communitiesApi = {
     signal?: AbortSignal,
   ) =>
     apiClient.request<PageResult<CommunityJoinRequestListItemView>>({
-      path: appendQuery(
-        `/api/communities/${encodeSegment(communityId)}/manage/join-requests`,
-        {
-          status: input.status ?? 'PENDING',
-          page: input.page ?? 1,
-          pageSize: input.pageSize ?? 20,
-        },
-      ),
+      path: appendQuery(`/api/communities/${encodeSegment(communityId)}/manage/join-requests`, {
+        status: input.status ?? 'PENDING',
+        page: input.page ?? 1,
+        pageSize: input.pageSize ?? 20,
+      }),
       signal,
     }),
 
@@ -132,10 +129,7 @@ export const communitiesApi = {
     joinRequestId: string,
     decisionMessage: string | null = null,
   ) =>
-    apiClient.request<
-      ApproveCommunityJoinRequestResponse,
-      { decisionMessage: string | null }
-    >({
+    apiClient.request<ApproveCommunityJoinRequestResponse, { decisionMessage: string | null }>({
       method: 'POST',
       path: `/api/communities/${encodeSegment(communityId)}/manage/join-requests/${encodeSegment(joinRequestId)}/approve`,
       body: { decisionMessage },

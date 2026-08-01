@@ -35,10 +35,11 @@ export const communityCreateSchema = z
     rules: z
       .array(
         z.object({
-          content: z.string().trim().min(1, '规则内容不能为空').max(
-            COMMUNITY_MAX_RULE_LENGTH,
-            `每条规则最多 ${COMMUNITY_MAX_RULE_LENGTH} 个字符`,
-          ),
+          content: z
+            .string()
+            .trim()
+            .min(1, '规则内容不能为空')
+            .max(COMMUNITY_MAX_RULE_LENGTH, `每条规则最多 ${COMMUNITY_MAX_RULE_LENGTH} 个字符`),
         }),
       )
       .max(COMMUNITY_MAX_RULE_COUNT, `最多 ${COMMUNITY_MAX_RULE_COUNT} 条规则`),

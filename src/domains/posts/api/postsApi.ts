@@ -51,10 +51,7 @@ export const postsApi = {
       signal,
     }),
 
-  createDraft: (
-    input: PostComposeInput,
-    idempotencyKey = createIdempotencyKey('create-draft'),
-  ) =>
+  createDraft: (input: PostComposeInput, idempotencyKey = createIdempotencyKey('create-draft')) =>
     apiClient.request<CreatePostDraftResult, PostComposeInput>({
       method: 'POST',
       path: '/api/posts/drafts',
@@ -122,10 +119,7 @@ export const postsApi = {
       signal,
     }),
 
-  publish: (
-    input: PublishPostDirectInput,
-    idempotencyKey = createIdempotencyKey('publish-post'),
-  ) =>
+  publish: (input: PublishPostDirectInput, idempotencyKey = createIdempotencyKey('publish-post')) =>
     apiClient.request<PublishPostDirectResult, PublishPostDirectInput>({
       method: 'POST',
       path: '/api/posts/publish',
@@ -133,11 +127,7 @@ export const postsApi = {
       idempotencyKey,
     }),
 
-  listReplies: (
-    postId: string,
-    input: CursorRequest = {},
-    signal?: AbortSignal,
-  ) =>
+  listReplies: (postId: string, input: CursorRequest = {}, signal?: AbortSignal) =>
     apiClient.request<ReplyListPageView>({
       path: `/api/posts/${encodeURIComponent(postId)}/replies${buildCursorQuery(input)}`,
       signal,

@@ -137,17 +137,11 @@ export interface BlockedUserManagementListItemView extends UserManagementListIte
 export type UserManagementCursorPage = CursorPageView<UserManagementListItemView>;
 
 export type FollowUserActionResult =
-  | 'FOLLOWED'
-  | 'REQUEST_SUBMITTED'
-  | 'ALREADY_FOLLOWING'
-  | 'ALREADY_REQUESTED';
+  'FOLLOWED' | 'REQUEST_SUBMITTED' | 'ALREADY_FOLLOWING' | 'ALREADY_REQUESTED';
 export type UnfollowUserActionResult = 'UNFOLLOWED' | 'NOOP_NOT_FOLLOWING';
 export type CancelFollowRequestActionResult = 'CANCELED' | 'NOOP_NOT_PENDING';
 export type UpsertUserMuteActionResult =
-  | 'CREATED'
-  | 'UPDATED'
-  | 'NOOP_SAME_FLAGS'
-  | 'CANCELED_BY_FALSE_FLAGS';
+  'CREATED' | 'UPDATED' | 'NOOP_SAME_FLAGS' | 'CANCELED_BY_FALSE_FLAGS';
 export type DeleteUserRelationActionResult = 'DELETED' | 'NOOP_NOT_FOUND';
 export type BlockUserActionResult = 'CREATED' | 'ALREADY_BLOCKED' | 'REPAIRED_EXISTING_BLOCK';
 
@@ -170,9 +164,7 @@ export type UnfollowUserResult = RelationshipWriteActionResultView<UnfollowUserA
 export type CancelFollowRequestResult =
   RelationshipWriteActionResultView<CancelFollowRequestActionResult>;
 export type UserFollowRelationshipWriteResult =
-  | FollowUserResult
-  | UnfollowUserResult
-  | CancelFollowRequestResult;
+  FollowUserResult | UnfollowUserResult | CancelFollowRequestResult;
 export type UpsertUserMuteResult = RelationshipWriteActionResultView<UpsertUserMuteActionResult>;
 export type DeleteUserRelationResult =
   RelationshipWriteActionResultView<DeleteUserRelationActionResult>;

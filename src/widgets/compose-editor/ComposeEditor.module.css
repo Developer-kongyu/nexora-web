@@ -137,7 +137,7 @@
   font-size: 11px;
 }
 
-.counter[data-warning="true"] {
+.counter[data-warning='true'] {
   color: var(--color-danger);
 }
 
@@ -207,11 +207,13 @@
   margin-bottom: 12px;
 }
 
-.mediaQueue h2, .settings h2 {
+.mediaQueue h2,
+.settings h2 {
   font-size: 14px;
 }
 
-.mediaQueue p, .settings p {
+.mediaQueue p,
+.settings p {
   margin-top: 2px;
   color: var(--color-muted);
   font-size: 11px;
@@ -228,7 +230,8 @@
   gap: 9px;
 }
 
-.mediaGrid article, .addMedia {
+.mediaGrid article,
+.addMedia {
   position: relative;
   aspect-ratio: 1.25;
   overflow: hidden;
@@ -237,7 +240,8 @@
   border-radius: 11px;
 }
 
-.mediaGrid img, .mediaGrid video {
+.mediaGrid img,
+.mediaGrid video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -358,7 +362,7 @@
   font-size: 11px;
 }
 
-.footer > span[data-state="error"] {
+.footer > span[data-state='error'] {
   color: var(--color-danger);
 }
 
@@ -390,7 +394,10 @@
 }
 
 @media (max-width: 480px) {
-  .identity, .editorWrap, .mediaQueue, .settings {
+  .identity,
+  .editorWrap,
+  .mediaQueue,
+  .settings {
     padding-right: 14px;
     padding-left: 14px;
   }

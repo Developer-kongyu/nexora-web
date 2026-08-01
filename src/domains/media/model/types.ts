@@ -2,11 +2,7 @@ export type UploadableMediaKind = 'IMAGE' | 'VIDEO';
 export type MediaImageRole = 'avatar' | 'cover';
 
 export type MediaAssetScene =
-  | 'POST_COMPOSE'
-  | 'USER_AVATAR'
-  | 'USER_COVER'
-  | 'COMMUNITY_AVATAR'
-  | 'COMMUNITY_COVER';
+  'POST_COMPOSE' | 'USER_AVATAR' | 'USER_COVER' | 'COMMUNITY_AVATAR' | 'COMMUNITY_COVER';
 
 export type MediaAssetStatus =
   | 'LOCAL'
@@ -105,9 +101,7 @@ export interface ConfirmMediaAssetUploadedResult {
 }
 
 export type MediaProcessingRetryCommand =
-  | 'IMAGE_PROCESS_REQUESTED'
-  | 'VIDEO_TRANSCODE_REQUESTED'
-  | 'NONE';
+  'IMAGE_PROCESS_REQUESTED' | 'VIDEO_TRANSCODE_REQUESTED' | 'NONE';
 
 export interface RetryMediaAssetProcessingResult {
   mediaAssetId: string;
@@ -129,18 +123,12 @@ export interface MediaUploadCheckpoint {
 }
 
 export type MediaUploadLifecycleStage =
-  | 'REQUESTING_SESSION'
-  | 'UPLOADING'
-  | 'CONFIRMING'
-  | 'RETRYING'
-  | 'PROCESSING'
-  | 'READY';
+  'REQUESTING_SESSION' | 'UPLOADING' | 'CONFIRMING' | 'RETRYING' | 'PROCESSING' | 'READY';
 
 export type MediaImageSelectionStage = 'SELECTED' | 'ERROR' | MediaUploadLifecycleStage;
 
 export type MediaImageSelectionPatch =
-  | Partial<MediaImageSelection>
-  | ((current: MediaImageSelection) => Partial<MediaImageSelection>);
+  Partial<MediaImageSelection> | ((current: MediaImageSelection) => Partial<MediaImageSelection>);
 
 export type MediaImageSelectionUpdate = (
   clientUploadId: string,
@@ -166,13 +154,7 @@ export interface MediaImageSelection {
 }
 
 export type UploadStatus =
-  | 'local'
-  | 'creating-session'
-  | 'uploading'
-  | 'confirming'
-  | 'processing'
-  | 'ready'
-  | 'failed';
+  'local' | 'creating-session' | 'uploading' | 'confirming' | 'processing' | 'ready' | 'failed';
 
 export interface UploadItem {
   clientUploadId: string;

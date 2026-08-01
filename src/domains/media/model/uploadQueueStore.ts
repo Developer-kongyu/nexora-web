@@ -46,9 +46,7 @@ export const useUploadQueueStore = create<UploadQueueState>((set, get) => ({
     }),
   update: (id, patch) =>
     set((state) => ({
-      items: state.items.map((item) =>
-        item.clientUploadId === id ? { ...item, ...patch } : item,
-      ),
+      items: state.items.map((item) => (item.clientUploadId === id ? { ...item, ...patch } : item)),
     })),
   clear: () =>
     set((state) => {

@@ -13,7 +13,11 @@ import {
 import type { ReviewDecision } from '@/shared/model/types';
 import { Avatar, Badge, Button, Card, IconButton, Select, useToast } from '@/shared/ui';
 import { EmptyPanel, LoadingRows } from '@/pages/_shared/PageParts';
-import { type CommunityManageSectionProps, formatCommunityManageDateTime, pageCount } from '../communityManage.model';
+import {
+  type CommunityManageSectionProps,
+  formatCommunityManageDateTime,
+  pageCount,
+} from '../communityManage.model';
 import styles from '../CommunityManagePage.module.css';
 
 const PAGE_SIZE = 10;
@@ -32,11 +36,7 @@ export function JoinRequestsSection({ communityId }: CommunityManageSectionProps
   const requests = useQuery({
     queryKey: communityManageKeys.requests(communityId, status, page, PAGE_SIZE),
     queryFn: ({ signal }) =>
-      communitiesApi.listJoinRequests(
-        communityId,
-        { status, page, pageSize: PAGE_SIZE },
-        signal,
-      ),
+      communitiesApi.listJoinRequests(communityId, { status, page, pageSize: PAGE_SIZE }, signal),
   });
 
   const review = useMutation<
@@ -68,7 +68,11 @@ export function JoinRequestsSection({ communityId }: CommunityManageSectionProps
       void queryClient.invalidateQueries({ queryKey: communityManageKeys.root(communityId) });
     },
     onError: () =>
-      showToast({ tone: 'error', title: '审批失败', description: '申请状态可能已变化，请刷新后重试。' }),
+      showToast({
+        tone: 'error',
+        title: '审批失败',
+        description: '申请状态可能已变化，请刷新后重试。',
+      }),
   });
 
   const totalPages = pageCount(requests.data?.total ?? 0, PAGE_SIZE);
@@ -81,7 +85,9 @@ export function JoinRequestsSection({ communityId }: CommunityManageSectionProps
           <p>按后端真实状态分页读取；批准与拒绝使用不同的正式动作接口。</p>
         </div>
         <div className={styles.headerActions}>
-          <Badge tone={status === 'PENDING' && (requests.data?.total ?? 0) > 0 ? 'warning' : 'neutral'}>
+          <Badge
+            tone={status === 'PENDING' && (requests.data?.total ?? 0) > 0 ? 'warning' : 'neutral'}
+          >
             {requests.data?.total ?? 0} 条
           </Badge>
           <Select
@@ -117,7 +123,8 @@ export function JoinRequestsSection({ communityId }: CommunityManageSectionProps
             const applicant = request.applicantEntry;
             const displayName = applicant.displayName ?? applicant.handle ?? '不可用账号';
             const handle = applicant.handle ? `@${applicant.handle}` : 'Handle 不可用';
-            const isCurrentReview = review.variables?.request.joinRequestId === request.joinRequestId;
+            const isCurrentReview =
+              review.variables?.request.joinRequestId === request.joinRequestId;
             return (
               <article key={request.joinRequestId}>
                 <Avatar
@@ -139,7 +146,9 @@ export function JoinRequestsSection({ communityId }: CommunityManageSectionProps
                   {applicant.cardState === 'PLACEHOLDER' ? (
                     <small>资料占位原因：{applicant.placeholderReason}</small>
                   ) : null}
-                  {request.decisionMessage ? <small>审批说明：{request.decisionMessage}</small> : null}
+                  {request.decisionMessage ? (
+                    <small>审批说明：{request.decisionMessage}</small>
+                  ) : null}
                 </div>
                 {request.status === 'PENDING' ? (
                   <div className={styles.rowActions}>
@@ -161,7 +170,9 @@ export function JoinRequestsSection({ communityId }: CommunityManageSectionProps
                   </div>
                 ) : (
                   <span className={styles.reviewedAt}>
-                    {request.reviewedAtIso ? `处理于 ${formatCommunityManageDateTime(request.reviewedAtIso)}` : '未记录处理时间'}
+                    {request.reviewedAtIso
+                      ? `处理于 ${formatCommunityManageDateTime(request.reviewedAtIso)}`
+                      : '未记录处理时间'}
                   </span>
                 )}
               </article>

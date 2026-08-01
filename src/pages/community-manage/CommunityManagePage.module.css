@@ -32,7 +32,8 @@
   min-width: 0;
 }
 
-.communityIdentity strong, .communityIdentity span {
+.communityIdentity strong,
+.communityIdentity span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -68,7 +69,9 @@
   border: 0;
   border-radius: 10px;
   cursor: pointer;
-  transition: color var(--transition), background var(--transition);
+  transition:
+    color var(--transition),
+    background var(--transition);
 }
 
 .sidebar nav button:hover {
@@ -76,7 +79,7 @@
   background: var(--color-surface-soft);
 }
 
-.sidebar nav button[data-active="true"] {
+.sidebar nav button[data-active='true'] {
   color: var(--color-primary);
   background: var(--color-primary-soft);
 }
@@ -104,7 +107,8 @@
   font-size: 12px;
 }
 
-.sectionToolbar > label, .headerActions > label {
+.sectionToolbar > label,
+.headerActions > label {
   min-width: 168px;
 }
 
@@ -214,11 +218,13 @@
   font-size: 11px;
 }
 
-.panelPadding, .formSection {
+.panelPadding,
+.formSection {
   padding: 19px;
 }
 
-.dailyTable, .logTable {
+.dailyTable,
+.logTable {
   display: grid;
   overflow-x: auto;
 }
@@ -237,7 +243,8 @@
   border-bottom: 0;
 }
 
-.dailyTable strong, .dailyTable span {
+.dailyTable strong,
+.dailyTable span {
   font-size: 12px;
 }
 
@@ -310,7 +317,9 @@
   min-width: 0;
 }
 
-.requests article span, .requests article p, .requests article small {
+.requests article span,
+.requests article p,
+.requests article small {
   color: var(--color-muted);
   font-size: 11px;
 }
@@ -320,14 +329,16 @@
   color: var(--color-text);
 }
 
-.requestTitle, .pinnedTitle {
+.requestTitle,
+.pinnedTitle {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
 
-.requestTitle strong, .pinnedTitle strong {
+.requestTitle strong,
+.pinnedTitle strong {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -379,7 +390,8 @@
   outline: 0;
 }
 
-.managementList, .pinnedList {
+.managementList,
+.pinnedList {
   display: grid;
 }
 
@@ -392,7 +404,8 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.managementList article:last-child, .pinnedList article:last-child {
+.managementList article:last-child,
+.pinnedList article:last-child {
   border-bottom: 0;
 }
 
@@ -402,7 +415,8 @@
   min-width: 0;
 }
 
-.managementList article span, .managementList article small {
+.managementList article span,
+.managementList article small {
   color: var(--color-muted);
   font-size: 10px;
 }
@@ -472,7 +486,8 @@
   min-width: 0;
 }
 
-.pinnedList article span, .pinnedList article small {
+.pinnedList article span,
+.pinnedList article small {
   color: var(--color-muted);
   font-size: 10px;
 }
@@ -598,12 +613,14 @@
   border-bottom: 0;
 }
 
-.logTable span, .logTable small {
+.logTable span,
+.logTable small {
   color: var(--color-muted);
   font-size: 10px;
 }
 
-.logTable strong, .logTable p {
+.logTable strong,
+.logTable p {
   font-size: 11px;
 }
 
@@ -670,7 +687,9 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .pinForm > :first-child, .fullField, .formActions {
+  .pinForm > :first-child,
+  .fullField,
+  .formActions {
     grid-column: 1 / -1;
   }
 
@@ -689,11 +708,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .metrics, .settingGrid, .switchGrid {
+  .metrics,
+  .settingGrid,
+  .switchGrid {
     grid-template-columns: 1fr;
   }
 
-  .sectionToolbar, .panel > header {
+  .sectionToolbar,
+  .panel > header {
     align-items: stretch;
     flex-direction: column;
   }
@@ -703,11 +725,14 @@
     flex-direction: column;
   }
 
-  .headerActions > label, .sectionToolbar > label {
+  .headerActions > label,
+  .sectionToolbar > label {
     min-width: 0;
   }
 
-  .tasks article, .requests article, .activity > div {
+  .tasks article,
+  .requests article,
+  .activity > div {
     grid-template-columns: auto minmax(0, 1fr);
   }
 
@@ -719,7 +744,8 @@
     justify-self: start;
   }
 
-  .managementToolbar, .pinForm {
+  .managementToolbar,
+  .pinForm {
     grid-template-columns: 1fr;
   }
 
@@ -727,11 +753,13 @@
     grid-column: auto;
   }
 
-  .managementList article, .pinnedList article {
+  .managementList article,
+  .pinnedList article {
     grid-template-columns: auto minmax(0, 1fr);
   }
 
-  .managementList article > :nth-child(n + 3), .pinnedList article > :nth-child(n + 3) {
+  .managementList article > :nth-child(n + 3),
+  .pinnedList article > :nth-child(n + 3) {
     grid-column: 2;
     justify-self: start;
   }
@@ -745,7 +773,8 @@
     justify-self: end;
   }
 
-  .inlineActions, .pagination {
+  .inlineActions,
+  .pagination {
     flex-wrap: wrap;
     justify-content: flex-start;
   }

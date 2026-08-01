@@ -17,12 +17,7 @@ describe('Modal', () => {
     view.rerender(
       <>
         <button type="button">打开弹窗</button>
-        <Modal
-          open
-          title="编辑资料"
-          description="修改后保存"
-          onClose={onClose}
-        />
+        <Modal open title="编辑资料" description="修改后保存" onClose={onClose} />
       </>,
     );
 

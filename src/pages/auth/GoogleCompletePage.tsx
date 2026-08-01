@@ -32,7 +32,7 @@ export function GoogleCompletePage() {
   const submit = form.handleSubmit(async (values) => {
     await completeProfile.mutateAsync(values);
     showToast({ tone: 'success', title: '资料已保存' });
-    navigate('/onboarding/interests', { replace: true });
+    void navigate('/onboarding/interests', { replace: true });
   });
 
   return (

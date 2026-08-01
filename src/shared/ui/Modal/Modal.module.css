@@ -15,7 +15,7 @@
   background: #fff;
   border-radius: 20px;
   box-shadow: var(--shadow-lg);
-  animation: modal .18s ease both;
+  animation: modal 0.18s ease both;
 }
 
 .modal > header {
@@ -56,6 +56,6 @@
 @keyframes modal {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(.98);
+    transform: translateY(10px) scale(0.98);
   }
 }

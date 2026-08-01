@@ -27,7 +27,8 @@
   font-size: 12px;
 }
 
-.sectionHeader > a, .sectionHeader > button {
+.sectionHeader > a,
+.sectionHeader > button {
   color: var(--color-primary);
   font-size: 12px;
   font-weight: 800;
@@ -75,7 +76,8 @@
   border-radius: 10px;
 }
 
-.pillTabs button, .pillTabs a {
+.pillTabs button,
+.pillTabs a {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,7 +117,8 @@
   font-size: 15px;
 }
 
-.sideCardHeader a, .sideCardHeader button {
+.sideCardHeader a,
+.sideCardHeader button {
   color: var(--color-primary);
   font-size: 11px;
   font-weight: 800;
@@ -144,7 +147,7 @@
 }
 
 .sideCard li::before {
-  content: "";
+  content: '';
   flex: 0 0 auto;
   width: 6px;
   height: 6px;
@@ -297,7 +300,8 @@
   font-size: 13px;
 }
 
-.listCopy span, .listCopy small {
+.listCopy span,
+.listCopy small {
   color: var(--color-muted);
   font-size: 12px;
   overflow: hidden;
@@ -538,7 +542,7 @@
   cursor: pointer;
 }
 
-.segmented button[data-active="true"] {
+.segmented button[data-active='true'] {
   color: var(--color-primary);
   background: #fff;
   box-shadow: var(--shadow-xs);
@@ -573,7 +577,8 @@
 }
 
 @media (max-width: 700px) {
-  .cardGrid, .fieldGrid {
+  .cardGrid,
+  .fieldGrid {
     grid-template-columns: 1fr;
   }
 

@@ -8,7 +8,14 @@ const ts = require('typescript');
 
 const root = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
 const srcRoot = path.join(root, 'src');
-const excluded = new Set(['node_modules', 'dist', 'coverage', 'storybook-static', 'playwright-report', 'test-results']);
+const excluded = new Set([
+  'node_modules',
+  'dist',
+  'coverage',
+  'storybook-static',
+  'playwright-report',
+  'test-results',
+]);
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
   const out = [];
@@ -20,8 +27,12 @@ function walk(dir) {
   }
   return out;
 }
-function rel(file) { return path.relative(root, file).replaceAll(path.sep, '/'); }
-function lineOf(sf, node) { return sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1; }
+function rel(file) {
+  return path.relative(root, file).replaceAll(path.sep, '/');
+}
+function lineOf(sf, node) {
+  return sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
+}
 function normalizeText(text) {
   return text
     .replace(/\/\*[\s\S]*?\*\//g, '')
@@ -29,15 +40,21 @@ function normalizeText(text) {
     .replace(/\s+/g, '')
     .replace(/;+/g, ';');
 }
-function hash(value) { return crypto.createHash('sha256').update(value).digest('hex').slice(0, 16); }
+function hash(value) {
+  return crypto.createHash('sha256').update(value).digest('hex').slice(0, 16);
+}
 function isProd(file) {
   const r = rel(file);
-  return !/(?:^|\/)(?:test|mocks)(?:\/|$)/.test(r)
-    && !/\.(?:test|spec|stories)\.(?:ts|tsx)$/.test(r)
-    && !r.includes('/generated/');
+  return (
+    !/(?:^|\/)(?:test|mocks)(?:\/|$)/.test(r) &&
+    !/\.(?:test|spec|stories)\.(?:ts|tsx)$/.test(r) &&
+    !r.includes('/generated/')
+  );
 }
 function isExported(node) {
-  return !!node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword || m.kind === ts.SyntaxKind.DefaultKeyword);
+  return !!node.modifiers?.some(
+    (m) => m.kind === ts.SyntaxKind.ExportKeyword || m.kind === ts.SyntaxKind.DefaultKeyword,
+  );
 }
 function declarationName(node) {
   return node.name && ts.isIdentifier(node.name) ? node.name.text : null;
@@ -46,7 +63,9 @@ function typeMemberCanonical(member, sf) {
   if (ts.isPropertySignature(member)) {
     const name = member.name?.getText(sf) ?? '';
     const optional = member.questionToken ? '?' : '';
-    const readonly = member.modifiers?.some((m) => m.kind === ts.SyntaxKind.ReadonlyKeyword) ? 'readonly ' : '';
+    const readonly = member.modifiers?.some((m) => m.kind === ts.SyntaxKind.ReadonlyKeyword)
+      ? 'readonly '
+      : '';
     return `${readonly}${name}${optional}:${normalizeText(member.type?.getText(sf) ?? 'unknown')}`;
   }
   if (ts.isMethodSignature(member)) {
@@ -66,7 +85,9 @@ function declarationCanonical(node, sf) {
     return `type|${normalizeText(node.type.getText(sf))}`;
   }
   if (ts.isEnumDeclaration(node)) {
-    const members = node.members.map((m) => `${m.name.getText(sf)}=${normalizeText(m.initializer?.getText(sf) ?? '')}`);
+    const members = node.members.map(
+      (m) => `${m.name.getText(sf)}=${normalizeText(m.initializer?.getText(sf) ?? '')}`,
+    );
     return `enum|${members.join('|')}`;
   }
   return null;
@@ -74,7 +95,15 @@ function declarationCanonical(node, sf) {
 function containingName(node) {
   let p = node.parent;
   while (p) {
-    if ((ts.isTypeAliasDeclaration(p) || ts.isInterfaceDeclaration(p) || ts.isFunctionDeclaration(p) || ts.isMethodDeclaration(p) || ts.isVariableDeclaration(p) || ts.isPropertyDeclaration(p)) && p.name) {
+    if (
+      (ts.isTypeAliasDeclaration(p) ||
+        ts.isInterfaceDeclaration(p) ||
+        ts.isFunctionDeclaration(p) ||
+        ts.isMethodDeclaration(p) ||
+        ts.isVariableDeclaration(p) ||
+        ts.isPropertyDeclaration(p)) &&
+      p.name
+    ) {
       return p.name.getText();
     }
     p = p.parent;
@@ -85,7 +114,13 @@ function literalUnionSignature(node) {
   if (!ts.isUnionTypeNode(node)) return null;
   const literals = [];
   for (const t of node.types) {
-    if (ts.isLiteralTypeNode(t) && (ts.isStringLiteral(t.literal) || ts.isNumericLiteral(t.literal) || t.literal.kind === ts.SyntaxKind.TrueKeyword || t.literal.kind === ts.SyntaxKind.FalseKeyword)) {
+    if (
+      ts.isLiteralTypeNode(t) &&
+      (ts.isStringLiteral(t.literal) ||
+        ts.isNumericLiteral(t.literal) ||
+        t.literal.kind === ts.SyntaxKind.TrueKeyword ||
+        t.literal.kind === ts.SyntaxKind.FalseKeyword)
+    ) {
       literals.push(t.getText());
     } else {
       return null;
@@ -101,9 +136,9 @@ function staticInitializerCanonical(init, sf) {
   return text.length >= 35 ? text : null;
 }
 function collectFunctionInfo(node, sf, file) {
-  let name = null;
-  let body = null;
-  let params = [];
+  let name;
+  let body;
+  let params;
   if (ts.isFunctionDeclaration(node) && node.body) {
     name = node.name?.text ?? '<anonymous>';
     body = node.body;
@@ -112,7 +147,11 @@ function collectFunctionInfo(node, sf, file) {
     name = node.name.getText(sf);
     body = node.body;
     params = node.parameters;
-  } else if (ts.isVariableDeclaration(node) && node.initializer && (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))) {
+  } else if (
+    ts.isVariableDeclaration(node) &&
+    node.initializer &&
+    (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))
+  ) {
     name = node.name.getText(sf);
     body = node.initializer.body;
     params = node.initializer.parameters;
@@ -125,9 +164,17 @@ function collectFunctionInfo(node, sf, file) {
     nodeCount += 1;
     if (ts.isIdentifier(n)) {
       // Preserve property names, JSX identifiers and declaration names only where they convey an API contract.
-      if (ts.isPropertyAccessExpression(n.parent) && n.parent.name === n) shape.push(`PROP:${n.text}`);
-      else if (ts.isPropertyAssignment(n.parent) && n.parent.name === n) shape.push(`KEY:${n.text}`);
-      else if (ts.isJsxAttribute(n.parent) || ts.isJsxOpeningElement(n.parent) || ts.isJsxClosingElement(n.parent) || ts.isJsxSelfClosingElement(n.parent)) shape.push(`JSX:${n.text}`);
+      if (ts.isPropertyAccessExpression(n.parent) && n.parent.name === n)
+        shape.push(`PROP:${n.text}`);
+      else if (ts.isPropertyAssignment(n.parent) && n.parent.name === n)
+        shape.push(`KEY:${n.text}`);
+      else if (
+        ts.isJsxAttribute(n.parent) ||
+        ts.isJsxOpeningElement(n.parent) ||
+        ts.isJsxClosingElement(n.parent) ||
+        ts.isJsxSelfClosingElement(n.parent)
+      )
+        shape.push(`JSX:${n.text}`);
       else shape.push('ID');
     } else if (ts.isStringLiteralLike(n)) shape.push(`STR:${n.text}`);
     else if (ts.isNumericLiteral(n)) shape.push(`NUM:${n.text}`);
@@ -158,25 +205,54 @@ const functions = [];
 for (const file of files) {
   if (!isProd(file)) continue;
   const text = fs.readFileSync(file, 'utf8');
-  const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const sf = ts.createSourceFile(
+    file,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+    file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
   function visit(node) {
-    if (ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node) || ts.isEnumDeclaration(node)) {
+    if (
+      ts.isInterfaceDeclaration(node) ||
+      ts.isTypeAliasDeclaration(node) ||
+      ts.isEnumDeclaration(node)
+    ) {
       const name = declarationName(node);
       const canonical = declarationCanonical(node, sf);
-      if (name && canonical) declarations.push({
-        file: rel(file), line: lineOf(sf, node), kind: ts.SyntaxKind[node.kind], name,
-        exported: isExported(node), canonical, canonicalHash: hash(canonical), length: canonical.length,
-      });
+      if (name && canonical)
+        declarations.push({
+          file: rel(file),
+          line: lineOf(sf, node),
+          kind: ts.SyntaxKind[node.kind],
+          name,
+          exported: isExported(node),
+          canonical,
+          canonicalHash: hash(canonical),
+          length: canonical.length,
+        });
     }
     const unionSig = literalUnionSignature(node);
-    if (unionSig) literalUnions.push({
-      file: rel(file), line: lineOf(sf, node), context: containingName(node), signature: unionSig, hash: hash(unionSig), count: node.types.length,
-    });
+    if (unionSig)
+      literalUnions.push({
+        file: rel(file),
+        line: lineOf(sf, node),
+        context: containingName(node),
+        signature: unionSig,
+        hash: hash(unionSig),
+        count: node.types.length,
+      });
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
       const canonical = staticInitializerCanonical(node.initializer, sf);
-      if (canonical) staticConstants.push({
-        file: rel(file), line: lineOf(sf, node), name: node.name.text, canonical, hash: hash(canonical), length: canonical.length,
-      });
+      if (canonical)
+        staticConstants.push({
+          file: rel(file),
+          line: lineOf(sf, node),
+          name: node.name.text,
+          canonical,
+          hash: hash(canonical),
+          length: canonical.length,
+        });
     }
     const fn = collectFunctionInfo(node, sf, file);
     if (fn) functions.push(fn);
@@ -191,36 +267,50 @@ function group(items, keyFn, min = 2) {
     if (!m.has(key)) m.set(key, []);
     m.get(key).push(item);
   }
-  return [...m.entries()].filter(([, group]) => group.length >= min).map(([key, group]) => ({ key, group }));
+  return [...m.entries()]
+    .filter(([, group]) => group.length >= min)
+    .map(([key, group]) => ({ key, group }));
 }
-const duplicateExportedNames = group(declarations.filter((d) => d.exported), (d) => d.name)
-  .filter(({group}) => new Set(group.map((x) => x.file)).size > 1);
-const duplicateDeclarationStructures = group(declarations.filter((d) => d.canonical.length >= 35), (d) => d.canonical)
-  .filter(({group}) => new Set(group.map((x) => x.file)).size > 1)
-  .map(({key, group}) => ({ hash: hash(key), canonical: key.slice(0, 400), group }));
+const duplicateExportedNames = group(
+  declarations.filter((d) => d.exported),
+  (d) => d.name,
+).filter(({ group }) => new Set(group.map((x) => x.file)).size > 1);
+const duplicateDeclarationStructures = group(
+  declarations.filter((d) => d.canonical.length >= 35),
+  (d) => d.canonical,
+)
+  .filter(({ group }) => new Set(group.map((x) => x.file)).size > 1)
+  .map(({ key, group }) => ({ hash: hash(key), canonical: key.slice(0, 400), group }));
 const repeatedLiteralUnions = group(literalUnions, (u) => u.signature)
-  .filter(({group}) => new Set(group.map((x) => x.file)).size > 1)
-  .map(({key, group}) => ({ signature: key, group }));
+  .filter(({ group }) => new Set(group.map((x) => x.file)).size > 1)
+  .map(({ key, group }) => ({ signature: key, group }));
 const duplicateStaticConstants = group(staticConstants, (x) => x.canonical)
-  .filter(({group}) => new Set(group.map((x) => x.file)).size > 1)
-  .map(({key, group}) => ({ hash: hash(key), canonical: key.slice(0, 500), group }));
+  .filter(({ group }) => new Set(group.map((x) => x.file)).size > 1)
+  .map(({ key, group }) => ({ hash: hash(key), canonical: key.slice(0, 500), group }));
 const exactFunctionClones = group(functions, (f) => f.exact)
-  .filter(({group}) => new Set(group.map((x) => x.file)).size > 1)
-  .map(({key, group}) => ({ hash: hash(key), group }));
-const shapedFunctionClones = group(functions.filter((f) => f.nodeCount >= 28), (f) => `${f.params}|${f.shape}`)
-  .filter(({group}) => new Set(group.map((x) => x.file)).size > 1)
-  .map(({key, group}) => ({ hash: hash(key), group }));
+  .filter(({ group }) => new Set(group.map((x) => x.file)).size > 1)
+  .map(({ key, group }) => ({ hash: hash(key), group }));
+const shapedFunctionClones = group(
+  functions.filter((f) => f.nodeCount >= 28),
+  (f) => `${f.params}|${f.shape}`,
+)
+  .filter(({ group }) => new Set(group.map((x) => x.file)).size > 1)
+  .map(({ key, group }) => ({ hash: hash(key), group }));
 const policyViolations = [];
 for (const file of files) {
   const relativePath = rel(file);
   const text = fs.readFileSync(file, 'utf8');
-  if (/^src\/domains\/.+\/api\/.+\.ts$/.test(relativePath)
-    && !/\.(?:test|spec)\.ts$/.test(relativePath)
-    && text.includes('new URLSearchParams')) {
+  if (
+    /^src\/domains\/.+\/api\/.+\.ts$/.test(relativePath) &&
+    !/\.(?:test|spec)\.ts$/.test(relativePath) &&
+    text.includes('new URLSearchParams')
+  ) {
     policyViolations.push({ file: relativePath, rule: 'API 查询参数必须复用 shared/api/query' });
   }
-  if (relativePath !== 'src/shared/lib/clipboard.ts'
-    && text.includes('navigator.clipboard.writeText')) {
+  if (
+    relativePath !== 'src/shared/lib/clipboard.ts' &&
+    text.includes('navigator.clipboard.writeText')
+  ) {
     policyViolations.push({ file: relativePath, rule: '剪贴板写入必须复用 shared/lib/clipboard' });
   }
   if (isProd(file) && /queryKey\s*:\s*\[/.test(text)) {

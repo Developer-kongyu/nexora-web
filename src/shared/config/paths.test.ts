@@ -7,9 +7,7 @@ describe('application paths', () => {
     expect(paths.post('post / 1')).toBe('/posts/post%20%2F%201');
     expect(paths.postMedia('post / 1', 2)).toBe('/posts/post%20%2F%201/media/2');
     expect(paths.composeDraft('draft / 1')).toBe('/compose/draft%20%2F%201');
-    expect(paths.bookmarkCollection('collection / 1')).toBe(
-      '/bookmarks/collection%20%2F%201',
-    );
+    expect(paths.bookmarkCollection('collection / 1')).toBe('/bookmarks/collection%20%2F%201');
     expect(paths.community('产品 / 讨论')).toBe(
       '/communities/%E4%BA%A7%E5%93%81%20%2F%20%E8%AE%A8%E8%AE%BA',
     );

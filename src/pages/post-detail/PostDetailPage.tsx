@@ -1,16 +1,5 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import {
-  ArrowLeft,
-  MessageCircle,
-  Send,
-  ShieldCheck,
-  Smile,
-  Trash2,
-} from 'lucide-react';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, MessageCircle, Send, ShieldCheck, Smile, Trash2 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/domains/auth';
@@ -59,13 +48,15 @@ function CommentRow({ item, rootPostId, onReply }: CommentRowProps) {
   const card = item.postCard;
   const initialLiked = Boolean(card?.interactionSummary?.viewerState?.liked);
   const initialLikeCount = card?.interactionSummary?.likeCount ?? 0;
-  const likeSourceKey = [card?.postId ?? item.relation.commentId, initialLiked, initialLikeCount].join(
-    '\u001f',
-  );
-  const [likeState, setLikeState] = useSynchronizedState<string, CommentLikeState>(
-    likeSourceKey,
-    { liked: initialLiked, likeCount: initialLikeCount },
-  );
+  const likeSourceKey = [
+    card?.postId ?? item.relation.commentId,
+    initialLiked,
+    initialLikeCount,
+  ].join('\u001f');
+  const [likeState, setLikeState] = useSynchronizedState<string, CommentLikeState>(likeSourceKey, {
+    liked: initialLiked,
+    likeCount: initialLikeCount,
+  });
 
   const likeMutation = useMutation({
     mutationFn: (nextLiked: boolean) => {
@@ -100,8 +91,7 @@ function CommentRow({ item, rootPostId, onReply }: CommentRowProps) {
       ]);
       showToast({ tone: 'success', title: '评论已删除' });
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '删除失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '删除失败', description: '请稍后重试。' }),
   });
 
   if (item.relation.status !== 'ACTIVE' || !card) {
@@ -125,12 +115,7 @@ function CommentRow({ item, rootPostId, onReply }: CommentRowProps) {
 
   return (
     <article className={styles.comment}>
-      <Avatar
-        size="md"
-        fallback={name.slice(0, 1)}
-        alt={name}
-        src={author?.avatarUrl}
-      />
+      <Avatar size="md" fallback={name.slice(0, 1)} alt={name} src={author?.avatarUrl} />
       <div>
         <header>
           <strong>{name}</strong>
@@ -204,8 +189,7 @@ export function PostDetailPage() {
     [replies.data?.pages],
   );
   const filteredCountHint = useMemo(
-    () =>
-      replies.data?.pages.reduce((sum, page) => sum + page.filteredCountHint, 0) ?? 0,
+    () => replies.data?.pages.reduce((sum, page) => sum + page.filteredCountHint, 0) ?? 0,
     [replies.data?.pages],
   );
 
@@ -231,8 +215,7 @@ export function PostDetailPage() {
           : undefined,
       });
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '评论发布失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '评论发布失败', description: '请稍后重试。' }),
   });
 
   const startReply = (target: ReplyTarget) => {
@@ -307,9 +290,7 @@ export function PostDetailPage() {
             />
             <div>
               <strong>{replyTo ? `回复 ${replyTo.name}` : '参与讨论'}</strong>
-              <p>
-                {replyTo ? '回复会挂载到所选评论下方' : '保持友善，围绕帖子内容展开交流'}
-              </p>
+              <p>{replyTo ? '回复会挂载到所选评论下方' : '保持友善，围绕帖子内容展开交流'}</p>
             </div>
             {replyTo ? (
               <Button size="sm" variant="ghost" onClick={() => setReplyTo(null)}>
@@ -368,7 +349,8 @@ export function PostDetailPage() {
           {degradedReasons.size > 0 ? (
             <div className={styles.degradedNotice} role="status">
               部分评论卡片暂不可用
-              {filteredCountHint > 0 ? `，本次省略 ${filteredCountHint} 条` : ''}；删除或隐藏项仍保留占位。
+              {filteredCountHint > 0 ? `，本次省略 ${filteredCountHint} 条` : ''}
+              ；删除或隐藏项仍保留占位。
             </div>
           ) : null}
 

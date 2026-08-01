@@ -56,7 +56,9 @@ export function PostCard({ post, pinned = false }: { post: PostViewModel; pinned
               ) : (
                 <strong>{post.author.displayName}</strong>
               )}
-              {authorProfileAvailable ? <ShieldCheck size={14} className={styles.verified} /> : null}
+              {authorProfileAvailable ? (
+                <ShieldCheck size={14} className={styles.verified} />
+              ) : null}
               {post.community ? (
                 <Link to={paths.community(post.community.slug)}>
                   <Badge tone="brand">{post.community.name}</Badge>
@@ -99,11 +101,7 @@ export function PostCard({ post, pinned = false }: { post: PostViewModel; pinned
           {post.media.length ? (
             <div className={styles.mediaGrid} data-count={Math.min(post.media.length, 4)}>
               {post.media.slice(0, 4).map((media, index) => (
-                <Link
-                  key={media.id}
-                  to={paths.postMedia(post.id, index)}
-                  className={styles.media}
-                >
+                <Link key={media.id} to={paths.postMedia(post.id, index)} className={styles.media}>
                   <img src={media.posterUrl || media.url} alt={media.alt} />
                   {media.kind === 'video' ? (
                     <span className={styles.videoBadge}>

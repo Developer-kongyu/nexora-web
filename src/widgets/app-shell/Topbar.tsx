@@ -35,7 +35,7 @@ export function Topbar() {
 
   const submit = () => {
     const value = query.trim();
-    if (value) navigate(paths.searchResults(value));
+    if (value) void navigate(paths.searchResults(value));
     else inputRef.current?.focus();
   };
 

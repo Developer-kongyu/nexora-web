@@ -1,13 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import {
-  Compass,
-  Flame,
-  Globe2,
-  Hash,
-  MapPin,
-  Sparkles,
-  TrendingUp,
-} from 'lucide-react';
+import { Compass, Flame, Globe2, Hash, MapPin, Sparkles, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { communitiesApi, communityKeys } from '@/domains/communities';
@@ -127,8 +119,7 @@ export function ExplorePage() {
             ))}
           </div>
           <span className={styles.toolbarLabel}>
-            <Compass size={14} style={{ display: 'inline', verticalAlign: '-2px' }} />{' '}
-            探索公开内容
+            <Compass size={14} style={{ display: 'inline', verticalAlign: '-2px' }} /> 探索公开内容
           </span>
         </div>
 
@@ -156,10 +147,7 @@ export function ExplorePage() {
                   </span>
                   <h3>#{topic.name}</h3>
                   <p>{topic.count} 条讨论</p>
-                  <Badge
-                    tone={topic.tone}
-                    style={{ position: 'absolute', right: 14, bottom: 14 }}
-                  >
+                  <Badge tone={topic.tone} style={{ position: 'absolute', right: 14, bottom: 14 }}>
                     {topic.growth}
                   </Badge>
                 </Link>
@@ -172,10 +160,7 @@ export function ExplorePage() {
           <LoadingRows count={2} />
         ) : (
           <section>
-            <div
-              className={styles.sectionHeader}
-              style={{ padding: '0 2px 12px', border: 0 }}
-            >
+            <div className={styles.sectionHeader} style={{ padding: '0 2px 12px', border: 0 }}>
               <div>
                 <h2>热门帖子</h2>
                 <p>高质量公开内容</p>

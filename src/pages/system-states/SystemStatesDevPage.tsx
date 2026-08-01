@@ -119,7 +119,10 @@ export function SystemStatesDevPage() {
       <section className={styles.boundaryNote}>
         <div>
           <strong>全局错误边界</strong>
-          <p>网络失败、频率限制、资源不存在和权限错误统一通过 EmptyState、PermissionGate 与 ErrorBoundary 呈现。</p>
+          <p>
+            网络失败、频率限制、资源不存在和权限错误统一通过 EmptyState、PermissionGate 与
+            ErrorBoundary 呈现。
+          </p>
         </div>
         <code>requestId · retryAfter · errorCode</code>
       </section>

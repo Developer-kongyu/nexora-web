@@ -1,6 +1,6 @@
-@import url("./tokens.css");
-@import url("./reset.css");
-@import url("./typography.css");
+@import url('./tokens.css');
+@import url('./reset.css');
+@import url('./typography.css');
 
 body {
   background: var(--color-bg);
@@ -75,7 +75,9 @@ body {
   border: 0;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
+  transition:
+    background var(--transition),
+    transform var(--transition);
 }
 
 [data-app-bootstrap-failure] button:hover {

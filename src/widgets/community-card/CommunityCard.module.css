@@ -15,11 +15,11 @@
   padding: 15px 16px;
 }
 
-.card[data-featured="true"] .row {
+.card[data-featured='true'] .row {
   align-items: start;
 }
 
-.card[data-featured="true"] .row > a {
+.card[data-featured='true'] .row > a {
   margin-top: -37px;
 }
 

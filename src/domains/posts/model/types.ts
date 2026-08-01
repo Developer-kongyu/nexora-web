@@ -48,8 +48,7 @@ export interface PostComposeHashtagRangeInput {
 }
 
 export type PostComposeEntityRangeInput =
-  | PostComposeMentionRangeInput
-  | PostComposeHashtagRangeInput;
+  PostComposeMentionRangeInput | PostComposeHashtagRangeInput;
 
 export interface PostComposeInput {
   bodyText: string | null;
@@ -151,13 +150,7 @@ export interface PostViewModel {
 }
 
 export type LinkPreviewComposeStatus =
-  | 'NONE'
-  | 'DISABLED'
-  | 'MISSING'
-  | 'PENDING'
-  | 'READY'
-  | 'FAILED'
-  | 'STALE';
+  'NONE' | 'DISABLED' | 'MISSING' | 'PENDING' | 'READY' | 'FAILED' | 'STALE';
 
 export interface PostDraftLinkPreviewStateView {
   state: LinkPreviewComposeStatus | 'UNAVAILABLE';
@@ -329,9 +322,7 @@ export interface ReplyPostListItemView {
   } | null;
 }
 
-export type RelationPostListDegradedReason =
-  | 'CARD_SURFACE_SHORT_PAGE'
-  | 'REPLY_TOMBSTONE_EXPOSED';
+export type RelationPostListDegradedReason = 'CARD_SURFACE_SHORT_PAGE' | 'REPLY_TOMBSTONE_EXPOSED';
 
 export interface ReplyListPageView {
   list: ReplyPostListItemView[];

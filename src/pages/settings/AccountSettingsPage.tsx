@@ -1,12 +1,4 @@
-import {
-  KeyRound,
-  Laptop,
-  LockKeyhole,
-  Mail,
-  ShieldCheck,
-  Smartphone,
-  Trash2,
-} from 'lucide-react';
+import { KeyRound, Laptop, LockKeyhole, Mail, ShieldCheck, Smartphone, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/shared/lib/cn';
 import { Button, Card, Modal, TextField, useToast } from '@/shared/ui';
@@ -256,7 +248,11 @@ export function AccountSettingsPage() {
               disabled={!identityValue.trim()}
               onClick={() => {
                 setIdentityField(null);
-                showToast({ tone: 'success', title: '验证信息已发送', description: '完成验证后更改生效。' });
+                showToast({
+                  tone: 'success',
+                  title: '验证信息已发送',
+                  description: '完成验证后更改生效。',
+                });
               }}
             >
               保存并验证

@@ -4,8 +4,7 @@
   place-items: center;
   padding: 24px;
   background:
-    radial-gradient(circle at 50% 0%, rgb(239 68 68 / 8%), transparent 35%),
-    var(--color-bg);
+    radial-gradient(circle at 50% 0%, rgb(239 68 68 / 8%), transparent 35%), var(--color-bg);
 }
 
 .card {
@@ -55,7 +54,8 @@
   margin-top: 8px;
 }
 
-.actions button, .actions a {
+.actions button,
+.actions a {
   display: inline-flex;
   align-items: center;
   justify-content: center;

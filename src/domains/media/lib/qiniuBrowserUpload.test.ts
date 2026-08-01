@@ -31,21 +31,14 @@ afterEach(() => {
 
 describe('uploadFileWithQiniu', () => {
   it('does not pass a raw unknown region string into the SDK config', async () => {
-    const subscribe = vi.fn(
-      (observer: { complete?: (result: { key?: string }) => void }) => {
-        observer.complete?.({ key: 'users/current/avatar.png' });
-        return { unsubscribe: vi.fn() };
-      },
-    );
-    const upload = vi.fn(
-      (
-        _file: File,
-        _key: string,
-        _token: string,
-        _putExtra: unknown,
-        _config: { region?: unknown },
-      ) => ({ subscribe }),
-    );
+    const subscribe = vi.fn((observer: { complete?: (result: { key?: string }) => void }) => {
+      observer.complete?.({ key: 'users/current/avatar.png' });
+      return { unsubscribe: vi.fn() };
+    });
+    const upload = vi.fn((...args: [File, string, string, unknown, { region?: unknown }]) => {
+      void args;
+      return { subscribe };
+    });
     (window as TestQiniuWindow).qiniu = { region: { z0: { id: 'z0' } }, upload };
 
     await uploadFileWithQiniu({
@@ -86,9 +79,7 @@ describe('uploadFileWithQiniu', () => {
       file,
       ticket: ticket({ sdkScriptUrl }),
     });
-    const firstScript = document.querySelector<HTMLScriptElement>(
-      'script[data-media-upload-sdk]',
-    );
+    const firstScript = document.querySelector<HTMLScriptElement>('script[data-media-upload-sdk]');
     expect(firstScript).not.toBeNull();
     firstScript?.dispatchEvent(new Event('load'));
 
@@ -99,18 +90,14 @@ describe('uploadFileWithQiniu', () => {
       file,
       ticket: ticket({ sdkScriptUrl }),
     });
-    const secondScript = document.querySelector<HTMLScriptElement>(
-      'script[data-media-upload-sdk]',
-    );
+    const secondScript = document.querySelector<HTMLScriptElement>('script[data-media-upload-sdk]');
     expect(secondScript).not.toBeNull();
     expect(secondScript).not.toBe(firstScript);
 
-    const subscribe = vi.fn(
-      (observer: { complete?: (result: { key?: string }) => void }) => {
-        observer.complete?.({ key: 'users/current/avatar.png' });
-        return { unsubscribe: vi.fn() };
-      },
-    );
+    const subscribe = vi.fn((observer: { complete?: (result: { key?: string }) => void }) => {
+      observer.complete?.({ key: 'users/current/avatar.png' });
+      return { unsubscribe: vi.fn() };
+    });
     (window as TestQiniuWindow).qiniu = {
       upload: vi.fn(() => ({ subscribe })),
     };

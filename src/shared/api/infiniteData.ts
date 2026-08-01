@@ -18,15 +18,10 @@ export function filterInfiniteDataItems<
   if (!data) return data;
   return {
     ...data,
-    pages: data.pages.map(
-      (page) =>
-        ({
-          ...page,
-          list: page.list.filter((item) =>
-            predicate(item as InfiniteListItem<TPage>),
-          ),
-        }) as TPage,
-    ),
+    pages: data.pages.map((page) => ({
+      ...page,
+      list: page.list.filter((item) => predicate(item as InfiniteListItem<TPage>)),
+    })),
   };
 }
 
@@ -50,8 +45,6 @@ export function mergeInfiniteDataItemsBy<
   getKey: (item: InfiniteListItem<TPage>) => string,
 ): InfiniteListItem<TPage>[] {
   if (!data) return [];
-  const items = data.pages.flatMap(
-    (page) => page.list as InfiniteListItem<TPage>[],
-  );
+  const items = data.pages.flatMap((page) => page.list as InfiniteListItem<TPage>[]);
   return uniqueItemsBy(items, getKey);
 }

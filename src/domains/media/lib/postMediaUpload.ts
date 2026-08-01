@@ -42,8 +42,7 @@ export async function uploadPostMediaQueueItem(input: {
           status: mapLifecycleStage(stage),
           error: undefined,
         }),
-      onCheckpoint: (checkpoint) =>
-        input.update(input.item.clientUploadId, { checkpoint }),
+      onCheckpoint: (checkpoint) => input.update(input.item.clientUploadId, { checkpoint }),
     });
 
     input.update(input.item.clientUploadId, {

@@ -1,12 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import {
-  Activity,
-  ClipboardList,
-  Pin,
-  UserCheck,
-  ShieldCheck,
-  UsersRound,
-} from 'lucide-react';
+import { Activity, ClipboardList, Pin, UserCheck, ShieldCheck, UsersRound } from 'lucide-react';
 import { useState } from 'react';
 import {
   COMMUNITY_MODERATION_ACTION_LABELS,
@@ -202,7 +195,10 @@ export function OverviewSection({ communityId, onNavigate }: OverviewSectionProp
             ))}
           </div>
         ) : (
-          <EmptyPanel title="暂无管理日志" description="完成管理操作后，正式审计记录会显示在这里。" />
+          <EmptyPanel
+            title="暂无管理日志"
+            description="完成管理操作后，正式审计记录会显示在这里。"
+          />
         )}
       </Card>
     </div>

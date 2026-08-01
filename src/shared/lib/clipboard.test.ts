@@ -20,9 +20,7 @@ afterEach(() => {
 
 describe('copyTextToClipboard', () => {
   it('invokes writeText with the Clipboard receiver', async () => {
-    let receiver: Clipboard | undefined;
     const writeText = vi.fn(function (this: Clipboard, value: string) {
-      receiver = this;
       return Promise.resolve(value);
     });
     const clipboard = { writeText } as unknown as Clipboard;
@@ -31,7 +29,7 @@ describe('copyTextToClipboard', () => {
     await copyTextToClipboard('https://example.com/posts/1');
 
     expect(writeText).toHaveBeenCalledWith('https://example.com/posts/1');
-    expect(receiver).toBe(clipboard);
+    expect(writeText.mock.contexts[0]).toBe(clipboard);
   });
 
   it('rejects when the Clipboard API is unavailable', async () => {

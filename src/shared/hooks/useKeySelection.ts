@@ -29,9 +29,11 @@ export function useKeySelection(
   }));
   const availableKeySet = useMemo(() => new Set(availableKeys), [availableKeys]);
   const sourceChanged = !Object.is(state.resetKey, resetKey);
-  const retainedSelectedKeys = sourceChanged
-    ? new Set<string>()
-    : retainSetValues(state.selectedKeys, availableKeySet);
+  const retainedSelectedKeys = useMemo(
+    () =>
+      sourceChanged ? new Set<string>() : retainSetValues(state.selectedKeys, availableKeySet),
+    [availableKeySet, sourceChanged, state.selectedKeys],
+  );
 
   if (sourceChanged || retainedSelectedKeys.size !== state.selectedKeys.size) {
     setState({ resetKey, selectedKeys: retainedSelectedKeys });

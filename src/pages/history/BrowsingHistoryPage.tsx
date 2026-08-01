@@ -15,10 +15,7 @@ import {
   type PostBrowseHistoryItemView,
   type PostBrowseHistoryPageView,
 } from '@/domains/library';
-import {
-  mergeInfiniteDataItemsBy,
-  removeInfiniteDataItemsByKey,
-} from '@/shared/api/infiniteData';
+import { mergeInfiniteDataItemsBy, removeInfiniteDataItemsByKey } from '@/shared/api/infiniteData';
 import { paths } from '@/shared/config/paths';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
 import { useKeySelection } from '@/shared/hooks/useKeySelection';
@@ -32,10 +29,7 @@ import styles from './BrowsingHistoryPage.module.css';
 const PAGE_SIZE = 20;
 type HistoryFilter = 'all' | 'posts' | 'communities';
 type ConfirmAction =
-  | { type: 'clear' }
-  | { type: 'selected' }
-  | { type: 'single'; postId: string }
-  | null;
+  { type: 'clear' } | { type: 'selected' } | { type: 'single'; postId: string } | null;
 
 function getHistoryTitle(item: PostBrowseHistoryItemView): string {
   if (item.itemState === 'PLACEHOLDER') return '内容暂不可用';
@@ -84,9 +78,7 @@ export function BrowsingHistoryPage() {
       settleBatch(postIds, (postId) => libraryApi.deleteHistoryItem(postId), 4),
     onSuccess: (results) => {
       const fulfilledIds = new Set(
-        results
-          .filter((item) => item.status === 'fulfilled')
-          .map((item) => item.input),
+        results.filter((item) => item.status === 'fulfilled').map((item) => item.input),
       );
       const failedIds = results
         .filter((item) => item.status === 'rejected')
@@ -177,11 +169,13 @@ export function BrowsingHistoryPage() {
         <section className={styles.panel}>
           <div className={styles.toolbar}>
             <div className={styles.filters} aria-label="浏览历史筛选">
-              {([
-                ['all', '全部'],
-                ['posts', '帖子'],
-                ['communities', '社群'],
-              ] as const).map(([value, label]) => (
+              {(
+                [
+                  ['all', '全部'],
+                  ['posts', '帖子'],
+                  ['communities', '社群'],
+                ] as const
+              ).map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
@@ -253,10 +247,7 @@ export function BrowsingHistoryPage() {
                       </label>
                       <div className={styles.itemCopy}>
                         {active ? (
-                          <Link
-                            to={paths.post(item.postId)}
-                            className={styles.itemTitle}
-                          >
+                          <Link to={paths.post(item.postId)} className={styles.itemTitle}>
                             {title}
                           </Link>
                         ) : (
@@ -281,15 +272,15 @@ export function BrowsingHistoryPage() {
                         <p>
                           {active
                             ? item.postCard.bodyTextPreview?.trim() || '该内容没有文字摘要。'
-                            : getPostAvailabilityPlaceholderMessage(item.placeholderReasonCode, 'history')}
+                            : getPostAvailabilityPlaceholderMessage(
+                                item.placeholderReasonCode,
+                                'history',
+                              )}
                         </p>
                       </div>
                       <div className={styles.itemActions}>
                         {active ? (
-                          <Link
-                            className={styles.viewLink}
-                            to={paths.post(item.postId)}
-                          >
+                          <Link className={styles.viewLink} to={paths.post(item.postId)}>
                             <Eye size={15} />
                             查看
                           </Link>
@@ -298,9 +289,7 @@ export function BrowsingHistoryPage() {
                           type="button"
                           className={styles.deleteButton}
                           disabled={isMutating}
-                          onClick={() =>
-                            setConfirmAction({ type: 'single', postId: item.postId })
-                          }
+                          onClick={() => setConfirmAction({ type: 'single', postId: item.postId })}
                         >
                           <Trash2 size={15} />
                           删除

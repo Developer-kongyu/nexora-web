@@ -1,7 +1,4 @@
-import type {
-  UserFollowRelationshipWriteResult,
-  UserRelationSnapshotView,
-} from './types';
+import type { UserFollowRelationshipWriteResult, UserRelationSnapshotView } from './types';
 
 export const USER_RELATIONSHIP_ACTIONS = ['follow', 'unfollow', 'cancel-request'] as const;
 export type UserRelationshipAction = (typeof USER_RELATIONSHIP_ACTIONS)[number];
@@ -9,11 +6,7 @@ export type UserRelationshipAction = (typeof USER_RELATIONSHIP_ACTIONS)[number];
 export function resolveUserRelationshipAction(
   relationship: UserRelationSnapshotView | null,
 ): UserRelationshipAction | null {
-  if (
-    relationship?.isSelf ||
-    relationship?.blockedByViewer ||
-    relationship?.blockedByTarget
-  ) {
+  if (relationship?.isSelf || relationship?.blockedByViewer || relationship?.blockedByTarget) {
     return null;
   }
   if (relationship?.outgoingFollowRequestPending) return 'cancel-request';

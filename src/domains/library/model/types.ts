@@ -49,8 +49,7 @@ export type BookmarkPermissionPlaceholderReasonCode =
   | 'DENY_COMMUNITY_POST_MUST_BE_PUBLIC';
 
 export type BookmarkPlaceholderReasonCode =
-  | BookmarkPermissionPlaceholderReasonCode
-  | 'CARD_HYDRATION_UNAVAILABLE';
+  BookmarkPermissionPlaceholderReasonCode | 'CARD_HYDRATION_UNAVAILABLE';
 
 interface BookmarkCollectionItemBase {
   bookmarkItemId: string;
@@ -131,8 +130,7 @@ export interface RemoveBookmarkCollectionItemsResult {
 }
 
 export type ContentCenterPublishedPageDegradedReason =
-  | 'OWNER_GATE_SHORT_PAGE'
-  | 'CARD_SURFACE_SHORT_PAGE';
+  'OWNER_GATE_SHORT_PAGE' | 'CARD_SURFACE_SHORT_PAGE';
 
 export interface ContentCenterPublishedPageView extends CursorPageView<PostCardBriefView> {
   degraded: boolean;
@@ -162,18 +160,10 @@ export interface BatchDeleteOwnDraftsResult {
 }
 
 export type BrowseHistorySourceScene =
-  | 'POST_DETAIL'
-  | 'SEARCH_RESULT'
-  | 'COMMUNITY_POST'
-  | 'PROFILE_POST'
-  | 'NOTIFICATION_JUMP';
+  'POST_DETAIL' | 'SEARCH_RESULT' | 'COMMUNITY_POST' | 'PROFILE_POST' | 'NOTIFICATION_JUMP';
 
 export type BrowseHistorySourceModule =
-  | 'POST'
-  | 'SEARCH'
-  | 'COMMUNITY'
-  | 'PROFILE'
-  | 'NOTIFICATION';
+  'POST' | 'SEARCH' | 'COMMUNITY' | 'PROFILE' | 'NOTIFICATION';
 
 interface PostBrowseHistoryItemBase {
   postId: string;

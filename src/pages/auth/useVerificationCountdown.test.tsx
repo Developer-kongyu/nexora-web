@@ -15,10 +15,14 @@ describe('useVerificationCountdown', () => {
     act(() => result.current.start(2));
     expect(result.current).toMatchObject({ seconds: 2, active: true });
 
-    act(() => vi.advanceTimersByTime(1000));
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(result.current.seconds).toBe(1);
 
-    act(() => vi.advanceTimersByTime(1000));
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(result.current).toMatchObject({ seconds: 0, active: false });
     expect(vi.getTimerCount()).toBe(0);
   });

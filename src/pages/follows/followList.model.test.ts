@@ -5,9 +5,7 @@ import {
 } from '@/domains/users/model';
 import { filterAndSortFollowList, matchesFollowListRelation } from './followList.model';
 
-function relationship(
-  patch: Partial<UserRelationSnapshotView> = {},
-): UserRelationSnapshotView {
+function relationship(patch: Partial<UserRelationSnapshotView> = {}): UserRelationSnapshotView {
   return {
     viewerUserId: 'viewer',
     targetUserId: 'target',

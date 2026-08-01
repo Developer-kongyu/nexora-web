@@ -5,12 +5,7 @@ export type ProfileVisibility = PublicPrivateVisibility;
 export const PERMISSION_AUDIENCES = ['everyone', 'following', 'none'] as const;
 export type PermissionAudience = (typeof PERMISSION_AUDIENCES)[number];
 
-export const COMMENT_PERMISSION_AUDIENCES = [
-  'everyone',
-  'following',
-  'followers',
-  'none',
-] as const;
+export const COMMENT_PERMISSION_AUDIENCES = ['everyone', 'following', 'followers', 'none'] as const;
 export type CommentPermissionAudience = (typeof COMMENT_PERMISSION_AUDIENCES)[number];
 
 export const MESSAGE_PERMISSION_AUDIENCES = ['following', 'mutual', 'none'] as const;

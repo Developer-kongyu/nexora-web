@@ -3,8 +3,7 @@
   padding: 38px 24px;
   background:
     radial-gradient(circle at 10% 15%, #eef2ff, transparent 32%),
-    radial-gradient(circle at 88% 85%, #ecfeff, transparent 28%),
-    var(--color-bg);
+    radial-gradient(circle at 88% 85%, #ecfeff, transparent 28%), var(--color-bg);
 }
 
 .shell {
@@ -106,7 +105,7 @@
 }
 
 .progress span::before {
-  content: "";
+  content: '';
   position: absolute;
   z-index: 0;
   top: 7px;
@@ -131,16 +130,19 @@
   box-shadow: 0 0 0 1px #dce3ee;
 }
 
-.progress span[data-state="current"], .progress span[data-state="done"] {
+.progress span[data-state='current'],
+.progress span[data-state='done'] {
   color: var(--color-primary);
 }
 
-.progress span[data-state="current"] i, .progress span[data-state="done"] i {
+.progress span[data-state='current'] i,
+.progress span[data-state='done'] i {
   background: var(--color-primary);
   box-shadow: 0 0 0 1px #a5b4fc;
 }
 
-.progress span[data-state="done"]::before, .progress span[data-state="current"]::before {
+.progress span[data-state='done']::before,
+.progress span[data-state='current']::before {
   background: #a5b4fc;
 }
 

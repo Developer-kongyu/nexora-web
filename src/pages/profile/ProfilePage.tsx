@@ -100,8 +100,7 @@ export function ProfilePage() {
   };
 
   const followMutation = useMutation({
-    mutationFn: (action: UserRelationshipAction) =>
-      performUserRelationshipAction(handle, action),
+    mutationFn: (action: UserRelationshipAction) => performUserRelationshipAction(handle, action),
     onSuccess: (result) => {
       if (result.targetState === 'FOUND') updateRelationship(result.relationship);
       else void profile.refetch();
@@ -111,36 +110,28 @@ export function ProfilePage() {
         title: describeUserRelationshipActionResult(result),
       });
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '操作失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '操作失败', description: '请稍后重试。' }),
   });
 
-  const muteMutation = useMutation<
-    UpsertUserMuteResult | DeleteUserRelationResult,
-    Error,
-    boolean
-  >({
-    mutationFn: (muted: boolean) =>
-      muted
-        ? usersApi.unmute(handle)
-        : usersApi.mute(handle, { mutePosts: true, muteNotifications: true }),
-    onSuccess: (result, wasMuted) => {
-      if (result.targetState === 'FOUND') updateRelationship(result.relationship);
-      else void profile.refetch();
-      setMenuOpen(false);
-      showToast({ tone: 'success', title: wasMuted ? '已取消静音' : '已静音该用户' });
+  const muteMutation = useMutation<UpsertUserMuteResult | DeleteUserRelationResult, Error, boolean>(
+    {
+      mutationFn: (muted: boolean) =>
+        muted
+          ? usersApi.unmute(handle)
+          : usersApi.mute(handle, { mutePosts: true, muteNotifications: true }),
+      onSuccess: (result, wasMuted) => {
+        if (result.targetState === 'FOUND') updateRelationship(result.relationship);
+        else void profile.refetch();
+        setMenuOpen(false);
+        showToast({ tone: 'success', title: wasMuted ? '已取消静音' : '已静音该用户' });
+      },
+      onError: () =>
+        showToast({ tone: 'error', title: '静音设置失败', description: '请稍后重试。' }),
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '静音设置失败', description: '请稍后重试。' }),
-  });
+  );
 
-  const blockMutation = useMutation<
-    BlockUserResult | DeleteUserRelationResult,
-    Error,
-    boolean
-  >({
-    mutationFn: (blocked: boolean) =>
-      blocked ? usersApi.unblock(handle) : usersApi.block(handle),
+  const blockMutation = useMutation<BlockUserResult | DeleteUserRelationResult, Error, boolean>({
+    mutationFn: (blocked: boolean) => (blocked ? usersApi.unblock(handle) : usersApi.block(handle)),
     onSuccess: (result, wasBlocked) => {
       if (result.targetState === 'FOUND') updateRelationship(result.relationship);
       else void profile.refetch();
@@ -148,8 +139,7 @@ export function ProfilePage() {
       void queryClient.invalidateQueries({ queryKey: userKeys.profilePosts(handle) });
       showToast({ tone: 'success', title: wasBlocked ? '已取消屏蔽' : '已屏蔽该用户' });
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '屏蔽设置失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '屏蔽设置失败', description: '请稍后重试。' }),
   });
 
   const visiblePosts = useMemo(() => {
@@ -346,7 +336,9 @@ export function ProfilePage() {
               <PostCard
                 key={`${tab}-${post.id}`}
                 post={{ ...post, variant: 'profile' }}
-                pinned={tab === '帖子' && profile.data?.pinnedPostIds.includes(post.id) && index < 3}
+                pinned={
+                  tab === '帖子' && profile.data?.pinnedPostIds.includes(post.id) && index < 3
+                }
               />
             ))}
           </div>
@@ -356,7 +348,9 @@ export function ProfilePage() {
               icon={<Pin size={22} />}
               title={`暂无${tab}内容`}
               description={own ? '发布内容后会显示在这里。' : '该用户尚未公开相关内容。'}
-              action={own ? <Button onClick={() => navigate('/compose')}>开始创作</Button> : undefined}
+              action={
+                own ? <Button onClick={() => navigate('/compose')}>开始创作</Button> : undefined
+              }
             />
           </Card>
         )}

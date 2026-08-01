@@ -1,18 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  validateMediaImageFile,
-  type MediaImageFileValidationResult,
-} from '../lib/imageSelection';
+import { validateMediaImageFile, type MediaImageFileValidationResult } from '../lib/imageSelection';
 import type {
   MediaImageSelection,
   MediaImageSelectionController,
   MediaImageSelectionPatch,
 } from '../model/types';
 
-export type MediaImageValidationFailure = Exclude<
-  MediaImageFileValidationResult,
-  { valid: true }
->;
+export type MediaImageValidationFailure = Exclude<MediaImageFileValidationResult, { valid: true }>;
 
 export interface UseMediaImageSelectionOptions {
   maxBytes?: number;

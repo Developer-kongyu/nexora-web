@@ -13,10 +13,7 @@ const inlineIconStyle = {
 export function ComposePage() {
   return (
     <>
-      <PageTitle
-        title="发布帖子"
-        description="编辑正文、媒体、投递位置与互动权限。"
-      />
+      <PageTitle title="发布帖子" description="编辑正文、媒体、投递位置与互动权限。" />
       <PageLayout
         aside={
           <>

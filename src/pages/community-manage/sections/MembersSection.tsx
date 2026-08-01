@@ -52,11 +52,7 @@ export function MembersSection({ communityId }: CommunityManageSectionProps) {
   const members = useQuery({
     queryKey: communityManageKeys.members(communityId, role, page, PAGE_SIZE),
     queryFn: ({ signal }) =>
-      communitiesApi.listMembers(
-        communityId,
-        { page, pageSize: PAGE_SIZE, role },
-        signal,
-      ),
+      communitiesApi.listMembers(communityId, { page, pageSize: PAGE_SIZE, role }, signal),
   });
 
   const changeRole = useMutation({
@@ -82,11 +78,7 @@ export function MembersSection({ communityId }: CommunityManageSectionProps) {
 
   const removeMember = useMutation({
     mutationFn: (member: CommunityMemberListItemView) =>
-      communitiesApi.removeMember(
-        communityId,
-        member.userId,
-        removeReason.trim() || null,
-      ),
+      communitiesApi.removeMember(communityId, member.userId, removeReason.trim() || null),
     onSuccess: (result, member) => {
       showToast({
         tone: 'success',
@@ -145,7 +137,9 @@ export function MembersSection({ communityId }: CommunityManageSectionProps) {
             label="角色"
             value={role ?? 'ALL'}
             onChange={(event) => {
-              setRole(event.target.value === 'ALL' ? null : (event.target.value as CommunityMemberRole));
+              setRole(
+                event.target.value === 'ALL' ? null : (event.target.value as CommunityMemberRole),
+              );
               setPage(1);
             }}
           >
@@ -269,7 +263,11 @@ export function MembersSection({ communityId }: CommunityManageSectionProps) {
         }}
         footer={
           <>
-            <Button variant="secondary" disabled={removeMember.isPending} onClick={() => setRemoving(null)}>
+            <Button
+              variant="secondary"
+              disabled={removeMember.isPending}
+              onClick={() => setRemoving(null)}
+            >
               取消
             </Button>
             <Button

@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, Globe2, MapPin, Plus, Search, Sparkles } from 'lucide-react';
-import {
-  RECOMMENDATION_INTEREST_OPTIONS,
-  settingsApi,
-  settingsKeys,
-} from '@/domains/settings';
+import { RECOMMENDATION_INTEREST_OPTIONS, settingsApi, settingsKeys } from '@/domains/settings';
 import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { cn } from '@/shared/lib/cn';
 import { toggleArrayValue } from '@/shared/lib/set';

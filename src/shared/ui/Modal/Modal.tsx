@@ -17,14 +17,7 @@ interface ModalProps {
   footer?: ReactNode;
 }
 
-export function Modal({
-  open,
-  title,
-  description,
-  children,
-  onClose,
-  footer,
-}: ModalProps) {
+export function Modal({ open, title, description, children, onClose, footer }: ModalProps) {
   const titleId = useId();
   const descriptionId = useId();
   const dialogRef = useRef<HTMLElement>(null);

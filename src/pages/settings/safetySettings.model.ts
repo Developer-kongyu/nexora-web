@@ -6,9 +6,7 @@ import type {
 
 export type SafetyEntryKind = 'mute' | 'block';
 
-export type SafetyManagementItem =
-  | UserManagementListItemView
-  | BlockedUserManagementListItemView;
+export type SafetyManagementItem = UserManagementListItemView | BlockedUserManagementListItemView;
 
 const placeholderLabels: Record<UserManagementPlaceholderReason, string> = {
   USER_NOT_FOUND: '账号已不存在',
@@ -31,9 +29,7 @@ export function safetyHandleLabel(item: SafetyManagementItem): string {
   return item.handle ? `@${item.handle}` : 'Handle 不可用';
 }
 
-export function placeholderReasonLabel(
-  reason: UserManagementPlaceholderReason | null,
-): string {
+export function placeholderReasonLabel(reason: UserManagementPlaceholderReason | null): string {
   return reason ? placeholderLabels[reason] : '用户资料暂不可用';
 }
 
@@ -66,10 +62,7 @@ export function filterSafetyItems<T extends SafetyManagementItem>(
   });
 }
 
-export function canCancelSafetyEntry(
-  kind: SafetyEntryKind,
-  item: SafetyManagementItem,
-): boolean {
+export function canCancelSafetyEntry(kind: SafetyEntryKind, item: SafetyManagementItem): boolean {
   if (!item.handle) return false;
   if (kind === 'block' && 'canUnblock' in item) return item.canUnblock;
   return true;

@@ -49,10 +49,7 @@ export const libraryApi = {
       body: { name },
     }),
 
-  updateCollectionVisibility: (
-    collectionId: string,
-    visibility: BookmarkCollectionVisibility,
-  ) =>
+  updateCollectionVisibility: (collectionId: string, visibility: BookmarkCollectionVisibility) =>
     apiClient.request<BookmarkCollectionSummary, { visibility: BookmarkCollectionVisibility }>({
       path: `${collectionPath(collectionId)}/visibility`,
       method: 'PATCH',
@@ -65,11 +62,7 @@ export const libraryApi = {
       method: 'DELETE',
     }),
 
-  collectionItems: (
-    collectionId: string,
-    params: CursorRequest = {},
-    signal?: AbortSignal,
-  ) =>
+  collectionItems: (collectionId: string, params: CursorRequest = {}, signal?: AbortSignal) =>
     apiClient.request<BookmarkCollectionItemsPage>({
       path: `${collectionPath(collectionId)}/items${buildCursorQuery(params)}`,
       signal,

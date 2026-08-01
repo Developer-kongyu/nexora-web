@@ -19,6 +19,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type FormEvent,
 } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -134,9 +135,7 @@ function ComposeEditorForm({
   const [quotePostId, setQuotePostId] = useState(
     initialCompose?.quoteOfPostId ?? initialQuotePostId,
   );
-  const [saveState, setSaveState] = useState<SaveState>(
-    initialDraft ? 'saved' : 'idle',
-  );
+  const [saveState, setSaveState] = useState<SaveState>(initialDraft ? 'saved' : 'idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState(
     initialDraft?.lastSavedAtIso ?? initialDraft?.lastAutosavedAtIso ?? null,
@@ -282,17 +281,12 @@ function ComposeEditorForm({
       setSaveError(draftErrorDescription(error));
       setSaveState('error');
     }
-  }, [
-    autosaveDraftMutation,
-    currentCompose,
-    currentFingerprint,
-    draftId,
-    draftVersion,
-  ]);
+  }, [autosaveDraftMutation, currentCompose, currentFingerprint, draftId, draftVersion]);
 
   useEffect(() => {
+    const uploadAbortController = uploadAbortControllerRef.current;
     return () => {
-      uploadAbortControllerRef.current.abort(createAbortError('发帖编辑器已卸载。'));
+      uploadAbortController.abort(createAbortError('发帖编辑器已卸载。'));
       clearUploads();
     };
   }, [clearUploads]);
@@ -389,7 +383,9 @@ function ComposeEditorForm({
     [createDraftMutation, draftId, draftVersion, saveDraftMutation],
   );
 
-  const handleSaveDraft = form.handleSubmit(async () => {
+  const handleSaveDraft = async () => {
+    const isValid = await form.trigger();
+    if (!isValid) return;
     setActiveAction('save');
     setSaveState('saving');
     setSaveError(null);
@@ -406,7 +402,7 @@ function ComposeEditorForm({
           : '可在内容中心继续编辑和发布。',
       });
       if (!initialDraft) {
-        navigate(paths.composeDraft(result.draftId), { replace: true });
+        void navigate(paths.composeDraft(result.draftId), { replace: true });
       }
     } catch (error) {
       const description = draftErrorDescription(error);
@@ -416,9 +412,12 @@ function ComposeEditorForm({
     } finally {
       setActiveAction(null);
     }
-  });
+  };
 
-  const handlePublish = form.handleSubmit(async () => {
+  const handlePublish = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const isValid = await form.trigger();
+    if (!isValid) return;
     setActiveAction('publish');
     setSaveError(null);
     try {
@@ -459,7 +458,7 @@ function ComposeEditorForm({
             ? '内容已同步到你的主页和可见用户时间线。'
             : '媒体处理完成后会自动发布，无需重复提交。',
       });
-      navigate(paths.post(result.postId));
+      void navigate(paths.post(result.postId));
     } catch (error) {
       showToast({
         tone: 'error',
@@ -469,7 +468,7 @@ function ComposeEditorForm({
     } finally {
       setActiveAction(null);
     }
-  });
+  };
 
   const saveStatusText = (() => {
     if (!draftId) return '首次保存后将启用自动保存';
@@ -609,12 +608,7 @@ function ComposeEditorForm({
               <span>定时</span>
             </button>
           </div>
-          <button
-            type="button"
-            className={styles.polish}
-            disabled
-            title="智能润色服务尚未开放"
-          >
+          <button type="button" className={styles.polish} disabled title="智能润色服务尚未开放">
             <Sparkles size={17} />
             <span>智能润色</span>
           </button>

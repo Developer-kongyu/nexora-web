@@ -76,23 +76,13 @@ export const usersApi = {
       path: `/api/users/me/follow-requests/${encodeURIComponent(followRequestId)}/reject`,
     }),
 
-  followers: (
-    handle: string,
-    cursor?: string | null,
-    limit = 20,
-    signal?: AbortSignal,
-  ) =>
+  followers: (handle: string, cursor?: string | null, limit = 20, signal?: AbortSignal) =>
     apiClient.request<CursorPageView<UserListItemView>>({
       path: `/api/users/${encodeURIComponent(handle)}/followers${buildCursorQuery({ cursor, limit })}`,
       signal,
     }),
 
-  following: (
-    handle: string,
-    cursor?: string | null,
-    limit = 20,
-    signal?: AbortSignal,
-  ) =>
+  following: (handle: string, cursor?: string | null, limit = 20, signal?: AbortSignal) =>
     apiClient.request<CursorPageView<UserListItemView>>({
       path: `/api/users/${encodeURIComponent(handle)}/following${buildCursorQuery({ cursor, limit })}`,
       signal,

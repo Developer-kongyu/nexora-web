@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -14,11 +16,15 @@ body {
   min-height: 100vh;
 }
 
-button, input, textarea, select {
+button,
+input,
+textarea,
+select {
   font: inherit;
 }
 
-button, [role="button"] {
+button,
+[role='button'] {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -31,7 +37,8 @@ a {
   text-decoration: none;
 }
 
-img, svg {
+img,
+svg {
   display: block;
 }
 
@@ -39,11 +46,17 @@ img {
   max-width: 100%;
 }
 
-h1, h2, h3, p, ul, ol {
+h1,
+h2,
+h3,
+p,
+ul,
+ol {
   margin: 0;
 }
 
-ul, ol {
+ul,
+ol {
   padding: 0;
   list-style: none;
 }

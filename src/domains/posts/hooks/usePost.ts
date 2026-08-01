@@ -69,13 +69,8 @@ export function useSavePostDraft() {
 export function usePublishPostDraft() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      draftId,
-      input,
-    }: {
-      draftId: string;
-      input?: PublishPostFromDraftInput;
-    }) => postsApi.publishDraft(draftId, input),
+    mutationFn: ({ draftId, input }: { draftId: string; input?: PublishPostFromDraftInput }) =>
+      postsApi.publishDraft(draftId, input),
     onSuccess: async (result) => {
       await Promise.all([
         client.invalidateQueries({ queryKey: feedKeys.all }),

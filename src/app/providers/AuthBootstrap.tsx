@@ -10,11 +10,7 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
       try {
         const session = await authApi.refresh();
         if (!isCurrent()) return null;
-        setRefreshedSession(
-          session.accessToken,
-          session.user,
-          session.onboardingCompleted,
-        );
+        setRefreshedSession(session.accessToken, session.user, session.onboardingCompleted);
         return session.accessToken;
       } catch {
         if (isCurrent()) setAnonymous();

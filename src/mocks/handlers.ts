@@ -24,7 +24,6 @@ import type { PermissionPolicy } from '@/domains/permissions/model/types';
 import type {
   BookmarkCollectionItemCardView,
   BookmarkCollectionSummary,
-  BookmarkCollectionVisibility,
   PostBrowseHistoryItemView,
 } from '@/domains/library/model/types';
 import {
@@ -204,8 +203,7 @@ let mockEditableProfile: UserProfileEditableView = {
 };
 
 type MockProfilePatchParseResult =
-  | { ok: true; value: UpdateOwnProfileRequest }
-  | { ok: false; message: string };
+  { ok: true; value: UpdateOwnProfileRequest } | { ok: false; message: string };
 
 function parseMockProfilePatch(raw: unknown): MockProfilePatchParseResult {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
@@ -420,10 +418,7 @@ let mockBlockRecords: MockBlockRecord[] = [
   },
 ];
 
-function seedMockRelation(
-  handle: string,
-  patch: Partial<UserRelationSnapshotView>,
-): void {
+function seedMockRelation(handle: string, patch: Partial<UserRelationSnapshotView>): void {
   const profile = mockUserProfiles[handle];
   if (!profile?.relationship) return;
   const relationship = { ...profile.relationship, ...patch };
@@ -682,7 +677,7 @@ function mockPostCard(postId: string): PostCardBriefView | null {
       height: media.height ?? null,
       durationMs: media.durationSeconds ? media.durationSeconds * 1000 : null,
       publicUrl: media.url,
-      thumbnailUrl: media.kind === 'video' ? media.posterUrl ?? null : media.url,
+      thumbnailUrl: media.kind === 'video' ? (media.posterUrl ?? null) : media.url,
       renderStatus: 'READY',
     })),
     linkCard: post.linkPreview
@@ -926,9 +921,9 @@ function isMockPostComposeInput(value: unknown): value is PostComposeInput {
     isNullableString(input.repostOfPostId) &&
     Boolean(
       composerMeta &&
-        composerMeta.editorKind === 'TEXTAREA' &&
-        composerMeta.textIndexUnit === 'UTF16_CODE_UNIT' &&
-        composerMeta.normalizationVersion === 'POST_TEXT_NORMALIZATION_V1',
+      composerMeta.editorKind === 'TEXTAREA' &&
+      composerMeta.textIndexUnit === 'UTF16_CODE_UNIT' &&
+      composerMeta.normalizationVersion === 'POST_TEXT_NORMALIZATION_V1',
     )
   );
 }
@@ -958,26 +953,18 @@ function syncMockDraftList(detail: PostDraftDetailView): void {
     linkPreviewState: detail.linkPreviewState,
     updatedAtIso: detail.updatedAtIso,
   };
-  const currentIndex = mockContentCenterDrafts.findIndex(
-    (item) => item.draftId === detail.draftId,
-  );
+  const currentIndex = mockContentCenterDrafts.findIndex((item) => item.draftId === detail.draftId);
   if (currentIndex === -1) mockContentCenterDrafts.unshift(nextItem);
   else mockContentCenterDrafts[currentIndex] = nextItem;
 }
 
 function removeMockDraft(draftId: string): boolean {
   const existed = mockDraftDetails.delete(draftId);
-  mockContentCenterDrafts = mockContentCenterDrafts.filter(
-    (item) => item.draftId !== draftId,
-  );
+  mockContentCenterDrafts = mockContentCenterDrafts.filter((item) => item.draftId !== draftId);
   return existed;
 }
 
-async function updateMockDraft(
-  draftId: string,
-  request: Request,
-  mode: 'AUTOSAVE' | 'SAVE',
-) {
+async function updateMockDraft(draftId: string, request: Request, mode: 'AUTOSAVE' | 'SAVE') {
   const current = mockDraftDetails.get(draftId);
   if (!current) return apiError(404, 'POST_DRAFT_NOT_FOUND', '草稿不存在');
   const requestedVersion = Number(request.headers.get('x-post-draft-version'));
@@ -1090,9 +1077,7 @@ function publishMockCompose(postId: string, input: PublishPostDirectInput) {
   if (!pendingMediaAssetIds.length) addMockPublishedPost(postId, input);
   return {
     postId,
-    publishState: pendingMediaAssetIds.length
-      ? ('PUBLISHING' as const)
-      : ('PUBLISHED' as const),
+    publishState: pendingMediaAssetIds.length ? ('PUBLISHING' as const) : ('PUBLISHED' as const),
     publishMode: pendingMediaAssetIds.length
       ? ('WAIT_MEDIA_READY' as const)
       : ('IMMEDIATE' as const),
@@ -1244,7 +1229,7 @@ let mockCommunityMembers: CommunityMemberListItemView[] = [
   mockCommunityMember('u-dev', 'MEMBER', '2026-01-18T08:00:00.000Z'),
 ];
 
-let mockCommunityJoinRequests: CommunityJoinRequestListItemView[] = [
+const mockCommunityJoinRequests: CommunityJoinRequestListItemView[] = [
   {
     joinRequestId: 'join-request-1',
     applicantUserId: 'u-travel',
@@ -1448,8 +1433,7 @@ function mockCommunityDetail(): CommunityDetailView {
       commentRoleMin: mockCommunitySettings.commentRoleMin,
       quoteEnabled: mockCommunitySettings.quoteEnabled,
       repostEnabled: mockCommunitySettings.repostEnabled,
-      requireRuleAcceptanceBeforePost:
-        mockCommunitySettings.requireRuleAcceptanceBeforePost,
+      requireRuleAcceptanceBeforePost: mockCommunitySettings.requireRuleAcceptanceBeforePost,
       rulesVersion: mockCommunityRulesVersion,
       settingsVersion: mockCommunitySettings.settingsVersion,
     },
@@ -1472,8 +1456,7 @@ function mockCommunityDetail(): CommunityDetailView {
       commentRoleMin: mockCommunitySettings.commentRoleMin,
       quoteEnabled: mockCommunitySettings.quoteEnabled,
       repostEnabled: mockCommunitySettings.repostEnabled,
-      requireRuleAcceptanceBeforePost:
-        mockCommunitySettings.requireRuleAcceptanceBeforePost,
+      requireRuleAcceptanceBeforePost: mockCommunitySettings.requireRuleAcceptanceBeforePost,
       rulesVersion: mockCommunityRulesVersion,
       settingsVersion: mockCommunitySettings.settingsVersion,
       actorMembershipStatus: 'ACTIVE',
@@ -1489,9 +1472,8 @@ function mockCommunityDetail(): CommunityDetailView {
 }
 
 function mockCommunityOverview(days: 7 | 14 | 30) {
-  const lastPostAtIso = posts
-    .map((post) => post.createdAt)
-    .sort((left, right) => right.localeCompare(left))[0] ?? null;
+  const lastPostAtIso =
+    posts.map((post) => post.createdAt).sort((left, right) => right.localeCompare(left))[0] ?? null;
   return {
     snapshot: {
       communityId: MOCK_COMMUNITY_ID,
@@ -1501,8 +1483,7 @@ function mockCommunityOverview(days: 7 | 14 | 30) {
       ).length,
       postCount: posts.length,
       pinnedPostCount: mockCommunityPinnedPosts.length,
-      activeManagerCount: mockCommunityMembers.filter((member) => member.role !== 'MEMBER')
-        .length,
+      activeManagerCount: mockCommunityMembers.filter((member) => member.role !== 'MEMBER').length,
       lastPostAtIso,
       visibility: mockCommunitySettings.visibility,
       joinPolicy: mockCommunitySettings.joinPolicy,
@@ -1873,8 +1854,7 @@ export const handlers = [
       : [];
     const response = {
       list,
-      nextCursor:
-        nextIndex < allItems.length ? `mock-comment-cursor:${nextIndex}` : null,
+      nextCursor: nextIndex < allItems.length ? `mock-comment-cursor:${nextIndex}` : null,
       degraded: degradedReasons.length > 0,
       degradedReasons,
       pageMayBeShort: false,
@@ -2077,9 +2057,7 @@ export const handlers = [
     }
     const previous = mockEditableProfile;
     const nextAvatarStorageKey =
-      body.avatarStorageKey === undefined
-        ? previous.avatarStorageKey
-        : body.avatarStorageKey;
+      body.avatarStorageKey === undefined ? previous.avatarStorageKey : body.avatarStorageKey;
     const nextCoverStorageKey =
       body.coverStorageKey === undefined ? previous.coverStorageKey : body.coverStorageKey;
     const nextAvatarUrl =
@@ -2171,10 +2149,13 @@ export const handlers = [
   http.get('/api/users/me/blocks', ({ request }) => {
     const list = [...mockBlockRecords]
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
-      .map((record) => ({
-        ...toManagementListItem(record.targetUserId),
-        canUnblock: record.canUnblock,
-      } satisfies BlockedUserManagementListItemView));
+      .map(
+        (record) =>
+          ({
+            ...toManagementListItem(record.targetUserId),
+            canUnblock: record.canUnblock,
+          }) satisfies BlockedUserManagementListItemView,
+      );
     return ok(pagedMockList(request, list));
   }),
   http.post('/api/users/:handle/follow', ({ params }) => {
@@ -2224,10 +2205,7 @@ export const handlers = [
     if (targetNotFound) return targetNotFound;
     const user = users.find((candidate) => candidate.handle === handle);
     const rawBody = (await request.json()) as Record<string, unknown>;
-    if (
-      typeof rawBody.mutePosts !== 'boolean' ||
-      typeof rawBody.muteNotifications !== 'boolean'
-    ) {
+    if (typeof rawBody.mutePosts !== 'boolean' || typeof rawBody.muteNotifications !== 'boolean') {
       return apiError(400, 'USER_MUTE_REQUEST_VALIDATION_ERROR', '静音参数不合法');
     }
     const existing = user ? mockMuteByUserId(user.id) : null;
@@ -2371,9 +2349,7 @@ export const handlers = [
           mediaAssetId: null,
           currentAssetStatus: null,
           ticket: null,
-          errorCode: validSize
-            ? 'MEDIA_ASSET_UNSUPPORTED_MIME'
-            : 'MEDIA_ASSET_FILE_SIZE_INVALID',
+          errorCode: validSize ? 'MEDIA_ASSET_UNSUPPORTED_MIME' : 'MEDIA_ASSET_FILE_SIZE_INVALID',
           errorMessage: validSize
             ? item.scene === 'POST_COMPOSE'
               ? '帖子媒体仅支持 JPG、PNG、WebP、MP4、WebM 或 MOV'
@@ -2534,7 +2510,8 @@ export const handlers = [
         coverUrl: null,
         rules: created.input.rules ?? [],
         visibility: 'public' as const,
-        joinMode: created.input.joinPolicy === 'APPROVAL' ? ('approval' as const) : ('open' as const),
+        joinMode:
+          created.input.joinPolicy === 'APPROVAL' ? ('approval' as const) : ('open' as const),
       });
     }
     const summary = communities.find((item) => item.slug === slug);
@@ -2705,8 +2682,7 @@ export const handlers = [
       const joinRequest = mockCommunityJoinRequests.find(
         (item) => item.joinRequestId === String(params.requestId),
       );
-      if (!joinRequest)
-        return apiError(404, 'COMMUNITY_JOIN_REQUEST_NOT_FOUND', '加入申请不存在');
+      if (!joinRequest) return apiError(404, 'COMMUNITY_JOIN_REQUEST_NOT_FOUND', '加入申请不存在');
       const body = (await request.json()) as { decisionMessage?: string | null };
       if (joinRequest.status === 'APPROVED') {
         return ok({
@@ -2781,8 +2757,7 @@ export const handlers = [
       const joinRequest = mockCommunityJoinRequests.find(
         (item) => item.joinRequestId === String(params.requestId),
       );
-      if (!joinRequest)
-        return apiError(404, 'COMMUNITY_JOIN_REQUEST_NOT_FOUND', '加入申请不存在');
+      if (!joinRequest) return apiError(404, 'COMMUNITY_JOIN_REQUEST_NOT_FOUND', '加入申请不存在');
       const body = (await request.json()) as { decisionMessage?: string | null };
       if (joinRequest.status === 'REJECTED') {
         return ok({
@@ -2849,7 +2824,7 @@ export const handlers = [
       nextRole: CommunityAssignableMemberRole;
       reason?: string | null;
     };
-    const previousRole = member.role as CommunityAssignableMemberRole;
+    const previousRole = member.role;
     const result = previousRole === body.nextRole ? 'NO_CHANGE' : 'CHANGED';
     if (result === 'CHANGED') {
       member.role = body.nextRole;
@@ -2880,7 +2855,11 @@ export const handlers = [
     const targetUserId = String(params.userId);
     const member = mockCommunityMembers.find((item) => item.userId === targetUserId);
     if (!member) {
-      return ok({ communityId: MOCK_COMMUNITY_ID, targetUserId, result: 'ALREADY_REMOVED' as const });
+      return ok({
+        communityId: MOCK_COMMUNITY_ID,
+        targetUserId,
+        result: 'ALREADY_REMOVED' as const,
+      });
     }
     if (member.role === 'OWNER' || targetUserId === currentUser.id)
       return apiError(403, 'COMMUNITY_MEMBER_REMOVE_FORBIDDEN', '不能移除该成员');
@@ -2903,7 +2882,9 @@ export const handlers = [
   http.get('/api/communities/:id/pinned-posts', ({ params }) =>
     String(params.id) === MOCK_COMMUNITY_ID
       ? ok({
-          list: [...mockCommunityPinnedPosts].sort((left, right) => left.sortOrder - right.sortOrder),
+          list: [...mockCommunityPinnedPosts].sort(
+            (left, right) => left.sortOrder - right.sortOrder,
+          ),
           degraded: false,
           degradedReason: null,
           filteredCountHint: 0,
@@ -2935,8 +2916,7 @@ export const handlers = [
     if (mockCommunityPinnedPosts.some((item) => item.sortOrder === body.sortOrder))
       return apiError(409, 'COMMUNITY_PIN_SLOT_OCCUPIED', '目标置顶槽位已被占用');
     const postCard = mockPostCard(body.postId);
-    if (!postCard)
-      return apiError(404, 'COMMUNITY_PIN_POST_NOT_FOUND', '帖子不存在或不可置顶');
+    if (!postCard) return apiError(404, 'COMMUNITY_PIN_POST_NOT_FOUND', '帖子不存在或不可置顶');
     const pinnedAtIso = new Date().toISOString();
     mockCommunityPinnedPosts = [
       ...mockCommunityPinnedPosts,
@@ -3020,37 +3000,34 @@ export const handlers = [
       });
     },
   ),
-  http.delete(
-    '/api/communities/:id/manage/pinned-posts/:postId',
-    async ({ params, request }) => {
-      if (String(params.id) !== MOCK_COMMUNITY_ID)
-        return apiError(404, 'COMMUNITY_NOT_FOUND', '社群不存在');
-      const postId = String(params.postId);
-      const existing = mockCommunityPinnedPosts.find((item) => item.postId === postId);
-      if (!existing) {
-        return ok({ communityId: MOCK_COMMUNITY_ID, postId, result: 'ALREADY_UNPINNED' as const });
-      }
-      const body = (await request.json()) as { reason?: string | null };
-      mockCommunityPinnedPosts = mockCommunityPinnedPosts.filter((item) => item.postId !== postId);
-      const unpinnedAtIso = new Date().toISOString();
-      addMockCommunityLog({
-        actionType: 'COMMUNITY_POST_UNPINNED',
+  http.delete('/api/communities/:id/manage/pinned-posts/:postId', async ({ params, request }) => {
+    if (String(params.id) !== MOCK_COMMUNITY_ID)
+      return apiError(404, 'COMMUNITY_NOT_FOUND', '社群不存在');
+    const postId = String(params.postId);
+    const existing = mockCommunityPinnedPosts.find((item) => item.postId === postId);
+    if (!existing) {
+      return ok({ communityId: MOCK_COMMUNITY_ID, postId, result: 'ALREADY_UNPINNED' as const });
+    }
+    const body = (await request.json()) as { reason?: string | null };
+    mockCommunityPinnedPosts = mockCommunityPinnedPosts.filter((item) => item.postId !== postId);
+    const unpinnedAtIso = new Date().toISOString();
+    addMockCommunityLog({
+      actionType: 'COMMUNITY_POST_UNPINNED',
+      postId,
+      reason: body.reason ?? null,
+      metadata: {
+        kind: 'COMMUNITY_PINNED_POST_CHANGED',
         postId,
+        pinType: existing.pinType,
+        sortOrder: existing.sortOrder,
+        action: 'UNPINNED',
         reason: body.reason ?? null,
-        metadata: {
-          kind: 'COMMUNITY_PINNED_POST_CHANGED',
-          postId,
-          pinType: existing.pinType,
-          sortOrder: existing.sortOrder,
-          action: 'UNPINNED',
-          reason: body.reason ?? null,
-          occurredAtIso: unpinnedAtIso,
-        },
-        createdAtIso: unpinnedAtIso,
-      });
-      return ok({ communityId: MOCK_COMMUNITY_ID, postId, result: 'UNPINNED' as const });
-    },
-  ),
+        occurredAtIso: unpinnedAtIso,
+      },
+      createdAtIso: unpinnedAtIso,
+    });
+    return ok({ communityId: MOCK_COMMUNITY_ID, postId, result: 'UNPINNED' as const });
+  }),
   http.put('/api/communities/:id/rules', async ({ params, request }) => {
     if (String(params.id) !== MOCK_COMMUNITY_ID)
       return apiError(404, 'COMMUNITY_NOT_FOUND', '社群不存在');
@@ -3111,7 +3088,7 @@ export const handlers = [
         ...body,
         settingsVersion: mockCommunitySettings.settingsVersion + 1,
         updatedAtIso: new Date().toISOString(),
-      } as MockCommunitySettings;
+      };
       mockCommunityUpdatedAtIso = mockCommunitySettings.updatedAtIso;
       addMockCommunityLog({
         actionType: 'COMMUNITY_SETTINGS_UPDATED',
@@ -3196,7 +3173,7 @@ export const handlers = [
     }
     const updated: BookmarkCollectionSummary = {
       ...collection,
-      visibility: value as BookmarkCollectionVisibility,
+      visibility: value,
       updatedAtIso: new Date().toISOString(),
     };
     mockBookmarkCollections = mockBookmarkCollections.map((item) =>
@@ -3243,27 +3220,23 @@ export const handlers = [
     const movedItems = mockBookmarkItems.filter(
       (item) => item.bookmarkCollectionId === collectionId,
     );
-    mockBookmarkItems = mockBookmarkItems.map(
-      (item): BookmarkCollectionItemCardView => {
-        if (item.bookmarkCollectionId !== collectionId) return item;
-        if (item.itemState === 'ACTIVE') {
-          return {
-            ...item,
-            bookmarkCollectionId: MOCK_DEFAULT_BOOKMARK_COLLECTION_ID,
-            postCard:
-              cloneMockPostCardForBookmark(
-                item.postId,
-                MOCK_DEFAULT_BOOKMARK_COLLECTION_ID,
-              ) ?? item.postCard,
-          };
-        }
+    mockBookmarkItems = mockBookmarkItems.map((item): BookmarkCollectionItemCardView => {
+      if (item.bookmarkCollectionId !== collectionId) return item;
+      if (item.itemState === 'ACTIVE') {
         return {
           ...item,
           bookmarkCollectionId: MOCK_DEFAULT_BOOKMARK_COLLECTION_ID,
-          postCard: null,
+          postCard:
+            cloneMockPostCardForBookmark(item.postId, MOCK_DEFAULT_BOOKMARK_COLLECTION_ID) ??
+            item.postCard,
         };
-      },
-    );
+      }
+      return {
+        ...item,
+        bookmarkCollectionId: MOCK_DEFAULT_BOOKMARK_COLLECTION_ID,
+        postCard: null,
+      };
+    });
     mockBookmarkCollections = mockBookmarkCollections.filter(
       (item) => item.collectionId !== collectionId,
     );
@@ -3287,11 +3260,7 @@ export const handlers = [
   http.post('/api/bookmarks/posts/:postId', async ({ params, request }) => {
     const postId = String(params.postId);
     const body = (await request.json()) as Record<string, unknown>;
-    if (
-      Object.keys(body).some(
-        (key) => key !== 'targetCollectionId' && key !== 'sourceScene',
-      )
-    ) {
+    if (Object.keys(body).some((key) => key !== 'targetCollectionId' && key !== 'sourceScene')) {
       return apiError(400, 'BOOKMARK_REQUEST_INVALID', '收藏请求字段不合法');
     }
     const targetCollectionId =
@@ -3390,8 +3359,7 @@ export const handlers = [
     for (const itemId of deduped) {
       const index = mockBookmarkItems.findIndex(
         (item) =>
-          item.bookmarkItemId === itemId &&
-          item.bookmarkCollectionId === body.sourceCollectionId,
+          item.bookmarkItemId === itemId && item.bookmarkCollectionId === body.sourceCollectionId,
       );
       if (index < 0 || body.sourceCollectionId === body.targetCollectionId) {
         skippedItemIds.push(itemId);
@@ -3448,19 +3416,14 @@ export const handlers = [
   }),
   http.post('/api/bookmarks/items/remove', async ({ request }) => {
     const body = (await request.json()) as { itemIds?: unknown };
-    if (
-      !Array.isArray(body.itemIds) ||
-      body.itemIds.some((item) => typeof item !== 'string')
-    ) {
+    if (!Array.isArray(body.itemIds) || body.itemIds.some((item) => typeof item !== 'string')) {
       return apiError(400, 'BOOKMARK_BATCH_REQUEST_INVALID', '批量移除请求不合法');
     }
     const requested = body.itemIds as string[];
     const deduped = [...new Set(requested)];
     const removed = mockBookmarkItems.filter((item) => deduped.includes(item.bookmarkItemId));
     const removedIds = new Set(removed.map((item) => item.bookmarkItemId));
-    mockBookmarkItems = mockBookmarkItems.filter(
-      (item) => !removedIds.has(item.bookmarkItemId),
-    );
+    mockBookmarkItems = mockBookmarkItems.filter((item) => !removedIds.has(item.bookmarkItemId));
     const skippedItemIds = deduped.filter((itemId) => !removedIds.has(itemId));
     refreshMockBookmarkCollectionCounts();
     return ok({
@@ -3496,10 +3459,7 @@ export const handlers = [
   ),
   http.post('/api/me/content-center/drafts/batch-delete', async ({ request }) => {
     const body = (await request.json()) as { draftIds?: unknown };
-    if (
-      !Array.isArray(body.draftIds) ||
-      body.draftIds.some((item) => typeof item !== 'string')
-    ) {
+    if (!Array.isArray(body.draftIds) || body.draftIds.some((item) => typeof item !== 'string')) {
       return apiError(400, 'POST_DRAFT_BATCH_INVALID', '草稿批量删除请求不合法');
     }
     const results = (body.draftIds as string[]).map((draftId) => {
@@ -3662,8 +3622,7 @@ export const handlers = [
   http.post('/api/permissions/me/policy/preview', async ({ request }) => {
     const policy = (await request.json()) as PermissionPolicy;
     return ok({
-      profileSummary:
-        policy.profileVisibility === 'private' ? '新关注者需要审批' : '公开资料可见',
+      profileSummary: policy.profileVisibility === 'private' ? '新关注者需要审批' : '公开资料可见',
       interactionSummary: `私信权限：${policy.allowMessages}`,
       discoverySummary: policy.searchEngineIndexing ? '允许搜索引擎收录' : '禁止搜索引擎收录',
     });

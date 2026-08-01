@@ -24,7 +24,8 @@ export function renderBootstrapFailure(
 
   const description = ownerDocument.createElement('p');
   description.id = 'app-bootstrap-failure-description';
-  description.textContent = '本地服务或应用资源初始化失败。请重新加载；若问题持续，请检查网络与部署配置。';
+  description.textContent =
+    '本地服务或应用资源初始化失败。请重新加载；若问题持续，请检查网络与部署配置。';
 
   const retryButton = ownerDocument.createElement('button');
   retryButton.type = 'button';

@@ -36,7 +36,7 @@
   cursor: pointer;
 }
 
-.filters button[data-active="true"] {
+.filters button[data-active='true'] {
   color: var(--color-primary);
   background: var(--color-surface);
   box-shadow: var(--shadow-xs);
@@ -143,7 +143,7 @@
   width: 5px;
   height: 9px;
   margin: 2px 0 0 6px;
-  content: "";
+  content: '';
   border-color: white;
   border-style: solid;
   border-width: 0 2px 2px 0;
@@ -214,7 +214,8 @@
   gap: 9px;
 }
 
-.viewLink, .deleteButton {
+.viewLink,
+.deleteButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -273,7 +274,8 @@
     width: 100%;
   }
 
-  .list, .loading {
+  .list,
+  .loading {
     padding: 14px;
   }
 
@@ -287,12 +289,12 @@
   }
 }
 
-.historyItem[data-placeholder="true"] {
+.historyItem[data-placeholder='true'] {
   background: #fffcf5;
   border-style: dashed;
 }
 
-.historyItem[data-placeholder="true"] .itemTitle {
+.historyItem[data-placeholder='true'] .itemTitle {
   color: #8a5a00;
 }
 

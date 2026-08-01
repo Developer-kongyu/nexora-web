@@ -35,8 +35,7 @@ export async function uploadMediaImageSelection({
       onProgress: (progress) => controller.update(selection.clientUploadId, { progress }),
       onStage: (stage) =>
         controller.update(selection.clientUploadId, { stage, errorMessage: null }),
-      onCheckpoint: (checkpoint) =>
-        controller.update(selection.clientUploadId, { checkpoint }),
+      onCheckpoint: (checkpoint) => controller.update(selection.clientUploadId, { checkpoint }),
     });
 
     controller.update(selection.clientUploadId, {

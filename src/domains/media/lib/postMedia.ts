@@ -5,10 +5,7 @@ import {
   MEDIA_POST_VIDEO_MAX_BYTES,
   MEDIA_VIDEO_MIME_TYPES,
 } from '../model/constraints';
-import type {
-  UploadableMediaKind,
-  UploadItem,
-} from '../model/types';
+import type { UploadableMediaKind, UploadItem } from '../model/types';
 
 const videoMimeTypes = new Set<string>(MEDIA_VIDEO_MIME_TYPES);
 

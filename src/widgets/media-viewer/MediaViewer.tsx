@@ -11,9 +11,7 @@ interface MediaViewerProps {
 }
 
 export function MediaViewer({ post, initialIndex = 0, onClose }: MediaViewerProps) {
-  const [index, setIndex] = useState(
-    Math.min(initialIndex, Math.max(0, post.media.length - 1)),
-  );
+  const [index, setIndex] = useState(Math.min(initialIndex, Math.max(0, post.media.length - 1)));
   const [playing, setPlaying] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);

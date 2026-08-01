@@ -96,22 +96,22 @@ app → pages → widgets → domains → shared
 
 ## 常用命令
 
-| 命令 | 说明 |
-| --- | --- |
-| `npm run dev` | 启动开发服务器 |
-| `npm run build` | TypeScript 工程构建并输出 `dist/` |
-| `npm run preview` | 本地预览生产包 |
-| `npm run typecheck` | TypeScript 严格类型检查 |
-| `npm run lint` | ESLint 检查 |
-| `npm run lint:css` | Stylelint 检查 |
-| `npm run format` | Prettier 格式化 |
-| `npm run test` | Vitest 单元与组件测试 |
-| `npm run test:e2e` | Playwright E2E |
-| `npm run storybook` | 启动组件工作台 |
-| `npm run api:generate -- <schema>` | 从 OpenAPI 生成类型 |
-| `npm run env:check -- <env-file>` | 校验部署环境变量 |
-| `npm run reuse:check` | 检查重复类型、枚举、常量、函数和公共能力绕过 |
-| `npm run check` | 执行复用、格式、类型、Lint、测试和生产构建 |
+| 命令                               | 说明                                         |
+| ---------------------------------- | -------------------------------------------- |
+| `npm run dev`                      | 启动开发服务器                               |
+| `npm run build`                    | TypeScript 工程构建并输出 `dist/`            |
+| `npm run preview`                  | 本地预览生产包                               |
+| `npm run typecheck`                | TypeScript 严格类型检查                      |
+| `npm run lint`                     | ESLint 检查                                  |
+| `npm run lint:css`                 | Stylelint 检查                               |
+| `npm run format`                   | Prettier 格式化                              |
+| `npm run test`                     | Vitest 单元与组件测试                        |
+| `npm run test:e2e`                 | Playwright E2E                               |
+| `npm run storybook`                | 启动组件工作台                               |
+| `npm run api:generate -- <schema>` | 从 OpenAPI 生成类型                          |
+| `npm run env:check -- <env-file>`  | 校验部署环境变量                             |
+| `npm run reuse:check`              | 检查重复类型、枚举、常量、函数和公共能力绕过 |
+| `npm run check`                    | 执行复用、格式、类型、Lint、测试和生产构建   |
 
 首次运行 Playwright 需执行：
 

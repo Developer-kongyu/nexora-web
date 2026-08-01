@@ -12,7 +12,7 @@
   color: var(--color-primary);
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
 }
 
 .formShell h1 {
@@ -135,8 +135,9 @@
   font-size: 12px;
 }
 
-.divider::before, .divider::after {
-  content: "";
+.divider::before,
+.divider::after {
+  content: '';
   flex: 1;
   height: 1px;
   background: var(--color-border);
@@ -245,7 +246,7 @@
 }
 
 .passwordRules span::before {
-  content: "✓";
+  content: '✓';
   margin-right: 5px;
   color: var(--color-success);
   font-weight: 900;

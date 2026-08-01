@@ -32,10 +32,7 @@ import {
   type ListOwnBookmarkCollectionsResult,
 } from '@/domains/library';
 import { postCardBriefToViewModel } from '@/domains/posts/lib/postCardAdapter';
-import {
-  mergeInfiniteDataItemsBy,
-  removeInfiniteDataItemsByKey,
-} from '@/shared/api/infiniteData';
+import { mergeInfiniteDataItemsBy, removeInfiniteDataItemsByKey } from '@/shared/api/infiniteData';
 import { paths } from '@/shared/config/paths';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
 import { useKeySelection } from '@/shared/hooks/useKeySelection';
@@ -78,9 +75,7 @@ function patchCollectionList(
   const exists = current.list.some((item) => item.collectionId === updated.collectionId);
   return {
     list: exists
-      ? current.list.map((item) =>
-          item.collectionId === updated.collectionId ? updated : item,
-        )
+      ? current.list.map((item) => (item.collectionId === updated.collectionId ? updated : item))
       : [...current.list, updated],
   };
 }
@@ -104,10 +99,10 @@ export function BookmarksPage() {
     queryKey: libraryKeys.bookmarkCollections,
     queryFn: ({ signal }) => libraryApi.collections(signal),
   });
-  const collectionList = collections.data?.list ?? [];
+  const collectionList = useMemo(() => collections.data?.list ?? [], [collections.data]);
   const defaultCollection = collectionList.find((item) => item.kind === 'DEFAULT') ?? null;
   const routeCollection = routeCollectionId
-    ? collectionList.find((item) => item.collectionId === routeCollectionId) ?? null
+    ? (collectionList.find((item) => item.collectionId === routeCollectionId) ?? null)
     : null;
   const current = routeCollection ?? defaultCollection;
   const currentCollectionId = current?.collectionId ?? null;
@@ -131,7 +126,7 @@ export function BookmarksPage() {
   useEffect(() => {
     if (!collections.isSuccess || !currentCollectionId) return;
     if (routeCollectionId !== currentCollectionId) {
-      navigate(paths.bookmarkCollection(currentCollectionId), { replace: true });
+      void navigate(paths.bookmarkCollection(currentCollectionId), { replace: true });
     }
   }, [collections.isSuccess, currentCollectionId, navigate, routeCollectionId]);
 
@@ -155,10 +150,7 @@ export function BookmarksPage() {
     [items.data],
   );
   const placeholderItems = itemList.filter((item) => item.itemState === 'PLACEHOLDER');
-  const itemIds = useMemo(
-    () => itemList.map((item) => item.bookmarkItemId),
-    [itemList],
-  );
+  const itemIds = useMemo(() => itemList.map((item) => item.bookmarkItemId), [itemList]);
   const itemSelection = useKeySelection(itemIds, currentCollectionId);
   const allLoadedSelected = itemSelection.areAllSelected(itemIds);
 
@@ -182,7 +174,7 @@ export function BookmarksPage() {
       setCreateName('');
       setCreateOpen(false);
       showToast({ tone: 'success', title: '收藏夹已创建' });
-      navigate(paths.bookmarkCollection(created.collectionId));
+      void navigate(paths.bookmarkCollection(created.collectionId));
     },
     onError: () =>
       showToast({ tone: 'error', title: '创建失败', description: '请检查名称后重试。' }),
@@ -196,10 +188,7 @@ export function BookmarksPage() {
         updated = await libraryApi.renameCollection(current.collectionId, renameName.trim());
       }
       if (visibility !== updated.visibility) {
-        updated = await libraryApi.updateCollectionVisibility(
-          current.collectionId,
-          visibility,
-        );
+        updated = await libraryApi.updateCollectionVisibility(current.collectionId, visibility);
       }
       return updated;
     },
@@ -227,9 +216,7 @@ export function BookmarksPage() {
       queryClient.setQueryData<ListOwnBookmarkCollectionsResult>(
         libraryKeys.bookmarkCollections,
         (value) => ({
-          list: (value?.list ?? []).filter(
-            (item) => item.collectionId !== currentCollectionId,
-          ),
+          list: (value?.list ?? []).filter((item) => item.collectionId !== currentCollectionId),
         }),
       );
       queryClient.removeQueries({
@@ -248,7 +235,7 @@ export function BookmarksPage() {
           ? `${result.movedItemCount} 条内容已移回默认收藏夹。`
           : undefined,
       });
-      navigate(paths.bookmarkCollection(result.fallbackCollectionId), {
+      void navigate(paths.bookmarkCollection(result.fallbackCollectionId), {
         replace: true,
       });
     },
@@ -276,8 +263,7 @@ export function BookmarksPage() {
       const moved = new Set(result.movedItemIds);
       queryClient.setQueryData<InfiniteData<BookmarkCollectionItemsPage>>(
         libraryKeys.bookmarkCollectionItems(currentCollectionId),
-        (data) =>
-          removeInfiniteDataItemsByKey(data, moved, (item) => item.bookmarkItemId),
+        (data) => removeInfiniteDataItemsByKey(data, moved, (item) => item.bookmarkItemId),
       );
       itemSelection.replace(result.skippedItemIds);
       patchCollectionUi({ moveOpen: false });
@@ -307,8 +293,7 @@ export function BookmarksPage() {
       const removed = new Set(result.removedItemIds);
       queryClient.setQueryData<InfiniteData<BookmarkCollectionItemsPage>>(
         libraryKeys.bookmarkCollectionItems(currentCollectionId),
-        (data) =>
-          removeInfiniteDataItemsByKey(data, removed, (item) => item.bookmarkItemId),
+        (data) => removeInfiniteDataItemsByKey(data, removed, (item) => item.bookmarkItemId),
       );
       itemSelection.replace(result.skippedItemIds);
       showToast({
@@ -323,8 +308,7 @@ export function BookmarksPage() {
         queryKey: libraryKeys.bookmarkCollectionItems(currentCollectionId),
       });
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '移除失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '移除失败', description: '请稍后重试。' }),
   });
 
   const beginFolderEdit = () => {
@@ -381,9 +365,7 @@ export function BookmarksPage() {
                 type="button"
                 key={collection.collectionId}
                 data-active={collection.collectionId === currentCollectionId}
-                onClick={() =>
-                  navigate(paths.bookmarkCollection(collection.collectionId))
-                }
+                onClick={() => navigate(paths.bookmarkCollection(collection.collectionId))}
               >
                 <span>
                   <Folder size={17} />
@@ -417,9 +399,7 @@ export function BookmarksPage() {
               <h2>{current?.name ?? '收藏内容'}</h2>
               <p>
                 {current?.itemCount ?? itemList.length} 项内容 ·{' '}
-                {current
-                  ? BOOKMARK_COLLECTION_VISIBILITY_LABELS[current.visibility]
-                  : '正在加载'}
+                {current ? BOOKMARK_COLLECTION_VISIBILITY_LABELS[current.visibility] : '正在加载'}
               </p>
             </div>
           </div>
@@ -485,9 +465,7 @@ export function BookmarksPage() {
           <Card className={styles.errorCard}>
             <AlertCircle size={22} />
             <div>
-              <strong>
-                {collections.isError ? '收藏夹目录加载失败' : '收藏内容加载失败'}
-              </strong>
+              <strong>{collections.isError ? '收藏夹目录加载失败' : '收藏内容加载失败'}</strong>
               <p>当前列表没有被修改，可以安全重新同步。</p>
             </div>
             <Button
@@ -518,7 +496,9 @@ export function BookmarksPage() {
                         disabled={isPending}
                         onChange={() => itemSelection.toggle(item.bookmarkItemId)}
                       />
-                      <span>{itemSelection.isSelected(item.bookmarkItemId) ? '已选择' : '选择'}</span>
+                      <span>
+                        {itemSelection.isSelected(item.bookmarkItemId) ? '已选择' : '选择'}
+                      </span>
                     </label>
                   ) : null}
                   {item.itemState === 'ACTIVE' ? (
@@ -530,7 +510,12 @@ export function BookmarksPage() {
                       </span>
                       <div>
                         <strong>收藏内容暂不可用</strong>
-                        <p>{getPostAvailabilityPlaceholderMessage(item.placeholderReasonCode, 'bookmark')}</p>
+                        <p>
+                          {getPostAvailabilityPlaceholderMessage(
+                            item.placeholderReasonCode,
+                            'bookmark',
+                          )}
+                        </p>
                         <small>收藏于 {formatDateTime(item.savedAtIso)}</small>
                       </div>
                       {!organizing ? (
@@ -750,8 +735,7 @@ export function BookmarksPage() {
         >
           {otherCollections.map((collection) => (
             <option key={collection.collectionId} value={collection.collectionId}>
-              {collection.name} ·{' '}
-              {BOOKMARK_COLLECTION_VISIBILITY_LABELS[collection.visibility]}
+              {collection.name} · {BOOKMARK_COLLECTION_VISIBILITY_LABELS[collection.visibility]}
             </option>
           ))}
         </Select>

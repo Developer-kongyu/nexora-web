@@ -33,7 +33,9 @@ describe('ToastProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: '显示保存成功' }));
     expect(screen.getByText('保存成功')).toBeInTheDocument();
 
-    act(() => vi.advanceTimersByTime(3_600));
+    act(() => {
+      vi.advanceTimersByTime(3_600);
+    });
     expect(screen.queryByText('保存成功')).not.toBeInTheDocument();
   });
 

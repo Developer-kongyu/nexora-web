@@ -68,7 +68,9 @@ export function SettingsSection({ communityId, detail }: CommunityManageDetailSe
         <header>
           <div>
             <h2>权限与加入设置</h2>
-            <p>{detail.community.name} · /{detail.community.slug}</p>
+            <p>
+              {detail.community.name} · /{detail.community.slug}
+            </p>
           </div>
           <Badge tone="brand">版本 {detail.community.settingsVersion}</Badge>
         </header>
@@ -162,11 +164,7 @@ export function SettingsSection({ communityId, detail }: CommunityManageDetailSe
             >
               放弃修改
             </Button>
-            <Button
-              loading={save.isPending}
-              disabled={!isDirty}
-              onClick={() => save.mutate()}
-            >
+            <Button loading={save.isPending} disabled={!isDirty} onClick={() => save.mutate()}>
               <Save size={15} /> 保存权限设置
             </Button>
           </div>

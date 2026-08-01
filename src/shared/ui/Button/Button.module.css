@@ -25,7 +25,7 @@
 }
 
 .button:disabled {
-  opacity: .52;
+  opacity: 0.52;
   cursor: not-allowed;
 }
 
@@ -96,7 +96,7 @@
   border: 2px solid rgb(255 255 255 / 45%);
   border-top-color: currentColor;
   border-radius: 50%;
-  animation: spin .7s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {

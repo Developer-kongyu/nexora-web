@@ -1,7 +1,4 @@
-import {
-  OnboardingSelection,
-  type OnboardingOption,
-} from './OnboardingSelection';
+import { OnboardingSelection, type OnboardingOption } from './OnboardingSelection';
 
 const CREATOR_OPTIONS = [
   {

@@ -152,10 +152,7 @@ export function Sidebar() {
   const mainNavigation = buildNavigationItems(MAIN_NAVIGATION_KEYS, currentUser.profilePath, {
     notifications: formatUnreadCount(unreadSummary.data?.totalUnreadCount ?? 0),
   });
-  const libraryNavigation = buildNavigationItems(
-    LIBRARY_NAVIGATION_KEYS,
-    currentUser.profilePath,
-  );
+  const libraryNavigation = buildNavigationItems(LIBRARY_NAVIGATION_KEYS, currentUser.profilePath);
   const secondaryNavigation = buildNavigationItems(
     SECONDARY_NAVIGATION_KEYS,
     currentUser.profilePath,
@@ -165,7 +162,7 @@ export function Sidebar() {
     try {
       await logout.mutateAsync();
     } finally {
-      navigate(paths.login, { replace: true });
+      void navigate(paths.login, { replace: true });
     }
   };
 

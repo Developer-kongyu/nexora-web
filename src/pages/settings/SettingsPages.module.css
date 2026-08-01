@@ -35,22 +35,22 @@
   border-radius: 12px;
 }
 
-.overviewCard[data-tone="cyan"] > span {
+.overviewCard[data-tone='cyan'] > span {
   color: #0784a0;
   background: #ecfeff;
 }
 
-.overviewCard[data-tone="pink"] > span {
+.overviewCard[data-tone='pink'] > span {
   color: #be185d;
   background: #fdf2f8;
 }
 
-.overviewCard[data-tone="green"] > span {
+.overviewCard[data-tone='green'] > span {
   color: #15803d;
   background: #ecfdf3;
 }
 
-.overviewCard[data-tone="orange"] > span {
+.overviewCard[data-tone='orange'] > span {
   color: #c2410c;
   background: #fff7ed;
 }
@@ -264,7 +264,8 @@
   font-size: 11px;
 }
 
-.devices p, .devices small {
+.devices p,
+.devices small {
   color: var(--color-muted);
   font-size: 9px;
 }
@@ -515,7 +516,7 @@
   cursor: pointer;
 }
 
-.segmented button[data-active="true"] {
+.segmented button[data-active='true'] {
   color: var(--color-primary);
   background: #fff;
   box-shadow: var(--shadow-xs);
@@ -565,7 +566,8 @@
   font-size: 11px;
 }
 
-.userList span, .userList p {
+.userList span,
+.userList p {
   color: var(--color-muted);
   font-size: 9px;
 }
@@ -579,7 +581,8 @@
 }
 
 @media (max-width: 620px) {
-  .overviewGrid, .selectGrid {
+  .overviewGrid,
+  .selectGrid {
     grid-template-columns: 1fr;
   }
 
@@ -714,7 +717,7 @@
   border-bottom: 0;
 }
 
-.safetyUserRow[data-placeholder="true"] {
+.safetyUserRow[data-placeholder='true'] {
   background: #fafbfc;
 }
 
@@ -728,7 +731,8 @@
   min-width: 0;
 }
 
-.safetyUserCopy > a, .safetyUserCopy > div {
+.safetyUserCopy > a,
+.safetyUserCopy > div {
   display: flex;
   align-items: baseline;
   gap: 7px;
@@ -743,7 +747,8 @@
   white-space: nowrap;
 }
 
-.safetyUserCopy span, .safetyUserCopy p {
+.safetyUserCopy span,
+.safetyUserCopy p {
   color: var(--color-muted);
   font-size: 9px;
 }

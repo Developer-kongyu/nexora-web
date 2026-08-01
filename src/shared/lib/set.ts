@@ -1,7 +1,5 @@
 export function toggleArrayValue<T>(current: readonly T[], value: T): T[] {
-  return current.includes(value)
-    ? current.filter((item) => item !== value)
-    : [...current, value];
+  return current.includes(value) ? current.filter((item) => item !== value) : [...current, value];
 }
 
 export function toggleSetValue<T>(current: ReadonlySet<T>, value: T): Set<T> {
@@ -11,18 +9,12 @@ export function toggleSetValue<T>(current: ReadonlySet<T>, value: T): Set<T> {
   return next;
 }
 
-export function retainSetValues<T>(
-  current: ReadonlySet<T>,
-  allowedValues: Iterable<T>,
-): Set<T> {
+export function retainSetValues<T>(current: ReadonlySet<T>, allowedValues: Iterable<T>): Set<T> {
   const allowed = new Set(allowedValues);
   return new Set([...current].filter((value) => allowed.has(value)));
 }
 
-export function uniqueItemsBy<T, TKey>(
-  items: Iterable<T>,
-  getKey: (item: T) => TKey,
-): T[] {
+export function uniqueItemsBy<T, TKey>(items: Iterable<T>, getKey: (item: T) => TKey): T[] {
   const seen = new Set<TKey>();
   const unique: T[] = [];
   for (const item of items) {

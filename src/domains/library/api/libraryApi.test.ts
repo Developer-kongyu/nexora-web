@@ -42,18 +42,15 @@ describe('libraryApi B07 contract', () => {
         });
         return apiSuccessResponse({ ...collection, name: '新名称' });
       }),
-      http.patch(
-        '/api/bookmarks/collections/:collectionId/visibility',
-        async ({ request }) => {
-          calls.push({
-            method: request.method,
-            pathname: new URL(request.url).pathname,
-            body: await request.json(),
-            idempotencyKey: request.headers.get('idempotency-key'),
-          });
-          return apiSuccessResponse({ ...collection, visibility: 'FOLLOWERS' as const });
-        },
-      ),
+      http.patch('/api/bookmarks/collections/:collectionId/visibility', async ({ request }) => {
+        calls.push({
+          method: request.method,
+          pathname: new URL(request.url).pathname,
+          body: await request.json(),
+          idempotencyKey: request.headers.get('idempotency-key'),
+        });
+        return apiSuccessResponse({ ...collection, visibility: 'FOLLOWERS' as const });
+      }),
       http.delete('/api/bookmarks/collections/:collectionId', ({ request }) => {
         calls.push({
           method: request.method,
@@ -61,7 +58,11 @@ describe('libraryApi B07 contract', () => {
           body: null,
           idempotencyKey: request.headers.get('idempotency-key'),
         });
-        return apiSuccessResponse({ deleted: true as const, fallbackCollectionId: 'default-1', movedItemCount: 2 });
+        return apiSuccessResponse({
+          deleted: true as const,
+          fallbackCollectionId: 'default-1',
+          movedItemCount: 2,
+        });
       }),
     );
 
@@ -101,10 +102,7 @@ describe('libraryApi B07 contract', () => {
   it('preserves cursor pagination and exact bookmark batch payloads', async () => {
     const calls: Array<{ method: string; url: string; body: unknown }> = [];
     server.use(
-      http.get(
-        '/api/bookmarks/collections/:collectionId/items',
-        recordEmptyCursorResponse(calls),
-      ),
+      http.get('/api/bookmarks/collections/:collectionId/items', recordEmptyCursorResponse(calls)),
       http.post('/api/bookmarks/items/move', async ({ request }) => {
         calls.push({ method: request.method, url: request.url, body: await request.json() });
         return apiSuccessResponse({
@@ -148,11 +146,13 @@ describe('libraryApi B07 contract', () => {
       cursor: 'cursor / 1',
       limit: '25',
     });
-    expect(calls.slice(1).map(({ method, url, body }) => ({
-      method,
-      pathname: new URL(url).pathname,
-      body,
-    }))).toEqual([
+    expect(
+      calls.slice(1).map(({ method, url, body }) => ({
+        method,
+        pathname: new URL(url).pathname,
+        body,
+      })),
+    ).toEqual([
       {
         method: 'POST',
         pathname: '/api/bookmarks/items/move',
@@ -240,15 +240,17 @@ describe('libraryApi B07 contract', () => {
     await libraryApi.batchDeleteDrafts(['draft-1', 'draft-2']);
     await libraryApi.deleted({ cursor: 'deleted-cursor', limit: 12 });
 
-    expect(calls.map(({ method, url, body }) => {
-      const parsed = new URL(url);
-      return {
-        method,
-        pathname: parsed.pathname,
-        query: Object.fromEntries(parsed.searchParams),
-        body,
-      };
-    })).toEqual([
+    expect(
+      calls.map(({ method, url, body }) => {
+        const parsed = new URL(url);
+        return {
+          method,
+          pathname: parsed.pathname,
+          query: Object.fromEntries(parsed.searchParams),
+          body,
+        };
+      }),
+    ).toEqual([
       {
         method: 'GET',
         pathname: '/api/me/content-center/published',
@@ -297,14 +299,16 @@ describe('libraryApi B07 contract', () => {
     await libraryApi.deleteHistoryItem('post / 1');
     await libraryApi.clearHistory();
 
-    expect(calls.map(({ method, url }) => {
-      const parsed = new URL(url);
-      return {
-        method,
-        pathname: parsed.pathname,
-        query: Object.fromEntries(parsed.searchParams),
-      };
-    })).toEqual([
+    expect(
+      calls.map(({ method, url }) => {
+        const parsed = new URL(url);
+        return {
+          method,
+          pathname: parsed.pathname,
+          query: Object.fromEntries(parsed.searchParams),
+        };
+      }),
+    ).toEqual([
       {
         method: 'GET',
         pathname: '/api/me/history/posts',

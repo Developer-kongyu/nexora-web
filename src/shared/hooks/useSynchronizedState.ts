@@ -5,10 +5,7 @@ interface SynchronizedState<TSource, TValue> {
   value: TValue;
 }
 
-function resolveStateAction<TValue>(
-  action: SetStateAction<TValue>,
-  currentValue: TValue,
-): TValue {
+function resolveStateAction<TValue>(action: SetStateAction<TValue>, currentValue: TValue): TValue {
   return typeof action === 'function'
     ? (action as (value: TValue) => TValue)(currentValue)
     : action;

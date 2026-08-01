@@ -22,7 +22,9 @@ export const communityManageSections = [
 
 export type CommunityManageSection = (typeof communityManageSections)[number];
 
-export function isCommunityManageSection(value: string | undefined): value is CommunityManageSection {
+export function isCommunityManageSection(
+  value: string | undefined,
+): value is CommunityManageSection {
   return communityManageSections.includes(value as CommunityManageSection);
 }
 

@@ -28,9 +28,7 @@ function mapMedia(card: PostCardBriefView): MediaItem[] {
         width: media.width ?? undefined,
         height: media.height ?? undefined,
         durationSeconds:
-          media.durationMs === null
-            ? undefined
-            : Math.max(0, Math.round(media.durationMs / 1_000)),
+          media.durationMs === null ? undefined : Math.max(0, Math.round(media.durationMs / 1_000)),
       },
     ];
   });

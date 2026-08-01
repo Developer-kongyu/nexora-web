@@ -11,9 +11,7 @@ import {
   safetyHandleLabel,
 } from './safetySettings.model';
 
-function mutedItem(
-  patch: Partial<UserManagementListItemView> = {},
-): UserManagementListItemView {
+function mutedItem(patch: Partial<UserManagementListItemView> = {}): UserManagementListItemView {
   return {
     userId: 'u-1',
     handle: 'quiet_user',
@@ -45,14 +43,10 @@ describe('safety settings model', () => {
   it('renders mute scope from canonical flags', () => {
     expect(muteScopeLabel(mutedItem())).toBe('已静音帖子与通知');
     expect(
-      muteScopeLabel(
-        mutedItem({ muted: { mutePosts: true, muteNotifications: false } }),
-      ),
+      muteScopeLabel(mutedItem({ muted: { mutePosts: true, muteNotifications: false } })),
     ).toBe('已静音帖子');
     expect(
-      muteScopeLabel(
-        mutedItem({ muted: { mutePosts: false, muteNotifications: true } }),
-      ),
+      muteScopeLabel(mutedItem({ muted: { mutePosts: false, muteNotifications: true } })),
     ).toBe('已静音通知');
   });
 

@@ -23,9 +23,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       clearToastTimer(id);
       if (!mountedRef.current) return;
-      visibleToastIdsRef.current = visibleToastIdsRef.current.filter(
-        (toastId) => toastId !== id,
-      );
+      visibleToastIdsRef.current = visibleToastIdsRef.current.filter((toastId) => toastId !== id);
       setToasts((items) => items.filter((item) => item.id !== id));
     },
     [clearToastTimer],
@@ -57,11 +55,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     mountedRef.current = true;
+    const timers = timersRef.current;
 
     return () => {
       mountedRef.current = false;
-      for (const timer of timersRef.current.values()) window.clearTimeout(timer);
-      timersRef.current.clear();
+      for (const timer of timers.values()) window.clearTimeout(timer);
+      timers.clear();
       visibleToastIdsRef.current = [];
     };
   }, []);

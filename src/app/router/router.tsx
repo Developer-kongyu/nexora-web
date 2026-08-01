@@ -242,7 +242,11 @@ const router = createBrowserRouter([
       },
       {
         path: '__dev/states',
-        element: <RequireAuth><Outlet /></RequireAuth>,
+        element: (
+          <RequireAuth>
+            <Outlet />
+          </RequireAuth>
+        ),
         children: [
           {
             index: true,

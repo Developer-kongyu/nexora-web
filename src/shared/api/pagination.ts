@@ -42,5 +42,8 @@ export function mergeCursorItemsBy<T>(
   pages: CursorPageView<T>[],
   getKey: (item: T) => string,
 ): T[] {
-  return uniqueItemsBy(pages.flatMap((page) => page.list), getKey);
+  return uniqueItemsBy(
+    pages.flatMap((page) => page.list),
+    getKey,
+  );
 }

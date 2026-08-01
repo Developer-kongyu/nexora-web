@@ -60,20 +60,20 @@ Access Token 只存在模块内存；Refresh Token 由后端 HttpOnly Cookie 承
 
 ## 5. 领域与后端 owner
 
-| 前端领域      | 后端模块 | 前端责任                                     |
-| ------------- | -------- | -------------------------------------------- |
-| auth          | B01      | 登录、注册、刷新、密码、onboarding           |
+| 前端领域      | 后端模块 | 前端责任                                                       |
+| ------------- | -------- | -------------------------------------------------------------- |
+| auth          | B01      | 登录、注册、刷新、密码、onboarding                             |
 | users         | B02      | 资料、关注/粉丝 cursor 列表、请求、静音/屏蔽管理与权威关系状态 |
-| permissions   | B03      | 隐私/权限读取与交互禁用原因                  |
-| posts         | B04      | 帖子、草稿、发布、评论/回复/引用/转发入口    |
-| media         | B05      | 上传会话、进度、媒体资产、链接卡片           |
-| engagement    | B06      | 点赞与计数交互；其他传播写链遵循 B04 owner   |
-| library       | B07      | 收藏、内容中心、浏览历史                     |
-| communities   | B08      | 社群发现、成员关系、创建与管理               |
-| feed          | B09      | Following、For You、Explore                  |
-| search        | B10      | 统一搜索结果与筛选                           |
-| notifications | B11      | 通知列表、未读、Socket.IO 增量               |
-| settings      | B12      | 偏好与设置总览；资料/账号/隐私写入回各 owner |
+| permissions   | B03      | 隐私/权限读取与交互禁用原因                                    |
+| posts         | B04      | 帖子、草稿、发布、评论/回复/引用/转发入口                      |
+| media         | B05      | 上传会话、进度、媒体资产、链接卡片                             |
+| engagement    | B06      | 点赞与计数交互；其他传播写链遵循 B04 owner                     |
+| library       | B07      | 收藏、内容中心、浏览历史                                       |
+| communities   | B08      | 社群发现、成员关系、创建与管理                                 |
+| feed          | B09      | Following、For You、Explore                                    |
+| search        | B10      | 统一搜索结果与筛选                                             |
+| notifications | B11      | 通知列表、未读、Socket.IO 增量                                 |
+| settings      | B12      | 偏好与设置总览；资料/账号/隐私写入回各 owner                   |
 
 ### B02 关系列表与管理列表
 

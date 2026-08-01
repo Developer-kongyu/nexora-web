@@ -79,7 +79,7 @@ export function CommunityManagePage() {
   });
 
   const switchSection = (section: CommunityManageSection) => {
-    navigate(paths.communityManageSection(communityId, section));
+    void navigate(paths.communityManageSection(communityId, section));
   };
 
   if (!communityId) {
@@ -149,10 +149,7 @@ export function CommunityManagePage() {
         title={`${community.name} · 管理台`}
         description="管理加入申请、成员角色、规则、置顶内容、权限与审计日志。"
         actions={
-          <Button
-            variant="secondary"
-            onClick={() => navigate(paths.community(community.slug))}
-          >
+          <Button variant="secondary" onClick={() => navigate(paths.community(community.slug))}>
             <ArrowLeft size={15} /> 返回社群
           </Button>
         }

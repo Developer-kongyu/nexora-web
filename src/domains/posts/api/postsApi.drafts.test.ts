@@ -243,10 +243,7 @@ describe('postsApi draft contract', () => {
       }),
     );
 
-    await postsApi.publish(
-      { ...compose, allowWaitingMediaPublish: true },
-      'publish-direct-fixed',
-    );
+    await postsApi.publish({ ...compose, allowWaitingMediaPublish: true }, 'publish-direct-fixed');
 
     expect(captured).toEqual({
       body: { ...compose, allowWaitingMediaPublish: true },

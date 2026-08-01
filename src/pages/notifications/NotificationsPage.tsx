@@ -23,11 +23,7 @@ import {
   type NotificationType,
   useUnreadSummary,
 } from '@/domains/notifications';
-import {
-  userKeys,
-  usersApi,
-  type FollowRequestReviewResult,
-} from '@/domains/users';
+import { userKeys, usersApi, type FollowRequestReviewResult } from '@/domains/users';
 import { formatRelativeTime } from '@/shared/lib/format';
 import type { ReviewDecision } from '@/shared/model/types';
 import { Avatar, Badge, Button, Card, useToast } from '@/shared/ui';
@@ -73,7 +69,7 @@ function notificationIcon(type: NotificationType) {
 
 function openActionUrl(actionUrl: string, navigate: ReturnType<typeof useNavigate>) {
   if (actionUrl.startsWith('/')) {
-    navigate(actionUrl);
+    void navigate(actionUrl);
     return;
   }
   window.location.assign(actionUrl);
@@ -139,30 +135,26 @@ export function NotificationsPage() {
       void refreshNotificationState();
       showToast({ tone: 'success', title: '全部通知已标为已读' });
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '标记失败', description: '请稍后重试。' }),
+    onError: () => showToast({ tone: 'error', title: '标记失败', description: '请稍后重试。' }),
   });
 
-  const reviewRequest = useMutation<
-    FollowRequestReviewResult,
-    Error,
-    FollowRequestReviewVariables
-  >({
-    mutationFn: ({ followRequestId, decision }) =>
-      decision === 'approve'
-        ? usersApi.approveFollowRequest(followRequestId)
-        : usersApi.rejectFollowRequest(followRequestId),
-    onSuccess: (_, variables) => {
-      void queryClient.invalidateQueries({ queryKey: userKeys.incomingFollowRequests });
-      void refreshNotificationState();
-      showToast({
-        tone: 'success',
-        title: variables.decision === 'approve' ? '已通过关注请求' : '已拒绝关注请求',
-      });
+  const reviewRequest = useMutation<FollowRequestReviewResult, Error, FollowRequestReviewVariables>(
+    {
+      mutationFn: ({ followRequestId, decision }) =>
+        decision === 'approve'
+          ? usersApi.approveFollowRequest(followRequestId)
+          : usersApi.rejectFollowRequest(followRequestId),
+      onSuccess: (_, variables) => {
+        void queryClient.invalidateQueries({ queryKey: userKeys.incomingFollowRequests });
+        void refreshNotificationState();
+        showToast({
+          tone: 'success',
+          title: variables.decision === 'approve' ? '已通过关注请求' : '已拒绝关注请求',
+        });
+      },
+      onError: () => showToast({ tone: 'error', title: '审批失败', description: '请稍后重试。' }),
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '审批失败', description: '请稍后重试。' }),
-  });
+  );
 
   const visibleNotifications = useMemo(() => {
     const items = list.data?.list ?? [];
@@ -304,14 +296,11 @@ export function NotificationsPage() {
               {followRequestItems.map((request) => {
                 const name = request.displayName ?? '资料暂不可用';
                 const handleLabel = request.handle ? `@${request.handle}` : '用户资料占位';
-                const isPending = reviewRequest.isPending && pendingReviewId === request.followRequestId;
+                const isPending =
+                  reviewRequest.isPending && pendingReviewId === request.followRequestId;
                 return (
                   <Card className={styles.request} key={request.followRequestId ?? request.userId}>
-                    <Avatar
-                      fallback={name.slice(0, 1)}
-                      alt={name}
-                      src={request.avatarUrl}
-                    />
+                    <Avatar fallback={name.slice(0, 1)} alt={name} src={request.avatarUrl} />
                     <div>
                       <strong>{name} 请求关注你</strong>
                       <p>

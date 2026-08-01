@@ -61,10 +61,11 @@ describe('communitiesApi management contract', () => {
       }),
     );
 
-    const result = await communitiesApi.listMembers(
-      'community / 1',
-      { page: 2, pageSize: 10, role: 'MODERATOR' },
-    );
+    const result = await communitiesApi.listMembers('community / 1', {
+      page: 2,
+      pageSize: 10,
+      role: 'MODERATOR',
+    });
 
     const url = new URL(capturedUrl);
     expect(url.pathname).toBe('/api/communities/community%20%2F%201/members');
@@ -95,11 +96,7 @@ describe('communitiesApi management contract', () => {
       ),
     );
 
-    const result = await communitiesApi.approveJoinRequest(
-      'c-1',
-      'request-1',
-      '资料符合规则',
-    );
+    const result = await communitiesApi.approveJoinRequest('c-1', 'request-1', '资料符合规则');
 
     expect(capturedBody).toEqual({ decisionMessage: '资料符合规则' });
     expect(idempotencyKey).toMatch(/^approve-community-join-request:/);
@@ -197,7 +194,11 @@ describe('communitiesApi management contract', () => {
             pathname: new URL(request.url).pathname,
             body: await request.json(),
           });
-          return apiSuccessResponse({ communityId: 'c-1', postId: 'post-2', result: 'UNPINNED' as const });
+          return apiSuccessResponse({
+            communityId: 'c-1',
+            postId: 'post-2',
+            result: 'UNPINNED' as const,
+          });
         },
       ),
     );
