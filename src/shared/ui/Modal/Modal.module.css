@@ -1,0 +1,61 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(15 23 42 / 48%);
+  backdrop-filter: blur(6px);
+}
+
+.modal {
+  width: min(520px, 100%);
+  overflow: hidden;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  animation: modal .18s ease both;
+}
+
+.modal > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal > header p {
+  margin-top: 4px;
+  color: var(--color-muted);
+}
+
+.modal > header button {
+  align-self: start;
+  padding: 6px;
+  color: var(--color-muted);
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.body {
+  padding: 22px;
+}
+
+.modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  background: #f8fafc;
+  border-top: 1px solid var(--color-border);
+}
+
+@keyframes modal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(.98);
+  }
+}

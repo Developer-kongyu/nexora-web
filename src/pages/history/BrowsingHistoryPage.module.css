@@ -1,0 +1,339 @@
+.panel {
+  min-height: 620px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 26px 22px 12px;
+  padding: 13px 16px;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.filters button {
+  min-height: 32px;
+  padding: 0 11px;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 700;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.filters button[data-active="true"] {
+  color: var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.batchActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.batchActions > span {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.selectAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.selectAll input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+
+.selectAll:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.list {
+  display: grid;
+  gap: 16px;
+  padding: 20px 22px 28px;
+}
+
+.loading {
+  padding: 20px 22px 28px;
+}
+
+.historyItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 116px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.historyItem:hover {
+  transform: translateY(-1px);
+  border-color: #c7d2fe;
+  box-shadow: var(--shadow-sm);
+}
+
+.checkboxLabel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.checkboxLabel span {
+  width: 20px;
+  height: 20px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  border-radius: 6px;
+  transition: all var(--transition);
+}
+
+.checkboxLabel input:checked + span {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 4px var(--color-primary);
+}
+
+.checkboxLabel input:checked + span::after {
+  display: block;
+  width: 5px;
+  height: 9px;
+  margin: 2px 0 0 6px;
+  content: "";
+  border-color: white;
+  border-style: solid;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkboxLabel input:focus-visible + span {
+  outline: 3px solid rgb(99 102 241 / 18%);
+  outline-offset: 2px;
+}
+
+.itemCopy {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.itemTitle {
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--color-text-strong);
+  font-size: 15px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemTitle:hover {
+  color: var(--color-primary);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta i {
+  width: 3px;
+  height: 3px;
+  background: var(--color-subtle);
+  border-radius: 50%;
+}
+
+.itemCopy p {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #3f4a5f;
+  font-size: 13px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.itemActions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.viewLink, .deleteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 76px;
+  min-height: 38px;
+  padding: 0 13px;
+  font-size: 13px;
+  font-weight: 800;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.viewLink:hover {
+  color: var(--color-primary);
+  border-color: #a5b4fc;
+}
+
+.deleteButton {
+  color: var(--color-danger);
+  border-color: #fecaca;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+}
+
+.deleteButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.clearButton {
+  width: 100%;
+  margin-top: 16px;
+  color: var(--color-danger);
+  border-color: #fecaca;
+}
+
+@media (max-width: 720px) {
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    margin: 14px;
+  }
+
+  .batchActions {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .selectAll {
+    width: 100%;
+  }
+
+  .list, .loading {
+    padding: 14px;
+  }
+
+  .historyItem {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .itemActions {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+}
+
+.historyItem[data-placeholder="true"] {
+  background: #fffcf5;
+  border-style: dashed;
+}
+
+.historyItem[data-placeholder="true"] .itemTitle {
+  color: #8a5a00;
+}
+
+.errorPanel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 22px 28px;
+  padding: 18px;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  border: 1px solid #fecdd3;
+  border-radius: var(--radius-md);
+}
+
+.errorPanel strong {
+  color: #b42318;
+  font-size: 13px;
+}
+
+.errorPanel p {
+  margin-top: 3px;
+  color: #7f1d1d;
+  font-size: 11px;
+}
+
+@media (max-width: 720px) {
+  .errorPanel {
+    grid-template-columns: auto minmax(0, 1fr);
+    margin: 14px;
+  }
+
+  .errorPanel button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding: 0 22px 24px;
+}

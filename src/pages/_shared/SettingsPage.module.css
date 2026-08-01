@@ -1,0 +1,166 @@
+.layout {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 250px;
+  gap: 18px;
+  align-items: start;
+}
+
+.nav {
+  position: sticky;
+  top: 112px;
+  padding: 13px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+}
+
+.navTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navTitle strong {
+  font-size: 13px;
+}
+
+.nav nav {
+  display: grid;
+  gap: 3px;
+  margin-top: 10px;
+}
+
+.nav a {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 9px;
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 9px;
+}
+
+.nav a:hover {
+  color: var(--color-primary);
+  background: #f8f9ff;
+}
+
+.nav a.active {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.nav > p {
+  margin: 14px 6px 3px;
+  padding-top: 12px;
+  color: var(--color-muted);
+  font-size: 9px;
+  line-height: 1.6;
+  border-top: 1px solid var(--color-border);
+}
+
+.layout > main {
+  min-width: 0;
+}
+
+.aside {
+  position: sticky;
+  top: 112px;
+  display: grid;
+  gap: 12px;
+}
+
+.aside section {
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+
+.aside h2 {
+  font-size: 13px;
+}
+
+.aside p, .aside li {
+  color: var(--color-muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.aside p {
+  margin-top: 8px;
+}
+
+.aside ul {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.aside li {
+  display: flex;
+  gap: 7px;
+}
+
+.aside li::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  margin-top: 6px;
+  background: #a5b4fc;
+  border-radius: 50%;
+}
+
+.aside button {
+  margin-top: 10px;
+  padding: 0;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 800;
+  background: transparent;
+  cursor: pointer;
+}
+
+@media (max-width: 1080px) {
+  .layout {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+
+  .aside {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .nav {
+    position: static;
+    overflow-x: auto;
+  }
+
+  .navTitle, .nav > p {
+    display: none;
+  }
+
+  .nav nav {
+    display: flex;
+    margin: 0;
+  }
+
+  .nav a {
+    flex: 0 0 auto;
+  }
+
+  .nav a svg:last-child {
+    display: none;
+  }
+}

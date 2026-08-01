@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+storybook-static
+playwright-report
+test-results
+public/mockServiceWorker.js
+src/shared/api/generated/openapi.d.ts

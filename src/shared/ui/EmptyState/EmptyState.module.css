@@ -1,0 +1,23 @@
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 46px 24px;
+  text-align: center;
+  color: var(--color-muted);
+  background: linear-gradient(180deg, #fff, #fafbff);
+  border: 1px dashed #cdd6e6;
+  border-radius: 16px;
+}
+
+.empty svg {
+  color: #a5b4fc;
+}
+
+.empty h2 {
+  font-size: 17px;
+}
+
+.empty p {
+  max-width: 440px;
+}

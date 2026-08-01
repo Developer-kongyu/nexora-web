@@ -1,0 +1,39 @@
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+
+.fallback {
+  color: #fff;
+  font-weight: 800;
+  background: var(--gradient-brand);
+}
+
+.sm {
+  width: 30px;
+  height: 30px;
+  font-size: 11px;
+}
+
+.md {
+  width: 42px;
+  height: 42px;
+  font-size: 15px;
+}
+
+.lg {
+  width: 56px;
+  height: 56px;
+  font-size: 20px;
+}
+
+.xl {
+  width: 94px;
+  height: 94px;
+  font-size: 32px;
+}

@@ -1,0 +1,290 @@
+.hero {
+  overflow: hidden;
+}
+
+.cover {
+  position: relative;
+  height: 142px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #fff;
+  font-size: 48px;
+  font-weight: 900;
+  background: var(--gradient-brand);
+}
+
+.cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgb(255 255 255 / 26%), transparent 25%),
+    radial-gradient(circle at 82% 55%, rgb(255 255 255 / 15%), transparent 30%);
+}
+
+.cover > span {
+  position: relative;
+  z-index: 1;
+}
+
+.cover i, .cover b {
+  position: absolute;
+  border: 2px solid rgb(255 255 255 / 26%);
+  border-radius: 50%;
+}
+
+.cover i {
+  width: 130px;
+  height: 130px;
+  left: 90px;
+  top: -60px;
+}
+
+.cover b {
+  width: 180px;
+  height: 180px;
+  right: 50px;
+  bottom: -100px;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 15px;
+  padding: 0 20px 18px;
+}
+
+.avatar {
+  margin-top: -43px;
+  border: 5px solid #fff;
+}
+
+.identity {
+  padding-top: 13px;
+}
+
+.identity > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.identity h1 {
+  font-size: 21px;
+}
+
+.identity > span {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.identity p {
+  margin-top: 7px;
+  color: #536075;
+}
+
+.identity small {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-top: 14px;
+}
+
+.hero nav {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.hero nav > button:not(:last-child) {
+  position: relative;
+  min-width: 72px;
+  min-height: 48px;
+  color: var(--color-muted);
+  font-weight: 700;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hero nav > button[data-active="true"] {
+  color: var(--color-primary);
+}
+
+.hero nav > button[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  bottom: 0;
+  height: 3px;
+  background: var(--gradient-brand);
+  border-radius: 3px 3px 0 0;
+}
+
+.hero nav > button:last-child {
+  margin-left: auto;
+}
+
+.announcement {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
+}
+
+.pin {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+  border-radius: 11px;
+}
+
+.announcement h2 {
+  margin-top: 7px;
+  font-size: 14px;
+}
+
+.announcement p {
+  margin-top: 4px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.feed {
+  display: grid;
+  gap: 14px;
+}
+
+.rules {
+  display: grid;
+  gap: 10px;
+}
+
+.rules li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.rules span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+  font-size: 9px;
+  font-weight: 800;
+  background: var(--color-primary-soft);
+  border-radius: 6px;
+}
+
+.members {
+  display: flex;
+  padding-left: 8px;
+}
+
+.members > * {
+  margin-left: -8px;
+}
+
+.members > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  background: #667085;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.tabPanel {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 20px;
+  text-align: center;
+}
+
+.tabPanel > svg {
+  color: var(--color-primary);
+}
+
+.tabPanel p {
+  color: var(--color-muted);
+}
+
+.tabPanel a {
+  margin-top: 5px;
+}
+
+@media (max-width: 600px) {
+  .header {
+    grid-template-columns: auto 1fr;
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .cover {
+    height: 112px;
+  }
+
+  .identity p {
+    font-size: 12px;
+  }
+
+  .hero nav {
+    overflow-x: auto;
+  }
+
+  .hero nav > button:last-child span {
+    display: none;
+  }
+
+  .announcement {
+    grid-template-columns: auto 1fr;
+  }
+
+  .announcement > svg {
+    display: none;
+  }
+}
+
+.announcement > button {
+  display: grid;
+  place-items: center;
+  color: var(--color-muted);
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.announcement > button:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}

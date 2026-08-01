@@ -1,0 +1,752 @@
+.layout {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.layout > main {
+  min-width: 0;
+}
+
+.sidebar {
+  position: sticky;
+  top: 112px;
+  padding: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-xs);
+}
+
+.communityIdentity {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 5px 5px 15px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.communityIdentity > div {
+  display: grid;
+  min-width: 0;
+}
+
+.communityIdentity strong, .communityIdentity span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.communityIdentity strong {
+  font-size: 13px;
+}
+
+.communityIdentity span {
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.sidebar nav {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.sidebar nav button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 43px;
+  padding: 0 10px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+
+.sidebar nav button:hover {
+  color: var(--color-primary);
+  background: var(--color-surface-soft);
+}
+
+.sidebar nav button[data-active="true"] {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.sectionToolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 2px;
+}
+
+.sectionToolbar h2 {
+  font-size: 17px;
+}
+
+.sectionToolbar p {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.sectionToolbar > label, .headerActions > label {
+  min-width: 168px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metric {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+}
+
+.metric > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 12px;
+}
+
+.metric > div {
+  display: grid;
+  gap: 2px;
+}
+
+.metric small {
+  color: var(--color-muted);
+  font-size: 10px;
+}
+
+.metric strong {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.panel > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 17px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panel > header h2 {
+  font-size: 16px;
+}
+
+.panel > header p {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+.tasks {
+  display: grid;
+}
+
+.tasks article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tasks article:last-child {
+  border-bottom: 0;
+}
+
+.taskIcon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 12px;
+}
+
+.tasks strong {
+  font-size: 13px;
+}
+
+.tasks p {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.panelPadding, .formSection {
+  padding: 19px;
+}
+
+.dailyTable, .logTable {
+  display: grid;
+  overflow-x: auto;
+}
+
+.dailyTable > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.3fr) repeat(3, minmax(84px, 1fr));
+  align-items: center;
+  min-width: 500px;
+  gap: 12px;
+  padding: 12px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dailyTable > div:last-child {
+  border-bottom: 0;
+}
+
+.dailyTable strong, .dailyTable span {
+  font-size: 12px;
+}
+
+.tableHeader {
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: var(--color-surface-soft);
+}
+
+.activity {
+  display: grid;
+}
+
+.activity > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.activity > div:last-child {
+  border-bottom: 0;
+}
+
+.activity > div > span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 9px;
+}
+
+.activity p {
+  min-width: 0;
+  font-size: 12px;
+}
+
+.activity small {
+  color: var(--color-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.requests {
+  display: grid;
+}
+
+.requests article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.requests article:last-child {
+  border-bottom: 0;
+}
+
+.requests article > div:nth-child(2) {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.requests article span, .requests article p, .requests article small {
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.requests article p {
+  margin-top: 4px;
+  color: var(--color-text);
+}
+
+.requestTitle, .pinnedTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.requestTitle strong, .pinnedTitle strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.reviewedAt {
+  text-align: right;
+}
+
+.managementToolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  align-items: end;
+  gap: 12px;
+  padding: 14px 19px;
+  background: var(--color-surface-soft);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+}
+
+.searchField:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 12%);
+}
+
+.searchField input {
+  width: 100%;
+  min-width: 0;
+  color: var(--color-text);
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.managementList, .pinnedList {
+  display: grid;
+}
+
+.managementList article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto minmax(150px, 190px) auto;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.managementList article:last-child, .pinnedList article:last-child {
+  border-bottom: 0;
+}
+
+.managementList article > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.managementList article span, .managementList article small {
+  color: var(--color-muted);
+  font-size: 10px;
+}
+
+.lockedRole {
+  max-width: 190px;
+  color: var(--color-muted);
+  font-size: 10px;
+  text-align: right;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 19px;
+  background: var(--color-surface-soft);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagination span {
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.pinForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(150px, 0.7fr) minmax(130px, 0.6fr);
+  gap: 13px;
+  padding: 19px;
+}
+
+.fullField {
+  grid-column: 1 / -1;
+}
+
+.formActions {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
+.pinnedList article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto minmax(112px, 145px) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pinSlot {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--color-primary);
+  font-weight: 900;
+  background: var(--color-primary-soft);
+  border-radius: 11px;
+}
+
+.pinnedList article > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pinnedList article span, .pinnedList article small {
+  color: var(--color-muted);
+  font-size: 10px;
+}
+
+.postLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.degradedNotice {
+  padding: 12px 19px;
+  color: var(--color-warning);
+  font-size: 11px;
+  background: var(--color-warning-soft);
+  border-top: 1px solid #fed7aa;
+}
+
+.ruleList {
+  display: grid;
+  gap: 10px;
+}
+
+.ruleRow {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.ruleRow > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-top: 5px;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 900;
+  background: var(--color-primary-soft);
+  border-radius: 10px;
+}
+
+.ruleRow label {
+  position: relative;
+  display: grid;
+  min-width: 0;
+}
+
+.ruleRow textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px 24px;
+  color: var(--color-text);
+  line-height: 1.55;
+  resize: vertical;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  outline: 0;
+}
+
+.ruleRow textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 12%);
+}
+
+.ruleRow label small {
+  position: absolute;
+  right: 9px;
+  bottom: 7px;
+  color: var(--color-muted);
+  font-size: 9px;
+}
+
+.ruleActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.ruleActions span {
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.inlineActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.settingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.switchGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.logTable > div {
+  display: grid;
+  grid-template-columns: 150px 140px minmax(180px, 1fr) minmax(180px, 1fr);
+  align-items: center;
+  min-width: 720px;
+  gap: 12px;
+  padding: 13px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.logTable > div:last-child {
+  border-bottom: 0;
+}
+
+.logTable span, .logTable small {
+  color: var(--color-muted);
+  font-size: 10px;
+}
+
+.logTable strong, .logTable p {
+  font-size: 11px;
+}
+
+.logTable p {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip: rect(0 0 0 0);
+}
+
+@media (max-width: 1180px) {
+  .metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .managementList article {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+  }
+
+  .managementList article > :nth-last-child(1) {
+    grid-column: 4;
+  }
+
+  .lockedRole {
+    grid-column: 2 / -1;
+    max-width: none;
+    text-align: left;
+  }
+}
+
+@media (max-width: 920px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .sidebar nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .sidebar nav button {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .sidebar nav button > svg:last-child {
+    display: none;
+  }
+
+  .pinForm {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pinForm > :first-child, .fullField, .formActions {
+    grid-column: 1 / -1;
+  }
+
+  .pinnedList article {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .pinnedList article > :nth-child(n + 3) {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 680px) {
+  .sidebar nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics, .settingGrid, .switchGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionToolbar, .panel > header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .headerActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .headerActions > label, .sectionToolbar > label {
+    min-width: 0;
+  }
+
+  .tasks article, .requests article, .activity > div {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .tasks article > button,
+  .requests article > .rowActions,
+  .requests article > .reviewedAt,
+  .activity > div > small {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .managementToolbar, .pinForm {
+    grid-template-columns: 1fr;
+  }
+
+  .pinForm > * {
+    grid-column: auto;
+  }
+
+  .managementList article, .pinnedList article {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .managementList article > :nth-child(n + 3), .pinnedList article > :nth-child(n + 3) {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .ruleRow {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .ruleRow > :last-child {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .inlineActions, .pagination {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}

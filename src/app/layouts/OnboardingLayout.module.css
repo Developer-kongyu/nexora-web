@@ -1,0 +1,174 @@
+.page {
+  min-height: 100vh;
+  padding: 38px 24px;
+  background:
+    radial-gradient(circle at 10% 15%, #eef2ff, transparent 32%),
+    radial-gradient(circle at 88% 85%, #ecfeff, transparent 28%),
+    var(--color-bg);
+}
+
+.shell {
+  width: min(1120px, 100%);
+  min-height: 884px;
+  margin: 0 auto;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 26px;
+  box-shadow: var(--shadow-lg);
+}
+
+.shell > header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 0 4px 22px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand > span {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 900;
+  background: var(--gradient-brand);
+  border-radius: 12px;
+}
+
+.brand div {
+  display: grid;
+  line-height: 1.2;
+}
+
+.brand small {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.stepLabel {
+  text-align: center;
+}
+
+.stepLabel strong {
+  display: block;
+  font-size: 15px;
+}
+
+.stepLabel span {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 4px 9px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--color-primary-soft);
+  border-radius: 999px;
+}
+
+.exit {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.exit:hover {
+  color: var(--color-primary);
+}
+
+.progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 22px;
+  padding: 0 12px;
+}
+
+.progress span {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  color: #a0aabc;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.progress span::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 7px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background: #e6eaf1;
+}
+
+.progress span:first-child::before {
+  display: none;
+}
+
+.progress i {
+  position: relative;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  background: #e2e8f0;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #dce3ee;
+}
+
+.progress span[data-state="current"], .progress span[data-state="done"] {
+  color: var(--color-primary);
+}
+
+.progress span[data-state="current"] i, .progress span[data-state="done"] i {
+  background: var(--color-primary);
+  box-shadow: 0 0 0 1px #a5b4fc;
+}
+
+.progress span[data-state="done"]::before, .progress span[data-state="current"]::before {
+  background: #a5b4fc;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 0;
+  }
+
+  .shell {
+    min-height: 100vh;
+    padding: 18px 14px;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .shell > header {
+    grid-template-columns: 1fr auto;
+  }
+
+  .stepLabel {
+    display: none;
+  }
+
+  .exit {
+    font-size: 0;
+  }
+
+  .progress {
+    margin-top: 8px;
+  }
+}

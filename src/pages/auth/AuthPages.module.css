@@ -1,0 +1,279 @@
+.formShell {
+  width: min(480px, 100%);
+}
+
+.formShell > header {
+  margin-bottom: 26px;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 9px;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .05em;
+}
+
+.formShell h1 {
+  font-size: 30px;
+}
+
+.formShell header p {
+  margin-top: 8px;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.back:hover {
+  color: var(--color-primary);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 11px;
+}
+
+.tabs button {
+  height: 38px;
+  color: var(--color-muted);
+  font-weight: 800;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  color: var(--color-primary);
+  background: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.fieldWrap {
+  position: relative;
+}
+
+.fieldWrap > button {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--color-muted);
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.formMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.checkbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}
+
+.link {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.error {
+  padding: 10px 12px;
+  color: #b42318;
+  font-size: 13px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 9px;
+}
+
+.wideButton {
+  width: 100%;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0;
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+.divider::before, .divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.google {
+  width: 100%;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--color-text);
+  font-weight: 800;
+  background: #fff;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.google:hover {
+  border-color: #a5b4fc;
+}
+
+.google span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: #4285f4;
+  font-size: 16px;
+  font-weight: 900;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+}
+
+.security {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 12px 13px;
+  color: #24734b;
+  font-size: 12px;
+  line-height: 1.55;
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+  border-radius: 11px;
+}
+
+.security svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.footer a {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -8px 0 18px;
+  padding: 11px 12px;
+  color: #167347;
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+}
+
+.codeRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.codeRow button {
+  height: 44px;
+}
+
+.terms {
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.terms a {
+  color: var(--color-primary);
+}
+
+.passwordRules {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.passwordRules span::before {
+  content: "✓";
+  margin-right: 5px;
+  color: var(--color-success);
+  font-weight: 900;
+}
+
+@media (max-width: 480px) {
+  .formShell h1 {
+    font-size: 27px;
+  }
+
+  .codeRow {
+    grid-template-columns: 1fr;
+  }
+
+  .codeRow button {
+    width: 100%;
+  }
+}
+
+.continueLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 800;
+  background: var(--color-primary-soft);
+  border-radius: 10px;
+}

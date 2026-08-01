@@ -1,0 +1,248 @@
+.hero {
+  position: relative;
+  min-height: 214px;
+  display: grid;
+  grid-template-columns: 1fr 230px;
+  align-items: center;
+  gap: 20px;
+  padding: 27px 30px;
+  overflow: hidden;
+  background: var(--gradient-brand-soft);
+  border: 1px solid #e2e3ff;
+  border-radius: 18px;
+}
+
+.hero > div > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 800;
+  background: #fff;
+  border-radius: 999px;
+}
+
+.hero h1 {
+  max-width: 500px;
+  margin-top: 13px;
+  font-size: 28px;
+}
+
+.hero p {
+  max-width: 510px;
+  margin-top: 9px;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.hero > div > div {
+  display: flex;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.heroArt {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 180px;
+  height: 150px;
+  margin: auto;
+  color: #fff;
+  background: var(--gradient-brand);
+  border-radius: 52% 48% 45% 55%;
+  transform: rotate(-4deg);
+  box-shadow: 0 22px 38px rgb(99 102 241 / 20%);
+}
+
+.heroArt svg {
+  transform: rotate(4deg);
+}
+
+.heroArt i, .heroArt b {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  opacity: .46;
+}
+
+.heroArt i {
+  width: 22px;
+  height: 22px;
+  right: 18px;
+  top: 20px;
+}
+
+.heroArt b {
+  width: 12px;
+  height: 12px;
+  left: 24px;
+  bottom: 25px;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.tabs button {
+  height: 34px;
+  padding: 0 12px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 800;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tabs button[data-active="true"] {
+  color: var(--color-primary);
+  background: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  color: var(--color-muted);
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.search input {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin: 4px 2px 12px;
+}
+
+.sectionHeading h2 {
+  font-size: 17px;
+}
+
+.sectionHeading p {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.categories button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px;
+  text-align: left;
+  color: var(--color-muted);
+  font-size: 11px;
+  background: #f8fafc;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.categories button:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.categories span {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  color: var(--color-primary);
+  background: #fff;
+  border-radius: 7px;
+}
+
+@media (max-width: 760px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .heroArt {
+    display: none;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 22px 18px;
+  }
+
+  .hero h1 {
+    font-size: 23px;
+  }
+
+  .hero > div > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tabs {
+    overflow-x: auto;
+  }
+
+  .categories {
+    grid-template-columns: 1fr;
+  }
+}
+
+.categories button[data-active="true"] {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow: inset 0 0 0 1px #c7d2fe;
+}

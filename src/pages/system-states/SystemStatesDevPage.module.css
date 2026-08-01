@@ -1,0 +1,239 @@
+.page {
+  min-height: 100vh;
+  padding: 58px clamp(24px, 5vw, 72px) 44px;
+  background: var(--color-bg);
+}
+
+.header {
+  max-width: 1240px;
+  margin: 0 auto 38px;
+}
+
+.devBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  margin-bottom: 10px;
+  padding: 0 10px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--color-primary-soft);
+  border-radius: 999px;
+}
+
+.header h1 {
+  font-size: clamp(30px, 3vw, 40px);
+  letter-spacing: -0.035em;
+}
+
+.header p {
+  margin-top: 6px;
+  color: var(--color-muted);
+  font-size: 15px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 68px 46px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.stateCard {
+  display: grid;
+  justify-items: center;
+  min-height: 300px;
+  padding: 32px 32px 28px;
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-xs);
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    border-color var(--transition);
+}
+
+.stateCard:hover {
+  transform: translateY(-3px);
+  border-color: #c7d2fe;
+  box-shadow: var(--shadow-md);
+}
+
+.illustration {
+  position: relative;
+  width: 100%;
+  height: 90px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.illustration[data-tone="blue"] {
+  background: linear-gradient(120deg, #a5b4fc, #67e8f9);
+}
+
+.illustration[data-tone="violet"] {
+  background: linear-gradient(120deg, #f5c2eb, #bfdbfe);
+}
+
+.illustration[data-tone="green"] {
+  background: linear-gradient(120deg, #86efac, #fde68a);
+}
+
+.illustration svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.illustration path {
+  fill: none;
+  stroke: rgb(255 255 255 / 68%);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.orbTop, .orbBottom {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: rgb(255 255 255 / 25%);
+  border-radius: 50%;
+}
+
+.orbTop {
+  top: 8px;
+  right: 38px;
+}
+
+.orbBottom {
+  bottom: 8px;
+  left: 44px;
+  width: 25px;
+  height: 25px;
+}
+
+.stateCard h2 {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.stateCard p {
+  max-width: 300px;
+  min-height: 42px;
+  margin-top: 9px;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.action {
+  align-self: end;
+  margin-top: 22px;
+}
+
+.primaryAction, .secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 152px;
+  min-height: 42px;
+  padding: 0 17px;
+  font-size: 14px;
+  font-weight: 800;
+  border-radius: 11px;
+  cursor: pointer;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    border-color var(--transition);
+}
+
+.primaryAction {
+  color: white;
+  background: var(--gradient-brand);
+  box-shadow: 0 8px 20px rgb(99 102 241 / 20%);
+}
+
+.secondaryAction {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+}
+
+.primaryAction:hover, .secondaryAction:hover {
+  transform: translateY(-1px);
+}
+
+.secondaryAction:hover {
+  color: var(--color-primary);
+  border-color: #a5b4fc;
+}
+
+.boundaryNote {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1240px;
+  margin: 74px auto 0;
+  padding: 20px 30px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+}
+
+.boundaryNote strong {
+  font-size: 16px;
+}
+
+.boundaryNote p {
+  margin-top: 5px;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.boundaryNote code {
+  padding: 8px 12px;
+  color: #4f46e5;
+  font-size: 12px;
+  background: var(--color-primary-soft);
+  border-radius: 9px;
+}
+
+@media (max-width: 1020px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .page {
+    padding: 32px 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .stateCard {
+    min-height: 286px;
+  }
+
+  .boundaryNote {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: 30px;
+    padding: 20px;
+  }
+}

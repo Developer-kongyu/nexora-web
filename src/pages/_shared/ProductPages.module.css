@@ -1,0 +1,622 @@
+.section {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xs);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 17px 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sectionHeader h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.sectionHeader p {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.sectionHeader > a, .sectionHeader > button {
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 800;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sectionBody {
+  padding: 18px;
+}
+
+.flushBody {
+  padding: 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbarLabel {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pillTabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.pillTabs button, .pillTabs a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 13px;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 800;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pillTabs .active {
+  color: var(--color-primary);
+  background: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+.sideCard {
+  padding: 18px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xs);
+}
+
+.sideCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.sideCardHeader h2 {
+  font-size: 15px;
+}
+
+.sideCardHeader a, .sideCardHeader button {
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 800;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sideCard p {
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.sideCard ul {
+  display: grid;
+  gap: 11px;
+}
+
+.sideCard li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sideCard li::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  margin-top: 6px;
+  background: #a5b4fc;
+  border-radius: 50%;
+}
+
+.infoBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  color: #4f46aa;
+  background: var(--color-primary-soft);
+  border: 1px solid #dce1ff;
+  border-radius: 12px;
+}
+
+.infoBanner p {
+  flex: 1;
+  font-size: 12px;
+}
+
+.infoBanner button {
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 800;
+  background: transparent;
+  cursor: pointer;
+}
+
+.successBanner {
+  color: #167347;
+  background: #ecfdf3;
+  border-color: #bbf7d0;
+}
+
+.warningBanner {
+  color: #a15c05;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.dangerBanner {
+  color: #b42318;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.quickCompose {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xs);
+}
+
+.quickCompose button.prompt {
+  min-height: 40px;
+  padding: 0 14px;
+  text-align: left;
+  color: #98a2b3;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  cursor: text;
+}
+
+.quickTools {
+  display: flex;
+  gap: 4px;
+}
+
+.quickTools button {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  color: var(--color-muted);
+  background: transparent;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.quickTools button:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.statTile {
+  padding: 15px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+}
+
+.statTile span {
+  display: block;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.statTile strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 23px;
+}
+
+.statTile small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+}
+
+.list {
+  display: grid;
+}
+
+.listRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.listRow:last-child {
+  border-bottom: 0;
+}
+
+.listCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.listCopy strong {
+  font-size: 13px;
+}
+
+.listCopy span, .listCopy small {
+  color: var(--color-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.featureCard {
+  position: relative;
+  min-height: 132px;
+  padding: 18px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    border-color var(--transition);
+}
+
+.featureCard:hover {
+  transform: translateY(-2px);
+  border-color: #c7d2fe;
+  box-shadow: var(--shadow-sm);
+}
+
+.featureCardIcon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 12px;
+}
+
+.featureCard h3 {
+  margin-top: 13px;
+}
+
+.featureCard p {
+  margin-top: 5px;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.featureCard .arrow {
+  position: absolute;
+  right: 16px;
+  top: 17px;
+  color: #a8b1c1;
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  color: #566176;
+  font-size: 12px;
+  font-weight: 700;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: #a5b4fc;
+}
+
+.chipSelected {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-color: #c7d2fe;
+}
+
+.formSection {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+}
+
+.formSection + .formSection {
+  margin-top: 16px;
+}
+
+.formSectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.formSectionHeader h2 {
+  font-size: 16px;
+}
+
+.formSectionHeader p {
+  margin-top: 4px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.formFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.formFooter > span {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.formFooter > div {
+  display: flex;
+  gap: 9px;
+}
+
+.dangerZone {
+  border-color: #fecdd3;
+}
+
+.dangerZone .formSectionHeader {
+  border-color: #ffe4e6;
+}
+
+.dangerZone h2 {
+  color: #b42318;
+}
+
+.emptyPanel {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 42px 20px;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 16px;
+}
+
+.emptyPanel h2 {
+  font-size: 16px;
+}
+
+.emptyPanel p {
+  max-width: 420px;
+  font-size: 13px;
+}
+
+.skeleton {
+  height: 112px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 42%, #f1f5f9 62%);
+  background-size: 400% 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  animation: shimmer 1.4s infinite;
+}
+
+.compactSkeleton {
+  height: 64px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.segmented {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.segmented button {
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--color-muted);
+  font-weight: 700;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.segmented button[data-active="true"] {
+  color: var(--color-primary);
+  background: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+.metaLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.metaLine span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.brandText {
+  color: var(--color-primary);
+}
+
+@media (max-width: 700px) {
+  .cardGrid, .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .full {
+    grid-column: auto;
+  }
+
+  .statGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .toolbarGroup {
+    flex-wrap: wrap;
+  }
+
+  .quickCompose {
+    grid-template-columns: auto 1fr;
+  }
+
+  .quickTools {
+    grid-column: 2;
+  }
+
+  .formFooter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .formFooter > div {
+    justify-content: flex-end;
+  }
+
+  .listRow {
+    align-items: start;
+  }
+
+  .rowActions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}

@@ -1,0 +1,70 @@
+.viewport {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: grid;
+  gap: 10px;
+  width: min(390px, calc(100vw - 32px));
+}
+
+.toast {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 11px;
+  padding: 14px 14px 14px 16px;
+  color: var(--color-text);
+  background: rgb(255 255 255 / 96%);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
+  animation: enter 0.22s ease both;
+}
+
+.toast[data-tone="success"] > svg {
+  color: var(--color-success);
+}
+
+.toast[data-tone="error"] > svg {
+  color: var(--color-danger);
+}
+
+.toast[data-tone="info"] > svg {
+  color: var(--color-primary);
+}
+
+.toast[data-tone="warning"] > svg {
+  color: var(--color-warning);
+}
+
+.toast span {
+  display: grid;
+  gap: 2px;
+}
+
+.toast small {
+  line-height: 1.4;
+}
+
+.toast button {
+  padding: 3px;
+  color: var(--color-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+@media (max-width: 620px) {
+  .viewport {
+    top: 12px;
+    right: 16px;
+  }
+}

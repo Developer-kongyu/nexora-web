@@ -1,0 +1,227 @@
+.sideAction {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.summaryGrid > div {
+  padding: 11px;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+}
+
+.summaryGrid span {
+  display: block;
+  color: var(--color-muted);
+  font-size: 10px;
+}
+
+.summaryGrid strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 20px;
+}
+
+.bulkBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--color-surface-soft);
+}
+
+.bulkBar label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bulkBar input, .checkboxLabel input {
+  accent-color: var(--color-primary);
+}
+
+.bulkBar > span {
+  flex: 1;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.bulkBar > div, .rowActions, .badges, .metaLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.errorPanel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  border-color: #fecdd3;
+}
+
+.errorPanel strong {
+  font-size: 13px;
+}
+
+.errorPanel p {
+  margin-top: 3px;
+  color: #7f1d1d;
+  font-size: 11px;
+}
+
+.draftList {
+  display: grid;
+  gap: 14px;
+}
+
+.draftRow {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 17px;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.draftRow[data-selected="true"] {
+  background: #fafbff;
+  border-color: #a5b4fc;
+}
+
+.checkboxLabel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  width: 16px;
+  height: 16px;
+}
+
+.draftIcon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 13px;
+}
+
+.draftCopy {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.draftCopy > strong {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metaLine {
+  flex-wrap: wrap;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.metaLine span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metaLine span + span::before {
+  width: 3px;
+  height: 3px;
+  margin-right: 4px;
+  content: "";
+  background: #cbd5e1;
+  border-radius: 50%;
+}
+
+.badges {
+  flex-wrap: wrap;
+}
+
+.rowActions {
+  justify-content: flex-end;
+}
+
+.loadMore {
+  justify-self: center;
+}
+
+@media (max-width: 920px) {
+  .draftRow {
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+
+  .rowActions {
+    grid-column: 2 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .bulkBar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .bulkBar > span {
+    flex-basis: 40%;
+  }
+
+  .bulkBar > div {
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .draftRow {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .draftIcon {
+    display: none;
+  }
+
+  .rowActions {
+    grid-column: 2;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .errorPanel {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .errorPanel > button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

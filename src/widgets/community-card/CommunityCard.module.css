@@ -1,0 +1,59 @@
+.card {
+  overflow: hidden;
+}
+
+.cover {
+  height: 74px;
+  background: var(--gradient-cover);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 16px;
+}
+
+.card[data-featured="true"] .row {
+  align-items: start;
+}
+
+.card[data-featured="true"] .row > a {
+  margin-top: -37px;
+}
+
+.copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.copy strong {
+  font-size: 14px;
+}
+
+.copy span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.copy p {
+  margin-top: 3px;
+  color: #586477;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 520px) {
+  .copy p {
+    display: none;
+  }
+
+  .row {
+    padding: 13px;
+  }
+}
