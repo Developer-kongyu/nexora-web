@@ -7,7 +7,7 @@
     "kind": "fresh-git-clone",
     "sourceCommit": "7f403400d401f3b13880522b62766b4681e066cc",
     "branch": "stage-015-formal-toolchain-green",
-    "clonePath": "C:\\Users\\lct_f\\Desktop\\X项目前端\\lct-web-stage015-clean-verify-7f40340",
+    "clonePath": "C:\\Users\\lct_f\\Desktop\\X项目\\twitter-clone-web",
     "initialGitStatusClean": true,
     "finalGitStatusClean": true,
     "packageLockUnchanged": true,

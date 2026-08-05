@@ -1,34 +1,33 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
 import { ShieldCheck } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import {
-  authApi,
+  onboardingPathForStatus,
   passwordConfirmationFieldSchema,
   passwordsMatch,
   strongPasswordSchema,
   useRegister,
-  verificationCodeSchema,
 } from '@/domains/auth';
 import { Button, TextField, useToast } from '@/shared/ui';
 import { AuthFormShell } from './AuthFormShell';
 import styles from './AuthPages.module.css';
-import { useVerificationCountdown } from './useVerificationCountdown';
 
 const schema = z
   .object({
     email: z.string().trim().email('请输入有效邮箱'),
-    code: verificationCodeSchema,
+    handle: z
+      .string()
+      .trim()
+      .min(3, 'Handle 至少 3 个字符')
+      .max(24, 'Handle 最多 24 个字符')
+      .regex(/^[A-Za-z][A-Za-z0-9_]*$/, 'Handle 需以字母开头，仅支持字母、数字与下划线'),
     password: strongPasswordSchema,
     confirmPassword: passwordConfirmationFieldSchema,
     agreed: z.boolean().refine(Boolean, '请阅读并同意服务条款与隐私政策'),
   })
-  .refine(passwordsMatch, {
-    path: ['confirmPassword'],
-    message: '两次输入的密码不一致',
-  });
+  .refine(passwordsMatch, { path: ['confirmPassword'], message: '两次输入的密码不一致' });
 
 type RegisterValues = z.infer<typeof schema>;
 
@@ -36,48 +35,28 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const registerMutation = useRegister();
-  const requestCode = useMutation({ mutationFn: authApi.requestRegistrationCode });
-  const countdown = useVerificationCountdown();
   const form = useForm<RegisterValues>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      email: '',
-      code: '',
-      password: '',
-      confirmPassword: '',
-      agreed: false,
-    },
+    defaultValues: { email: '', handle: '', password: '', confirmPassword: '', agreed: false },
   });
-
-  const sendCode = async () => {
-    const valid = await form.trigger('email');
-    if (!valid || countdown.active) return;
-    const result = await requestCode.mutateAsync({ email: form.getValues('email').trim() });
-    countdown.start(result.retryAfterSeconds);
-    showToast({ tone: 'success', title: '注册验证码已发送' });
-  };
-
   const submit = form.handleSubmit(async (values) => {
-    await registerMutation.mutateAsync({
+    const session = await registerMutation.mutateAsync({
       email: values.email,
-      code: values.code,
+      handle: values.handle,
       password: values.password,
     });
     showToast({ tone: 'success', title: '账号创建成功', description: '接下来设置你的兴趣偏好' });
-    void navigate('/onboarding/interests', { replace: true });
+    void navigate(onboardingPathForStatus(session.onboardingStatus) ?? '/home', { replace: true });
   });
-
-  const error = registerMutation.error || requestCode.error;
-
   return (
     <AuthFormShell
       eyebrow="加入社区"
       title="创建你的账号"
-      description="只需几步，即可开始分享和连接。"
+      description="填写邮箱、唯一 Handle 与密码即可完成注册。"
       backTo="/auth/login"
       footer={
         <span>
-          已有账号？ <Link to="/auth/login">直接登录</Link>
+          已有账号？<Link to="/auth/login">直接登录</Link>
         </span>
       }
     >
@@ -90,26 +69,15 @@ export function RegisterPage() {
           {...form.register('email')}
           error={form.formState.errors.email?.message}
         />
-        <div className={styles.codeRow}>
-          <TextField
-            label="邮箱验证码"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            placeholder="6 位验证码"
-            maxLength={6}
-            {...form.register('code')}
-            error={form.formState.errors.code?.message}
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            loading={requestCode.isPending}
-            disabled={countdown.active}
-            onClick={() => void sendCode()}
-          >
-            {countdown.active ? `${countdown.seconds}s 后重发` : '发送验证码'}
-          </Button>
-        </div>
+        <TextField
+          label="Handle"
+          autoCapitalize="none"
+          autoCorrect="off"
+          placeholder="例如 zhiqiu"
+          hint="以字母开头，仅支持字母、数字与下划线"
+          {...form.register('handle')}
+          error={form.formState.errors.handle?.message}
+        />
         <TextField
           label="密码"
           type="password"
@@ -129,8 +97,7 @@ export function RegisterPage() {
         <div className={styles.passwordRules}>
           <span>至少 8 个字符</span>
           <span>包含字母与数字</span>
-          <span>不使用常见弱密码</span>
-          <span>两次输入一致</span>
+          <span>Handle 注册后可修改</span>
         </div>
         <label className={styles.checkbox}>
           <input type="checkbox" {...form.register('agreed')} />
@@ -141,9 +108,9 @@ export function RegisterPage() {
             {form.formState.errors.agreed.message}
           </p>
         ) : null}
-        {error ? (
+        {registerMutation.error ? (
           <p className={styles.error} role="alert">
-            {error.message}
+            {registerMutation.error.message}
           </p>
         ) : null}
         <Button
@@ -157,7 +124,7 @@ export function RegisterPage() {
       </form>
       <div className={styles.security}>
         <ShieldCheck size={18} />
-        <span>注册成功后，你可以随时在设置中调整账号、隐私和推荐偏好。</span>
+        <span>注册后可通过独立的邮箱验证流程完成邮箱认证。</span>
       </div>
     </AuthFormShell>
   );

@@ -19,6 +19,34 @@ const editableProfile = {
   updatedAt: '2026-07-28T08:00:00.000Z',
 };
 
+describe('usersApi current-user card contract', () => {
+  it('loads the exact owner current-user card resource', async () => {
+    let method = '';
+    server.use(
+      http.get('/api/users/me', ({ request }) => {
+        method = request.method;
+        return apiSuccessResponse({
+          userId: 'user-current',
+          handle: 'current.user',
+          displayName: '当前用户',
+          avatarUrl: null,
+        });
+      }),
+    );
+
+    const result = await usersApi.getCurrentUserCard();
+
+    expect(method).toBe('GET');
+    expect(result).toEqual({
+      userId: 'user-current',
+      handle: 'current.user',
+      displayName: '当前用户',
+      avatarUrl: null,
+    });
+    expect(Object.keys(result).sort()).toEqual(['avatarUrl', 'displayName', 'handle', 'userId']);
+  });
+});
+
 describe('usersApi editable profile contract', () => {
   it('loads the owner-only editable profile resource', async () => {
     let method = '';

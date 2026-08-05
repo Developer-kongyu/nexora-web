@@ -1,88 +1,209 @@
 import { apiClient } from '@/shared/api/client';
+import type { UserSummary } from '@/domains/users/model/types';
 import type {
   AuthSessionResponse,
+  BackendAuthSessionResponse,
   GoogleProfileInput,
+  GoogleVerificationResult,
   LoginInput,
   LoginWithCodeInput,
   PasswordResetRequestInput,
+  PasswordResetRequestResponse,
   RegisterInput,
   ResetPasswordInput,
   VerificationCodeResponse,
 } from '../model/types';
 
+function inferHandle(identifier: string): string | null {
+  const value = identifier.trim().replace(/^@/, '');
+  if (!/^[A-Za-z][A-Za-z0-9_]{2,23}$/.test(value)) return null;
+  return value;
+}
+
+function toSession(
+  response: BackendAuthSessionResponse,
+  userHint: Partial<UserSummary> = {},
+): AuthSessionResponse {
+  const handle = userHint.handle ?? '';
+  return {
+    accessToken: response.accessToken,
+    csrfToken: response.csrfToken,
+    user: {
+      id: response.userId,
+      handle,
+      displayName: userHint.displayName ?? (handle || '用户'),
+      avatarUrl: userHint.avatarUrl ?? null,
+    },
+    onboardingStatus: response.onboardingStatus,
+    onboardingCompleted:
+      response.onboardingStatus === 'COMPLETED' || response.onboardingStatus === 'SKIPPED',
+  };
+}
+
 export const authApi = {
-  login: (input: LoginInput) =>
-    apiClient.request<AuthSessionResponse, LoginInput>({
+  login: async (input: LoginInput) => {
+    const response = await apiClient.request<
+      BackendAuthSessionResponse,
+      { loginIdentifier: string; password: string; deviceName: null }
+    >({
       method: 'POST',
       path: '/api/auth/login/password',
-      body: input,
+      body: {
+        loginIdentifier: input.identifier.trim(),
+        password: input.password,
+        deviceName: null,
+      },
       auth: false,
       retry401: false,
-    }),
-  requestLoginCode: (input: Pick<LoginWithCodeInput, 'identifier'>) =>
-    apiClient.request<VerificationCodeResponse, Pick<LoginWithCodeInput, 'identifier'>>({
+    });
+    const handle = inferHandle(input.identifier);
+    return toSession(response, handle ? { handle, displayName: handle } : {});
+  },
+
+  requestLoginCode: async (input: Pick<LoginWithCodeInput, 'identifier'>) => {
+    const response = await apiClient.request<
+      { requested: true; expiresInSeconds: number },
+      { phone: string; regionCode: null }
+    >({
       method: 'POST',
       path: '/api/auth/login/code/request',
-      body: input,
+      body: { phone: input.identifier.trim(), regionCode: null },
       auth: false,
       retry401: false,
-    }),
-  loginWithCode: (input: LoginWithCodeInput) =>
-    apiClient.request<AuthSessionResponse, LoginWithCodeInput>({
+    });
+    return {
+      ...response,
+      retryAfterSeconds: response.expiresInSeconds,
+    } satisfies VerificationCodeResponse;
+  },
+
+  loginWithCode: async (input: LoginWithCodeInput) => {
+    const response = await apiClient.request<
+      BackendAuthSessionResponse,
+      { phone: string; regionCode: null; code: string; deviceName: null }
+    >({
       method: 'POST',
-      path: '/api/auth/login/code',
-      body: input,
+      path: '/api/auth/login/code/confirm',
+      body: {
+        phone: input.identifier.trim(),
+        regionCode: null,
+        code: input.code,
+        deviceName: null,
+      },
       auth: false,
       retry401: false,
-    }),
-  requestRegistrationCode: (input: { email: string }) =>
-    apiClient.request<VerificationCodeResponse, { email: string }>({
+    });
+    return toSession(response);
+  },
+
+  register: async (input: RegisterInput) => {
+    const response = await apiClient.request<
+      BackendAuthSessionResponse,
+      { email: string; password: string; handle: string; deviceName: null }
+    >({
       method: 'POST',
-      path: '/api/auth/register/code/request',
-      body: input,
-      auth: false,
-      retry401: false,
-    }),
-  register: (input: RegisterInput) =>
-    apiClient.request<AuthSessionResponse, RegisterInput>({
-      method: 'POST',
-      path: '/api/auth/register',
-      body: input,
+      path: '/api/auth/register/email',
+      body: {
+        email: input.email.trim(),
+        password: input.password,
+        handle: input.handle.trim(),
+        deviceName: null,
+      },
       auth: false,
       retry401: false,
       idempotencyKey: crypto.randomUUID(),
-    }),
+    });
+    return toSession(response, { handle: input.handle.trim(), displayName: input.handle.trim() });
+  },
+
   requestPasswordReset: (input: PasswordResetRequestInput) =>
-    apiClient.request<VerificationCodeResponse, PasswordResetRequestInput>({
+    apiClient.request<PasswordResetRequestResponse, { loginIdentifier: string }>({
       method: 'POST',
       path: '/api/auth/password/reset/request',
-      body: input,
+      body: { loginIdentifier: input.identifier.trim() },
       auth: false,
       retry401: false,
     }),
-  resetPassword: (input: ResetPasswordInput) =>
-    apiClient.request<void, ResetPasswordInput>({
+
+  resetPassword: (input: ResetPasswordInput) => {
+    const body =
+      input.resetType === 'LINK'
+        ? { resetType: 'LINK' as const, token: input.token, newPassword: input.password }
+        : {
+            resetType: 'CODE' as const,
+            phone: input.phone.trim(),
+            code: input.code,
+            newPassword: input.password,
+          };
+    return apiClient.request<{ reset: true; userId: string; securityVersion: number }, typeof body>(
+      {
+        method: 'POST',
+        path: '/api/auth/password/reset/confirm',
+        body,
+        auth: false,
+        retry401: false,
+        idempotencyKey: crypto.randomUUID(),
+      },
+    );
+  },
+
+  verifyGoogleIdToken: async (idToken: string): Promise<GoogleVerificationResult> => {
+    const response = await apiClient.request<
+      | { mode: 'LOGIN_SUCCESS'; authSession: BackendAuthSessionResponse }
+      | {
+          mode: 'PROFILE_COMPLETION_REQUIRED';
+          pendingUserId: string;
+          completionToken: string;
+          completionTokenExpiresInSeconds: number;
+          oauthProfile: {
+            email: string | null;
+            displayName: string | null;
+            avatarUrl: string | null;
+          };
+        },
+      { idToken: string; deviceName: null }
+    >({
       method: 'POST',
-      path: '/api/auth/password/reset',
-      body: input,
+      path: '/api/auth/oauth/google/verify-id-token',
+      body: { idToken, deviceName: null },
+      auth: false,
+      retry401: false,
+    });
+    if (response.mode === 'LOGIN_SUCCESS') {
+      return { mode: response.mode, authSession: toSession(response.authSession) };
+    }
+    return response;
+  },
+
+  completeGoogleProfile: async (input: GoogleProfileInput) => {
+    const response = await apiClient.request<
+      BackendAuthSessionResponse,
+      GoogleProfileInput & { deviceName: null }
+    >({
+      method: 'POST',
+      path: '/api/auth/oauth/google/complete-profile',
+      body: { ...input, deviceName: null },
       auth: false,
       retry401: false,
       idempotencyKey: crypto.randomUUID(),
-    }),
-  completeGoogleProfile: (input: GoogleProfileInput) =>
-    apiClient.request<AuthSessionResponse, GoogleProfileInput>({
-      method: 'POST',
-      path: '/api/auth/google/complete',
-      body: input,
-      auth: false,
-      retry401: false,
-    }),
-  refresh: () =>
-    apiClient.request<AuthSessionResponse>({
+    });
+    return toSession(response, { handle: input.handle, displayName: input.handle });
+  },
+
+  refresh: async () => {
+    const response = await apiClient.request<BackendAuthSessionResponse>({
       method: 'POST',
       path: '/api/auth/refresh',
       auth: false,
       retry401: false,
+    });
+    return toSession(response);
+  },
+
+  logout: () =>
+    apiClient.request<void>({
+      method: 'POST',
+      path: '/api/auth/logout',
+      retry401: false,
     }),
-  logout: () => apiClient.request<void>({ method: 'POST', path: '/api/auth/logout' }),
 };

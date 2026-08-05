@@ -1,5 +1,7 @@
 import { Compass, LockKeyhole, Sparkles, UsersRound } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
+import { APP_BRAND } from '@/shared/config/brand';
+import { BrandMark } from '@/shared/ui';
 import styles from './PublicLayout.module.css';
 
 export function PublicLayout() {
@@ -8,17 +10,17 @@ export function PublicLayout() {
       <div className={styles.shell}>
         <section className={styles.brand}>
           <div className={styles.brandTop}>
-            <span className={styles.logo}>L</span>
+            <BrandMark className={styles.logo} />
             <span>
-              <strong>LCT Circle</strong>
-              <small>发现同频的人</small>
+              <strong>{APP_BRAND.name}</strong>
+              <small>{APP_BRAND.tagline}</small>
             </span>
           </div>
 
           <div className={styles.hero}>
             <span className={styles.eyebrow}>
               <Sparkles size={14} />
-              现代兴趣社交网络
+              开放兴趣社交网络
             </span>
             <h1>
               分享热爱，
@@ -58,7 +60,7 @@ export function PublicLayout() {
             </article>
           </div>
 
-          <p className={styles.copyright}>© 2026 LCT Circle · 尊重表达与真实关系</p>
+          <p className={styles.copyright}>© 2026 {APP_BRAND.name} · 尊重表达与真实关系</p>
         </section>
 
         <section className={styles.panel}>

@@ -63,16 +63,9 @@
 }
 
 .logo {
-  display: grid;
-  place-items: center;
   width: 44px;
   height: 44px;
-  color: #fff;
-  font-size: 23px;
-  font-weight: 900;
-  background: var(--gradient-brand);
-  border-radius: 14px;
-  box-shadow: 0 10px 22px rgb(99 102 241 / 25%);
+  filter: drop-shadow(0 10px 11px rgb(99 102 241 / 22%));
 }
 
 .brandTop > span:last-child {

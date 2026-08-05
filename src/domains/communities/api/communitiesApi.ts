@@ -1,12 +1,17 @@
 import { apiClient } from '@/shared/api/client';
 import { createIdempotencyKey } from '@/shared/api/idempotency';
-import { buildCursorQuery } from '@/shared/api/pagination';
 import { appendQuery } from '@/shared/api/query';
 import type { CursorPage } from '@/shared/api/pagination';
+import {
+  communityCardToSummary,
+  communityDetailToLegacy,
+  type CommunityMembershipStateDto,
+} from '../lib/communityAdapter';
 import type {
   ApproveCommunityJoinRequestResponse,
   ChangeCommunityMemberRoleResponse,
   CommunityAssignableMemberRole,
+  CommunityCardBriefView,
   CommunityDetail,
   CommunityDetailView,
   CommunityJoinRequestStatus,
@@ -49,22 +54,58 @@ function encodeSegment(value: string): string {
   return encodeURIComponent(value);
 }
 
-export const communitiesApi = {
-  /** Legacy cursor adapter retained until the public discovery page is migrated. */
-  list: (cursor?: string, signal?: AbortSignal) =>
-    apiClient.request<CursorPage<CommunitySummary>>({
-      path: `/api/communities${buildCursorQuery({ cursor })}`,
-      auth: false,
-      signal,
-    }),
+function getCommunityDetailBySlug(slug: string, signal?: AbortSignal) {
+  return apiClient.request<CommunityDetailView>({
+    path: `/api/communities/slug/${encodeSegment(slug)}`,
+    signal,
+  });
+}
 
-  /** Legacy public-detail adapter retained for the current community detail page. */
-  detail: (slug: string, signal?: AbortSignal) =>
-    apiClient.request<CommunityDetail>({
-      path: `/api/communities/slug/${encodeSegment(slug)}`,
-      auth: false,
+function getCommunityMembershipStates(communityIds: string[], signal?: AbortSignal) {
+  if (communityIds.length === 0) {
+    return Promise.resolve({ list: [] as Array<CommunityMembershipStateDto | null> });
+  }
+  return apiClient.request<
+    { list: Array<CommunityMembershipStateDto | null> },
+    { communityIds: string[] }
+  >({
+    method: 'POST',
+    path: '/api/communities/membership-states/_batch',
+    body: { communityIds },
+    signal,
+  });
+}
+
+export const communitiesApi = {
+  list: async (cursor?: string, signal?: AbortSignal): Promise<CursorPage<CommunitySummary>> => {
+    const pageNumber = Math.max(1, Number(cursor) || 1);
+    const pageSize = 20;
+    const page = await apiClient.request<PageResult<CommunityCardBriefView>>({
+      path: appendQuery('/api/communities', { page: pageNumber, pageSize }),
       signal,
-    }),
+    });
+    const membership = await getCommunityMembershipStates(
+      page.list.map((community) => community.communityId),
+      signal,
+    )
+      .catch(() => ({ list: page.list.map(() => null) }));
+    const hasMore = page.page * page.pageSize < page.total;
+    return {
+      list: page.list.map((community, index) =>
+        communityCardToSummary(community, membership.list[index] ?? null),
+      ),
+      nextCursor: hasMore ? String(page.page + 1) : null,
+      hasMore,
+    };
+  },
+
+  detail: async (slug: string, signal?: AbortSignal): Promise<CommunityDetail> => {
+    const detail = await getCommunityDetailBySlug(slug, signal);
+    return communityDetailToLegacy(detail);
+  },
+
+  getMembershipStates: getCommunityMembershipStates,
+  getDetailBySlug: getCommunityDetailBySlug,
 
   getDetailById: (communityId: string, signal?: AbortSignal) =>
     apiClient.request<CommunityDetailView>({

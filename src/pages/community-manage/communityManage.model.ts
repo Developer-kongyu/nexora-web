@@ -1,4 +1,4 @@
-import type { CommunityDetailView } from '@/domains/communities/model';
+import type { CommunityDetailView, CommunityPermissionRole } from '@/domains/communities/model';
 import { formatDateTime as formatSharedDateTime } from '@/shared/lib/format';
 
 export interface CommunityManageSectionProps {
@@ -13,7 +13,6 @@ export const communityManageSections = [
   'overview',
   'requests',
   'members',
-  'content',
   'pinned',
   'rules',
   'logs',
@@ -22,10 +21,42 @@ export const communityManageSections = [
 
 export type CommunityManageSection = (typeof communityManageSections)[number];
 
+export interface CommunityManageAccess {
+  sections: readonly CommunityManageSection[];
+  canChangeMemberRoles: boolean;
+  canRemoveMembers: boolean;
+}
+
 export function isCommunityManageSection(
   value: string | undefined,
 ): value is CommunityManageSection {
   return communityManageSections.includes(value as CommunityManageSection);
+}
+
+function isAdministrator(role: CommunityPermissionRole): boolean {
+  return role === 'ADMIN' || role === 'OWNER';
+}
+
+export function getCommunityManageAccess(detail: CommunityDetailView): CommunityManageAccess {
+  const context = detail.viewerContext;
+  if (!context?.canManageCommunity) {
+    return { sections: [], canChangeMemberRoles: false, canRemoveMembers: false };
+  }
+
+  const administrator = isAdministrator(context.actorRole);
+  const sections: CommunityManageSection[] = ['overview'];
+  if (context.canReviewJoinRequests) sections.push('requests');
+  sections.push('members');
+  if (context.canPinPost) sections.push('pinned');
+  if (administrator) sections.push('rules');
+  sections.push('logs');
+  if (administrator) sections.push('settings');
+
+  return {
+    sections,
+    canChangeMemberRoles: administrator,
+    canRemoveMembers: true,
+  };
 }
 
 export function formatCommunityManageDateTime(value: string | null): string {

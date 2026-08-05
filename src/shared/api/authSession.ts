@@ -10,6 +10,7 @@ export interface AuthRefreshContext {
 type RefreshHandler = (context: AuthRefreshContext) => Promise<string | null>;
 
 let accessToken: string | null = null;
+let csrfToken: string | null = null;
 let refreshHandler: RefreshHandler | null = null;
 let refreshInFlight: Promise<string | null> | null = null;
 let refreshGeneration = 0;
@@ -23,9 +24,20 @@ function invalidateRefresh(): void {
 
 export const authSession = {
   getAccessToken: () => accessToken,
+  getCsrfToken: () => {
+    if (csrfToken) return csrfToken;
+    if (typeof document === 'undefined') return null;
+    const cookie = document.cookie
+      .split('; ')
+      .find((entry) => entry.startsWith('auth_csrf_token='));
+    return cookie ? decodeURIComponent(cookie.slice('auth_csrf_token='.length)) : null;
+  },
   setAccessToken: (token: string) => {
     accessToken = token;
     refreshEnabled = true;
+  },
+  setCsrfToken: (token: string | null) => {
+    csrfToken = token;
   },
   configureRefresh: (handler: RefreshHandler) => {
     if (refreshHandler !== handler) {
@@ -60,6 +72,7 @@ export const authSession = {
   invalidateRefresh,
   clear: () => {
     accessToken = null;
+    csrfToken = null;
     invalidateRefresh();
   },
 };

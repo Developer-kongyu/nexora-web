@@ -1,5 +1,8 @@
 import type { PublicPrivateVisibility } from '@/shared/model/visibility';
 
+export const ACCOUNT_VISIBILITIES = ['PUBLIC', 'PRIVATE'] as const;
+export type AccountVisibility = (typeof ACCOUNT_VISIBILITIES)[number];
+
 export type ProfileVisibility = PublicPrivateVisibility;
 
 export const PERMISSION_AUDIENCES = ['everyone', 'following', 'none'] as const;

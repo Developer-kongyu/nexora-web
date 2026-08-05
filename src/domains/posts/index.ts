@@ -3,4 +3,5 @@ export * from './hooks/useDraftListSelection';
 export * from './hooks/usePost';
 export * from './lib/compose';
 export * from './lib/draftPresentation';
+export * from './lib/postText';
 export * from './model';

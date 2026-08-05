@@ -1,7 +1,7 @@
 import { Filter, SearchX, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useSearch, type SearchTab } from '@/domains/search';
+import { useSearch, type SearchSort, type SearchTab } from '@/domains/search';
 import { Button, Select, Switch } from '@/shared/ui';
 import { CommunityCard } from '@/widgets/community-card/CommunityCard';
 import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
@@ -15,7 +15,8 @@ export function SearchPage() {
   const [params, setParams] = useSearchParams();
   const query = params.get('q') || '人工智能';
   const tab = (params.get('tab') || 'posts') as SearchTab;
-  const sort = params.get('sort') || 'relevance';
+  const requestedSort = params.get('sort');
+  const sort: SearchSort = requestedSort === 'latest' ? 'latest' : 'relevance';
   const [timeRange, setTimeRange] = useState('all');
   const [language, setLanguage] = useState('all');
   const [mediaOnly, setMediaOnly] = useState(false);
@@ -181,7 +182,6 @@ export function SearchPage() {
             >
               <option value="relevance">相关度</option>
               <option value="latest">最新发布</option>
-              <option value="popular">互动最多</option>
             </Select>
           </div>
         </div>

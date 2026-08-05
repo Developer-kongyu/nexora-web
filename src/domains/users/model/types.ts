@@ -1,5 +1,8 @@
 import type { CursorPageView } from '@/shared/api/pagination';
 import type { ResolvedMediaState } from '@/shared/model/media';
+import type { UserIdentityBriefView } from '@/shared/model/userIdentity';
+
+export type CurrentUserCardView = UserIdentityBriefView;
 
 export interface UserSummary {
   id: string;

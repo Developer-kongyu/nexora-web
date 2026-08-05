@@ -15,20 +15,20 @@ export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettingsView = {
   follows: true,
   communities: true,
   mentions: true,
-  reposts: false,
+  reposts: true,
   emailDigest: true,
   push: true,
 };
 
-export const RECOMMENDATION_INTEREST_OPTIONS = [
-  '产品设计',
-  '人工智能',
-  '摄影',
-  '软件开发',
-  '旅行',
-  '阅读与写作',
-  '独立开发',
-  '城市生活',
-  '音乐',
-  '健康',
-] as const;
+export interface InterestTagCatalogItem {
+  interestTagCode: string;
+  displayName: string;
+  sortOrder: number;
+  enabled: boolean;
+}
+
+export interface InterestTagCatalogView {
+  dictionaryVersion: string;
+  items: InterestTagCatalogItem[];
+  allowedInterestTagCodes: string[];
+}

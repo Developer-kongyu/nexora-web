@@ -1,63 +1,44 @@
+import { useQuery } from '@tanstack/react-query';
+import { onboardingApi, useAuthStore } from '@/domains/auth';
+import { settingsApi, settingsKeys } from '@/domains/settings';
+import type { AccentTone } from '@/shared/model/presentation';
 import { OnboardingSelection, type OnboardingOption } from './OnboardingSelection';
 
-const INTEREST_OPTIONS = [
-  {
-    id: 'ai',
-    title: '人工智能',
-    description: '产品、模型与工作流',
-    tone: 'purple',
-  },
-  {
-    id: 'design',
-    title: '产品设计',
-    description: '体验、研究与设计系统',
-    tone: 'cyan',
-  },
-  {
-    id: 'photo',
-    title: '摄影',
-    description: '城市、街拍与后期',
-    tone: 'green',
-  },
-  {
-    id: 'dev',
-    title: '软件开发',
-    description: '前端、后端与工程效率',
-    tone: 'pink',
-  },
-  {
-    id: 'travel',
-    title: '旅行',
-    description: '路线、记录与在地体验',
-    tone: 'orange',
-  },
-  {
-    id: 'writing',
-    title: '阅读与写作',
-    description: '书籍、长文与创作',
-    tone: 'purple',
-  },
-  {
-    id: 'music',
-    title: '音乐',
-    description: '现场、器乐与制作',
-    tone: 'cyan',
-  },
-  {
-    id: 'fitness',
-    title: '健康生活',
-    description: '运动、饮食与习惯',
-    tone: 'green',
-  },
-] satisfies OnboardingOption[];
+const INTEREST_TONES: AccentTone[] = ['purple', 'cyan', 'green', 'pink', 'orange'];
 
 export function InterestsPage() {
+  const catalogQuery = useQuery({
+    queryKey: settingsKeys.interestCatalog,
+    queryFn: settingsApi.interestCatalog,
+    staleTime: 5 * 60 * 1000,
+  });
+  const options: OnboardingOption[] =
+    catalogQuery.data?.items
+      .filter((item) => item.enabled)
+      .map((item, index) => ({
+        id: item.interestTagCode,
+        title: item.displayName,
+        description: `探索${item.displayName}相关内容`,
+        tone: INTEREST_TONES[index % INTEREST_TONES.length] ?? 'purple',
+      })) ?? [];
+
+  const submit = async (selected: string[]) => {
+    await onboardingApi.saveInterests(selected);
+    useAuthStore.setState({ onboardingStatus: 'PENDING_RECOMMENDED_USERS' });
+  };
+
   return (
     <OnboardingSelection
+      key={catalogQuery.data?.dictionaryVersion ?? 'interest-catalog-loading'}
       title="选择感兴趣的话题"
-      description="选择至少 3 个，用于生成首批内容与社群推荐。"
-      options={INTEREST_OPTIONS}
+      description="兴趣标签由服务端字典提供，并用于生成推荐快照。"
+      options={options}
+      loading={catalogQuery.isLoading}
+      error={catalogQuery.error?.message ?? null}
       nextPath="/onboarding/follow"
+      minSelection={3}
+      onSubmit={submit}
+      onSkip={() => submit([])}
     />
   );
 }

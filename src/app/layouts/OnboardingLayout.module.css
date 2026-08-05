@@ -31,16 +31,10 @@
   gap: 10px;
 }
 
-.brand > span {
-  display: grid;
-  place-items: center;
+.logo {
   width: 39px;
   height: 39px;
-  color: #fff;
-  font-size: 20px;
-  font-weight: 900;
-  background: var(--gradient-brand);
-  border-radius: 12px;
+  filter: drop-shadow(0 8px 9px rgb(99 102 241 / 20%));
 }
 
 .brand div {
@@ -78,9 +72,17 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 0;
   color: var(--color-muted);
   font-size: 12px;
   font-weight: 700;
+  background: transparent;
+  cursor: pointer;
+}
+
+.exit:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .exit:hover {

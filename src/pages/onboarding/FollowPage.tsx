@@ -1,48 +1,58 @@
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { onboardingApi, onboardingKeys, useAuthStore } from '@/domains/auth';
 import { OnboardingSelection, type OnboardingOption } from './OnboardingSelection';
 
-const CREATOR_OPTIONS = [
-  {
-    id: 'xiaoming',
-    title: '小明同学',
-    description: '@xiaoming · 摄影与产品',
-    meta: '2,140 位关注者 · 本周更新 4 篇',
-    tone: 'cyan',
-    initials: '明',
-  },
-  {
-    id: 'aqiang',
-    title: '程序员阿强',
-    description: '@aqiang_dev · 工程效率',
-    meta: '893 位关注者 · 前端与 CI 实践',
-    tone: 'purple',
-    initials: '强',
-  },
-  {
-    id: 'travel',
-    title: '旅行记录本',
-    description: '@travel_log · 城市漫游',
-    meta: '6,900 位关注者 · 胶片与路线',
-    tone: 'green',
-    initials: '旅',
-  },
-  {
-    id: 'pm',
-    title: '产品小助手',
-    description: '@pm_helper · PRD 模板',
-    meta: '4,320 位关注者 · 团队协作',
-    tone: 'pink',
-    initials: '产',
-  },
-] satisfies OnboardingOption[];
-
 export function FollowPage() {
+  const query = useQuery({
+    queryKey: onboardingKeys.recommendedUsers,
+    queryFn: onboardingApi.recommendedUsers,
+    refetchInterval: (current) => (current.state.data?.submittable === false ? 2_000 : false),
+  });
+  const options = useMemo<OnboardingOption[]>(
+    () =>
+      query.data?.list.map(({ card, reasonCode }) => ({
+        id: card.userId,
+        title: card.displayName,
+        description: `@${card.handle}${card.bio ? ` · ${card.bio}` : ''}`,
+        meta: `${card.followersCount.toLocaleString()} 位关注者${reasonCode ? ` · ${reasonCode}` : ''}`,
+        tone: 'cyan',
+        initials: card.displayName.slice(0, 1),
+      })) ?? [],
+    [query.data],
+  );
+
+  const submit = async (selected: string[]) => {
+    if (!query.data) throw new Error('推荐结果尚未加载');
+    const result = await onboardingApi.submitUsers(query.data, selected);
+    if (result.retryRequired) throw new Error('部分关注操作失败，请重试后再继续');
+    useAuthStore.setState({ onboardingStatus: 'PENDING_RECOMMENDED_COMMUNITIES' });
+  };
+
+  const skip = async () => {
+    if (query.data?.submittable) {
+      await submit([]);
+      return;
+    }
+    const result = await onboardingApi.skip();
+    useAuthStore.setState({
+      onboardingCompleted: true,
+      onboardingStatus: result.onboardingStatus,
+    });
+  };
+
   return (
     <OnboardingSelection
+      key={query.data?.snapshotVersion ?? 'loading'}
       kind="user"
       title="关注一些优质创作者"
-      description="点选整张卡片完成选择，首页会优先展示他们的更新。"
-      options={CREATOR_OPTIONS}
+      options={options}
       nextPath="/onboarding/communities"
+      skipPath={query.data?.submittable ? undefined : '/home'}
+      loading={query.isLoading}
+      error={query.error?.message ?? null}
+      onSubmit={submit}
+      onSkip={skip}
     />
   );
 }

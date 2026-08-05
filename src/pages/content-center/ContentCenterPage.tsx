@@ -29,7 +29,6 @@ import {
   useDraftListSelection,
   type PostDeletedListItemView,
 } from '@/domains/posts';
-import { postCardBriefToViewModel } from '@/domains/posts/lib/postCardAdapter';
 import { mergeInfiniteDataItemsBy, removeInfiniteDataItemsByKey } from '@/shared/api/infiniteData';
 import { paths } from '@/shared/config/paths';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
@@ -40,6 +39,7 @@ import { PostCard } from '@/widgets/post-card/PostCard';
 import { EmptyPanel, LoadingRows, SideCard } from '../_shared/PageParts';
 import productStyles from '../_shared/ProductPages.module.css';
 import styles from './ContentCenterPage.module.css';
+import { hydrateContentCenterPublishedPage } from './contentCenter.model';
 
 const PAGE_SIZE = 20;
 type ContentTab = 'published' | 'drafts' | 'deleted';
@@ -68,8 +68,10 @@ export function ContentCenterPage() {
 
   const published = useInfiniteQuery({
     queryKey: libraryKeys.contentCenterPublished,
-    queryFn: ({ pageParam, signal }) =>
-      libraryApi.published({ cursor: pageParam, limit: PAGE_SIZE }, signal),
+    queryFn: async ({ pageParam, signal }) => {
+      const page = await libraryApi.published({ cursor: pageParam, limit: PAGE_SIZE }, signal);
+      return hydrateContentCenterPublishedPage(page, signal);
+    },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: getNextCursorPageParam,
   });
@@ -89,7 +91,7 @@ export function ContentCenterPage() {
   });
 
   const publishedItems = useMemo(
-    () => mergeInfiniteDataItemsBy(published.data, (post) => post.postId),
+    () => mergeInfiniteDataItemsBy(published.data, (post) => post.id),
     [published.data],
   );
   const draftItems = useMemo(
@@ -269,7 +271,7 @@ export function ContentCenterPage() {
               ) : null}
               <div className={styles.postList}>
                 {publishedItems.map((post) => (
-                  <PostCard key={post.postId} post={postCardBriefToViewModel(post, 'profile')} />
+                  <PostCard key={post.id} post={post} />
                 ))}
               </div>
               {published.hasNextPage ? (

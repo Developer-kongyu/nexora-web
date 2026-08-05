@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PostCardBriefView } from '../model/types';
-import { postCardBriefToViewModel } from './postCardAdapter';
+import { mergeReplyTarget, mergeRepostSource, postCardBriefToViewModel } from './postCardAdapter';
 
 const card: PostCardBriefView = {
   postId: 'post-1',
@@ -111,5 +111,55 @@ describe('postCardBriefToViewModel', () => {
         durationSeconds: 1,
       },
     ]);
+  });
+
+  it('keeps the repost actor while displaying the source post', () => {
+    const repost = postCardBriefToViewModel({
+      ...card,
+      postId: 'repost-1',
+      postKind: 'REPOST',
+      bodyTextPreview: null,
+      authorUserId: 'user-reposter',
+      author: {
+        userId: 'user-reposter',
+        handle: 'reposter',
+        displayName: '转发者',
+        avatarUrl: '/reposter.png',
+      },
+    });
+    const source = postCardBriefToViewModel(card);
+    const result = mergeRepostSource(repost, source);
+
+    expect(result.id).toBe('repost-1');
+    expect(result.contentPostId).toBe('post-1');
+    expect(result.postKind).toBe('REPOST');
+    expect(result.author.displayName).toBe('作者');
+    expect(result.relation?.actor.displayName).toBe('转发者');
+  });
+
+  it('hydrates a reply with its direct target author', () => {
+    const reply = postCardBriefToViewModel({
+      ...card,
+      postId: 'reply-1',
+      postKind: 'REPLY',
+    });
+    const target = postCardBriefToViewModel({
+      ...card,
+      postId: 'parent-1',
+      authorUserId: 'parent-user',
+      author: {
+        userId: 'parent-user',
+        handle: 'parent',
+        displayName: '直接父级作者',
+        avatarUrl: null,
+      },
+    });
+    const result = mergeReplyTarget(reply, target);
+
+    expect(result.relation).toMatchObject({
+      kind: 'REPLY',
+      targetAuthor: { id: 'parent-user', handle: 'parent' },
+      targetProfileAvailable: true,
+    });
   });
 });

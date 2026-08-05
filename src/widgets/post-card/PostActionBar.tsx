@@ -63,6 +63,7 @@ function createPostActionState(post: PostViewModel): PostActionState {
 function getPostActionSourceKey(post: PostViewModel): string {
   return [
     post.id,
+    post.contentPostId ?? post.id,
     post.viewer.liked,
     post.viewer.bookmarked,
     post.viewer.reposted,
@@ -85,6 +86,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
     createPostActionState(post),
   );
   const [pendingAction, setPendingAction] = useState<ActionKey | null>(null);
+  const contentPostId = post.contentPostId ?? post.id;
 
   const toggleLike = async () => {
     if (pendingAction || !post.permissions.canLike) return;
@@ -96,7 +98,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
       likes: adjustCount(current.likes, next),
     }));
     try {
-      await (next ? engagementApi.like(post.id) : engagementApi.unlike(post.id));
+      await (next ? engagementApi.like(contentPostId) : engagementApi.unlike(contentPostId));
     } catch {
       setActionState((current) => ({
         ...current,
@@ -123,7 +125,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
       reposts: adjustCount(current.reposts, next),
     }));
     try {
-      await (next ? postsApi.createRepost(post.id) : postsApi.cancelRepost(post.id));
+      await (next ? postsApi.createRepost(contentPostId) : postsApi.cancelRepost(contentPostId));
       showToast({ tone: 'success', title: next ? '已转发到你的主页' : '已取消转发' });
     } catch {
       setActionState((current) => ({
@@ -152,12 +154,12 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
     }));
     try {
       if (next) {
-        await libraryApi.savePostBookmark(post.id, {
+        await libraryApi.savePostBookmark(contentPostId, {
           targetCollectionId: null,
           sourceScene: resolveBookmarkSourceScene(post),
         });
       } else {
-        await libraryApi.removePostBookmark(post.id);
+        await libraryApi.removePostBookmark(contentPostId);
       }
       showToast({ tone: 'success', title: next ? '已保存到默认收藏夹' : '已取消收藏' });
       void queryClient.invalidateQueries({ queryKey: libraryKeys.bookmarks });
@@ -184,7 +186,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
 
   const share = async () => {
     if (pendingAction) return;
-    const url = `${window.location.origin}/posts/${encodeURIComponent(post.id)}`;
+    const url = `${window.location.origin}/posts/${encodeURIComponent(contentPostId)}`;
     setPendingAction('share');
     try {
       const shareWithNavigator = navigator.share?.bind(navigator);
@@ -218,7 +220,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
       icon: MessageCircle,
       disabled: !post.permissions.canComment,
       action: () => {
-        void navigate(paths.post(post.id));
+        void navigate(paths.post(contentPostId));
       },
     },
     {

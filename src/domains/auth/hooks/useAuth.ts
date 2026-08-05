@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { usersApi } from '@/domains/users';
 import { authSession } from '@/shared/api/authSession';
 import { authApi } from '../api/authApi';
 import { useAuthStore } from '../model/authStore';
@@ -16,7 +17,13 @@ function useSessionMutation<TInput>(
   return useMutation({
     mutationFn,
     onSuccess: (session) =>
-      setSession(session.accessToken, session.user, session.onboardingCompleted),
+      setSession(
+        session.accessToken,
+        session.user,
+        session.onboardingCompleted,
+        session.csrfToken,
+        session.onboardingStatus,
+      ),
   });
 }
 
@@ -34,6 +41,37 @@ export function useRegister() {
 
 export function useCompleteGoogleProfile() {
   return useSessionMutation<GoogleProfileInput>((input) => authApi.completeGoogleProfile(input));
+}
+
+export function useVerifyGoogleIdToken() {
+  const setSession = useAuthStore((state) => state.setSession);
+  const updateUser = useAuthStore((state) => state.updateUser);
+  return useMutation({
+    mutationFn: authApi.verifyGoogleIdToken,
+    onSuccess: async (result) => {
+      if (result.mode !== 'LOGIN_SUCCESS') return;
+      const session = result.authSession;
+      setSession(
+        session.accessToken,
+        session.user,
+        session.onboardingCompleted,
+        session.csrfToken,
+        session.onboardingStatus,
+      );
+
+      try {
+        const card = await usersApi.getCurrentUserCard();
+        updateUser({
+          id: card.userId,
+          handle: card.handle,
+          displayName: card.displayName,
+          avatarUrl: card.avatarUrl,
+        });
+      } catch {
+        // 会话已经由后端 ID Token 校验建立；用户卡暂时不可用不应回滚登录。
+      }
+    },
+  });
 }
 
 export function useLogout() {

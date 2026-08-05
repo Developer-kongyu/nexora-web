@@ -4,6 +4,7 @@ import type {
   ApproveFollowRequestResult,
   BlockedUserManagementListItemView,
   BlockUserResult,
+  CurrentUserCardView,
   CancelFollowRequestResult,
   DeleteUserRelationResult,
   FollowUserResult,
@@ -32,6 +33,13 @@ export interface UpdateOwnProfileRequest {
 }
 
 export const usersApi = {
+  getCurrentUserCard: (signal?: AbortSignal) =>
+    apiClient.request<CurrentUserCardView>({
+      path: '/api/users/me',
+      signal,
+      retry401: false,
+    }),
+
   profile: (handle: string, signal?: AbortSignal) =>
     apiClient.request<UserProfileHeaderView>({
       path: `/api/users/${encodeURIComponent(handle)}`,

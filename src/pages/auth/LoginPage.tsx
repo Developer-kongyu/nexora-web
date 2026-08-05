@@ -1,36 +1,45 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { Eye, EyeOff, LockKeyhole, MailCheck, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-import { authApi, useLogin, useLoginWithCode } from '@/domains/auth';
+import {
+  GoogleCredentialButton,
+  authApi,
+  onboardingPathForStatus,
+  useLogin,
+  useLoginWithCode,
+  useVerifyGoogleIdToken,
+} from '@/domains/auth';
+import { APP_BRAND } from '@/shared/config/brand';
 import { Button, TextField, useToast } from '@/shared/ui';
 import { AuthFormShell } from './AuthFormShell';
 import styles from './AuthPages.module.css';
+import {
+  type LoginMode,
+  validateLoginIdentifier,
+  validateLoginSecret,
+} from './loginValidation';
 import { useVerificationCountdown } from './useVerificationCountdown';
 
-const schema = z.object({
-  identifier: z.string().trim().min(1, '请输入邮箱、手机号或 handle'),
-  secret: z.string().min(1, '请输入密码或验证码'),
-});
-
-type LoginValues = z.infer<typeof schema>;
-type LoginMode = 'password' | 'code';
+interface LoginValues {
+  identifier: string;
+  secret: string;
+}
 
 export function LoginPage() {
   const [mode, setMode] = useState<LoginMode>('password');
   const [showPassword, setShowPassword] = useState(false);
   const passwordLogin = useLogin();
   const codeLogin = useLoginWithCode();
+  const googleLogin = useVerifyGoogleIdToken();
   const requestCode = useMutation({ mutationFn: authApi.requestLoginCode });
   const countdown = useVerificationCountdown();
+  const [googleFlowError, setGoogleFlowError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
   const form = useForm<LoginValues>({
-    resolver: zodResolver(schema),
     defaultValues: { identifier: '', secret: '' },
   });
 
@@ -51,25 +60,51 @@ export function LoginPage() {
   };
 
   const submit = form.handleSubmit(async (values) => {
-    if (mode === 'password' && values.secret.length < 8) {
-      form.setError('secret', { message: '密码至少 8 位' });
-      return;
-    }
-    if (mode === 'code' && !/^\d{6}$/.test(values.secret)) {
-      form.setError('secret', { message: '请输入 6 位数字验证码' });
-      return;
-    }
+    const identifier = values.identifier.trim();
 
-    if (mode === 'password') {
-      await passwordLogin.mutateAsync({ identifier: values.identifier, password: values.secret });
-    } else {
-      await codeLogin.mutateAsync({ identifier: values.identifier, code: values.secret });
-    }
+    const session =
+      mode === 'password'
+        ? await passwordLogin.mutateAsync({
+            identifier,
+            password: values.secret,
+          })
+        : await codeLogin.mutateAsync({ identifier, code: values.secret });
 
-    showToast({ tone: 'success', title: '登录成功', description: '欢迎回到 LCT Circle' });
+    showToast({ tone: 'success', title: '登录成功', description: `欢迎回到 ${APP_BRAND.name}` });
     const from = (location.state as { from?: string } | null)?.from || '/home';
-    void navigate(from, { replace: true });
+    const destination = session.onboardingCompleted
+      ? from
+      : (onboardingPathForStatus(session.onboardingStatus) ?? from);
+    void navigate(destination, { replace: true });
   });
+
+  const handleGoogleCredential = useCallback(
+    async (idToken: string) => {
+      setGoogleFlowError(null);
+      const result = await googleLogin.mutateAsync(idToken);
+      if (result.mode === 'PROFILE_COMPLETION_REQUIRED') {
+        sessionStorage.setItem(
+          'google-profile-completion',
+          JSON.stringify({
+            pendingUserId: result.pendingUserId,
+            completionToken: result.completionToken,
+            expiresAt: Date.now() + result.completionTokenExpiresInSeconds * 1000,
+          }),
+        );
+        void navigate('/auth/google/complete', { replace: true });
+        return;
+      }
+
+      showToast({ tone: 'success', title: 'Google 登录成功', description: `欢迎回到 ${APP_BRAND.name}` });
+      const from = (location.state as { from?: string } | null)?.from || '/home';
+      const session = result.authSession;
+      const destination = session.onboardingCompleted
+        ? from
+        : (onboardingPathForStatus(session.onboardingStatus) ?? from);
+      void navigate(destination, { replace: true });
+    },
+    [googleLogin, location.state, navigate, showToast],
+  );
 
   const loginError = passwordLogin.error || codeLogin.error || requestCode.error;
   const isPending = passwordLogin.isPending || codeLogin.isPending;
@@ -77,7 +112,7 @@ export function LoginPage() {
   return (
     <AuthFormShell
       eyebrow="欢迎回来"
-      title="登录 LCT Circle"
+      title={`登录 ${APP_BRAND.name}`}
       description="继续探索你的兴趣、创作与社群。"
       footer={
         <span>
@@ -104,10 +139,15 @@ export function LoginPage() {
 
       <form className={styles.form} onSubmit={submit}>
         <TextField
-          label="账号"
-          autoComplete="username"
-          placeholder="邮箱、手机号或 @handle"
-          {...form.register('identifier')}
+          label={mode === 'code' ? '手机号' : '账号'}
+          autoComplete={mode === 'code' ? 'tel' : 'username'}
+          inputMode={mode === 'code' ? 'tel' : undefined}
+          placeholder={
+            mode === 'code' ? '请输入手机号，如 +8613800138000' : '邮箱、手机号或 @handle'
+          }
+          {...form.register('identifier', {
+            validate: (value) => validateLoginIdentifier(value, mode),
+          })}
           error={form.formState.errors.identifier?.message}
         />
         {mode === 'password' ? (
@@ -117,7 +157,9 @@ export function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
               placeholder="请输入密码"
-              {...form.register('secret')}
+              {...form.register('secret', {
+                validate: (value) => validateLoginSecret(value, mode),
+              })}
               error={form.formState.errors.secret?.message}
             />
             <button
@@ -134,12 +176,15 @@ export function LoginPage() {
               label="验证码"
               inputMode="numeric"
               autoComplete="one-time-code"
-              placeholder="6 位验证码"
+              placeholder="请输入 6 位验证码"
               maxLength={6}
-              {...form.register('secret')}
+              {...form.register('secret', {
+                validate: (value) => validateLoginSecret(value, mode),
+              })}
               error={form.formState.errors.secret?.message}
             />
             <Button
+              className={styles.codeButton}
               type="button"
               variant="secondary"
               loading={requestCode.isPending}
@@ -177,14 +222,16 @@ export function LoginPage() {
       </form>
 
       <div className={styles.divider}>或使用</div>
-      <button
-        type="button"
-        className={styles.google}
-        onClick={() => navigate('/auth/google/complete')}
-      >
-        <span>G</span>
-        使用 Google 继续
-      </button>
+      <GoogleCredentialButton
+        disabled={googleLogin.isPending}
+        onCredential={handleGoogleCredential}
+        onError={setGoogleFlowError}
+      />
+      {googleFlowError || googleLogin.error ? (
+        <p className={styles.error} role="alert">
+          {googleFlowError ?? googleLogin.error?.message}
+        </p>
+      ) : null}
       <div className={styles.security}>
         <ShieldCheck size={18} />
         <span>登录信息通过加密连接传输。我们不会通过私信索要你的密码或验证码。</span>

@@ -1,6 +1,7 @@
 import { delay, http, HttpResponse } from 'msw';
 import type {
   CommunityAssignableMemberRole,
+  CommunityCardBriefView,
   CommunitySummary,
   CreateCommunityInput,
   CommunityDetailView,
@@ -19,12 +20,13 @@ import type {
   UpdateCommunitySettingsInput,
   UserPublicCardView,
 } from '@/domains/communities/model/types';
+import type { FeedListItemDto } from '@/domains/feed/model/types';
 import type { NotificationItem, UnreadSummary } from '@/domains/notifications/model/types';
-import type { PermissionPolicy } from '@/domains/permissions/model/types';
 import type {
   BookmarkCollectionItemCardView,
   BookmarkCollectionSummary,
   PostBrowseHistoryItemView,
+  RecordPostBrowseHistoryInput,
 } from '@/domains/library/model/types';
 import {
   MEDIA_IMAGE_MAX_BYTES,
@@ -52,6 +54,7 @@ import type {
   DeleteCommentResult,
   PostComposeInput,
   PostCardBriefView,
+  PostDetailDto,
   PostDraftComposeView,
   PostDraftDetailView,
   PostDraftListItemView,
@@ -66,6 +69,7 @@ import type {
   BlockedUserManagementListItemView,
   BlockUserResult,
   CancelFollowRequestResult,
+  CurrentUserCardView,
   DeleteUserRelationResult,
   FollowUserResult,
   RejectFollowRequestResult,
@@ -143,6 +147,31 @@ function allCommunitySummaries(): CommunitySummary[] {
   return [...mockCreatedCommunities.map((item) => item.summary), ...communities];
 }
 
+function mockCommunityCard(summary: CommunitySummary): CommunityCardBriefView {
+  const created = mockCreatedCommunities.find((item) => item.summary.id === summary.id);
+  const managed = summary.id === MOCK_COMMUNITY_ID;
+  return {
+    communityId: summary.id,
+    slug: summary.slug,
+    name: summary.name,
+    description: summary.description || null,
+    avatarKey: null,
+    avatarUrl: summary.avatarUrl,
+    coverKey: null,
+    coverUrl: null,
+    categoryKey: created?.input.categoryKey ?? (managed ? 'AI_PRODUCT' : null),
+    tags: created?.input.tags ?? [],
+    status: 'ACTIVE',
+    visibility: managed ? mockCommunitySettings.visibility : 'PUBLIC',
+    joinPolicy: managed ? mockCommunitySettings.joinPolicy : (created?.input.joinPolicy ?? 'OPEN'),
+    memberCount: managed ? mockCommunityMembers.length : summary.membersCount,
+    postCount: managed ? posts.length : 0,
+    pinnedPostCount: managed ? mockCommunityPinnedPosts.length : 0,
+    ownerUserId: currentUser.id,
+    createdAtIso: managed ? MOCK_COMMUNITY_CREATED_AT : '2026-07-01T00:00:00.000Z',
+    updatedAtIso: managed ? mockCommunityUpdatedAtIso : '2026-07-28T00:00:00.000Z',
+  };
+}
 function mediaBusinessKey(scene: MediaAssetScene, clientUploadId: string): string {
   return `${scene}:${clientUploadId}`;
 }
@@ -705,6 +734,102 @@ function mockPostCard(postId: string): PostCardBriefView | null {
   };
 }
 
+function mockFeedListItem(postId: string): FeedListItemDto {
+  const post = posts.find((candidate) => candidate.id === postId);
+  const card = mockPostCard(postId);
+  if (!post || !card) throw new Error(`Missing mock feed fixture: ${postId}`);
+  const interaction = card.interactionSummary;
+  return {
+    postId: card.postId,
+    dedupePostId: card.postId,
+    publishedAtIso: card.publishedAtIso ?? post.createdAt,
+    author: {
+      userId: card.authorUserId,
+      displayName: card.author?.displayName ?? null,
+      handle: card.author?.handle ?? null,
+      avatarUrl: card.author?.avatarUrl ?? null,
+    },
+    community: card.community
+      ? {
+          communityId: card.community.communityId,
+          name: card.community.displayName,
+          slug: card.community.slug ?? card.community.communityId,
+          avatarUrl: card.community.avatarUrl,
+          description: null,
+        }
+      : null,
+    summary: {
+      bodyText: card.bodyTextPreview,
+      hasImage: card.attachedMedia.some((media) => media.mediaType === 'IMAGE'),
+      hasVideo: card.attachedMedia.some((media) => media.mediaType === 'VIDEO'),
+      mediaCount: card.attachedMedia.length,
+    },
+    mediaBundle: card.attachedMedia.length
+      ? {
+          items: card.attachedMedia.map((media) => ({
+            slotIndex: media.sortOrder,
+            mediaAssetId: media.mediaAssetId,
+            assetKind: media.mediaType === 'VIDEO' ? ('VIDEO' as const) : ('IMAGE' as const),
+            previewUrl: media.publicUrl,
+            posterUrl: media.thumbnailUrl,
+            width: media.width,
+            height: media.height,
+            durationMs: media.durationMs,
+          })),
+          mediaCount: card.attachedMedia.length,
+        }
+      : null,
+    counters: {
+      likeCount: interaction?.likeCount ?? 0,
+      commentCount: interaction?.commentCount ?? 0,
+      quoteCount: interaction?.quoteCount ?? 0,
+      repostCount: interaction?.repostCount ?? 0,
+      bookmarkCount: interaction?.bookmarkCount ?? 0,
+      impressionCount: post.stats.views,
+      dedupedVideoViewCount: 0,
+    },
+    viewerState: interaction?.viewerState
+      ? {
+          liked: interaction.viewerState.liked,
+          reposted: interaction.viewerState.reposted,
+          quoted: false,
+          bookmarked: interaction.viewerState.bookmarked,
+        }
+      : null,
+  };
+}
+
+function mockPostDetail(postId: string): PostDetailDto | null {
+  const post = posts.find((candidate) => candidate.id === postId);
+  const card = mockPostCard(postId);
+  if (!post || !card || !card.interactionSummary) return null;
+  return {
+    postId: card.postId,
+    authorUserId: card.authorUserId,
+    postKind: card.postKind,
+    replyToPostId: post.relation?.kind === 'REPLY' ? post.relation.targetPostId : null,
+    quoteOfPostId: null,
+    repostOfPostId: post.relation?.kind === 'REPOST' ? post.relation.targetPostId : null,
+    rootPostId: post.relation?.rootPostId ?? null,
+    bodyText: post.content,
+    status: card.status,
+    author: card.author,
+    community: card.community,
+    attachedMedia: card.attachedMedia,
+    hashtags: post.tags.map((tagNormalized) => ({ tagNormalized })),
+    linkCard: card.linkCard,
+    interactionSummary: card.interactionSummary,
+    interactionPermission: {
+      canView: true,
+      canLike: true,
+      canBookmark: true,
+      canComment: true,
+      canQuote: true,
+      canRepost: true,
+    },
+    publishedAtIso: card.publishedAtIso,
+  };
+}
 function requiredMockPostCard(postId: string): PostCardBriefView {
   const card = mockPostCard(postId);
   if (!card) throw new Error(`Missing mock post fixture: ${postId}`);
@@ -1471,6 +1596,51 @@ function mockCommunityDetail(): CommunityDetailView {
   };
 }
 
+function mockCommunityDetailForSummary(summary: CommunitySummary): CommunityDetailView {
+  if (summary.id === MOCK_COMMUNITY_ID) return mockCommunityDetail();
+  const card = mockCommunityCard(summary);
+  const created = mockCreatedCommunities.find((item) => item.summary.id === summary.id);
+  const joined = summary.joined ?? false;
+  return {
+    community: {
+      ...card,
+      postRoleMin: 'MEMBER',
+      commentRoleMin: 'VISITOR',
+      quoteEnabled: true,
+      repostEnabled: true,
+      requireRuleAcceptanceBeforePost: false,
+      rulesVersion: 1,
+      settingsVersion: 1,
+    },
+    rules: (created?.input.rules ?? []).map((rule, index) => ({
+      sortOrder: index + 1,
+      content: rule,
+    })),
+    managers: [],
+    pinnedPosts: [],
+    viewerContext: {
+      communityId: card.communityId,
+      status: card.status,
+      visibility: card.visibility,
+      joinPolicy: card.joinPolicy,
+      postRoleMin: 'MEMBER',
+      commentRoleMin: 'VISITOR',
+      quoteEnabled: true,
+      repostEnabled: true,
+      requireRuleAcceptanceBeforePost: false,
+      rulesVersion: 1,
+      settingsVersion: 1,
+      actorMembershipStatus: joined ? 'ACTIVE' : 'NONE',
+      actorRole: joined ? 'MEMBER' : 'VISITOR',
+      actorHasAcceptedCurrentRules: joined,
+      canViewCommunity: true,
+      canManageCommunity: false,
+      canReviewJoinRequests: false,
+      canPinPost: false,
+      canPublishPost: joined,
+    },
+  };
+}
 function mockCommunityOverview(days: 7 | 14 | 30) {
   const lastPostAtIso =
     posts.map((post) => post.createdAt).sort((left, right) => right.localeCompare(left))[0] ?? null;
@@ -1659,53 +1829,215 @@ function calculateUnreadSummary(): UnreadSummary {
   };
 }
 
+function mockAuthSession(
+  onboardingStatus:
+    | 'PENDING_INTERESTS'
+    | 'PENDING_RECOMMENDED_USERS'
+    | 'PENDING_RECOMMENDED_COMMUNITIES'
+    | 'PENDING_COMPLETE'
+    | 'COMPLETED' = 'COMPLETED',
+  authMethod: 'PASSWORD' | 'PHONE_CODE' | 'GOOGLE_ID_TOKEN' = 'PASSWORD',
+) {
+  return {
+    userId: currentUser.id,
+    accessToken: 'mock-access-token',
+    accessTokenExpiresAt: '2030-01-01T00:00:00.000Z',
+    refreshTokenExpiresAt: '2030-02-01T00:00:00.000Z',
+    csrfToken: 'mock-csrf-token',
+    session: {
+      sessionId: 'mock-session-id',
+      authMethod,
+      deviceName: null,
+      lastSeenAt: '2026-07-28T00:00:00.000Z',
+      expiresAt: '2030-02-01T00:00:00.000Z',
+    },
+    onboardingStatus,
+  };
+}
+
+let mockNotificationSettings = {
+  inAppChannelEnabled: true,
+  emailChannelEnabled: true,
+  smsChannelEnabled: false,
+  followNotificationEnabled: true,
+  mentionNotificationEnabled: true,
+  interactionNotificationEnabled: true,
+  communityNotificationEnabled: true,
+  systemNotificationEnabled: true,
+  onlyMutualFollowCanNotify: false,
+  quietHoursEnabled: false,
+  quietHoursStartMinute: null as number | null,
+  quietHoursEndMinute: null as number | null,
+  quietHoursTimezone: null as string | null,
+  defaultCommunityNewPostMode: 'HIGHLIGHTS' as const,
+  defaultCommunityAnnouncementMode: 'REALTIME' as const,
+  defaultCommunityInteractionMode: 'RELATED_ONLY' as const,
+};
+
+let mockInterestTagCodes = ['design', 'machine-learning', 'photography'];
+const mockInterestTagLabels = [
+  ['machine-learning', '人工智能'],
+  ['design', '产品设计'],
+  ['photography', '摄影'],
+  ['web-development', '软件开发'],
+  ['travel', '旅行'],
+  ['writing', '阅读与写作'],
+  ['music', '音乐'],
+  ['sports', '健康生活'],
+  ['databases', '数据库'],
+  ['science', '科学'],
+] as const;
+const mockInterestTagCatalog = mockInterestTagLabels.map(
+  ([interestTagCode, displayName], sortOrder) => ({
+    interestTagCode,
+    displayName,
+    sortOrder,
+    enabled: true,
+  }),
+);
+
+const baseMockPermissionPolicy = {
+  accountVisibility: 'PUBLIC' as const,
+  allowSearchIndex: true,
+  defaultPostVisibility: 'PUBLIC' as const,
+  defaultLikePermission: 'EVERYONE' as const,
+  defaultBookmarkPermission: 'EVERYONE' as const,
+  defaultCommentPermission: 'EVERYONE' as const,
+  defaultQuotePermission: 'EVERYONE' as const,
+  defaultRepostPermission: 'EVERYONE' as const,
+  mentionPermission: 'EVERYONE' as const,
+  followerListVisibility: 'EVERYONE' as const,
+  followingListVisibility: 'EVERYONE' as const,
+  birthdayVisibility: 'HIDDEN' as const,
+};
+let mockPermissionPolicy = { ...baseMockPermissionPolicy };
 export const handlers = [
   http.post('/api/auth/refresh', async () => {
     await delay(120);
-    return ok({ accessToken: 'mock-access-token', user: currentUser, onboardingCompleted: true });
+    return ok(mockAuthSession());
   }),
   http.post('/api/auth/login/password', async () => {
     await delay(250);
-    return ok({ accessToken: 'mock-access-token', user: currentUser, onboardingCompleted: true });
+    return ok(mockAuthSession());
   }),
   http.post('/api/auth/login/code/request', async () => {
     await delay(160);
-    return ok({ retryAfterSeconds: 60 });
+    return ok({ requested: true as const, expiresInSeconds: 600 });
   }),
-  http.post('/api/auth/login/code', async () => {
+  http.post('/api/auth/login/code/confirm', async () => {
     await delay(220);
-    return ok({ accessToken: 'mock-access-token', user: currentUser, onboardingCompleted: true });
+    return ok(mockAuthSession('COMPLETED', 'PHONE_CODE'));
   }),
-  http.post('/api/auth/register/code/request', async () => {
-    await delay(160);
-    return ok({ retryAfterSeconds: 60 });
-  }),
-  http.post('/api/auth/register', async () => {
+  http.post('/api/auth/register/email', async () => {
     await delay(260);
-    return ok({ accessToken: 'mock-access-token', user: currentUser, onboardingCompleted: false });
+    return ok(mockAuthSession('PENDING_INTERESTS'));
   }),
   http.post('/api/auth/password/reset/request', async () => {
     await delay(160);
-    return ok({ retryAfterSeconds: 60 });
+    return ok({ requested: true as const });
   }),
-  http.post('/api/auth/password/reset', async () => {
+  http.post('/api/auth/password/reset/confirm', async () => {
     await delay(220);
-    return new HttpResponse(null, { status: 204 });
+    return ok({ reset: true as const, userId: currentUser.id, securityVersion: 2 });
   }),
-  http.post('/api/auth/google/complete', async () => {
+  http.post('/api/auth/oauth/google/verify-id-token', async () => {
     await delay(220);
-    return ok({ accessToken: 'mock-access-token', user: currentUser, onboardingCompleted: false });
+    return ok({ mode: 'LOGIN_SUCCESS' as const, authSession: mockAuthSession() });
   }),
-  http.post('/api/auth/logout', () => new HttpResponse(null, { status: 204 })),
+  http.post('/api/auth/oauth/google/complete-profile', async () => {
+    await delay(220);
+    return ok(mockAuthSession('PENDING_INTERESTS', 'GOOGLE_ID_TOKEN'));
+  }),
+  http.get('/api/auth/onboarding/status', () =>
+    ok({
+      userId: currentUser.id,
+      onboardingStatus: 'PENDING_INTERESTS' as const,
+      completedSteps: [],
+      selectedInterestTagCodes: [],
+      recommendedUserIds: [],
+      recommendedCommunityIds: [],
+      lastStep: null,
+      nextStep: 'interests' as const,
+      recommendationSnapshotVersion: null,
+      recommendationSnapshotPayloadHash: null,
+    }),
+  ),
+  http.post('/api/auth/onboarding/interests', () => ok({ saved: true as const })),
+  http.get('/api/auth/onboarding/recommendations/users', () =>
+    ok({
+      list: users.slice(0, 4).map((user, index) => ({
+        userId: user.id,
+        score: 1 - index * 0.1,
+        reasonCode: 'INTEREST_MATCH',
+        card: {
+          userId: user.id,
+          handle: user.handle,
+          displayName: user.displayName,
+          bio: user.bio ?? null,
+          avatarUrl: user.avatarUrl,
+          followersCount: user.followersCount ?? 0,
+        },
+      })),
+      snapshotVersion: 1,
+      snapshotPayloadHash: 'mock-user-snapshot',
+      submitMode: 'SNAPSHOT' as const,
+      sourceSubmitToken: null,
+      submittable: true,
+    }),
+  ),
+  http.post('/api/auth/onboarding/recommendations/users', () =>
+    ok({
+      retryRequired: false,
+      completedSteps: ['interests', 'recommended-users'],
+      lastStep: 'recommended-users' as const,
+      nextStep: 'recommended-communities' as const,
+    }),
+  ),
+  http.get('/api/auth/onboarding/recommendations/communities', () =>
+    ok({
+      list: allCommunitySummaries().map((summary, index) => ({
+        communityId: summary.id,
+        score: 1 - index * 0.1,
+        reasonCode: 'INTEREST_MATCH',
+        card: {
+          communityId: summary.id,
+          slug: summary.slug,
+          displayName: summary.name,
+          avatarUrl: summary.avatarUrl,
+          memberCount: summary.membersCount,
+          description: summary.description || null,
+        },
+        membership: { joined: summary.joined, pending: false },
+      })),
+      snapshotVersion: 1,
+      snapshotPayloadHash: 'mock-community-snapshot',
+      submitMode: 'SNAPSHOT' as const,
+      sourceSubmitToken: null,
+      submittable: true,
+    }),
+  ),
+  http.post('/api/auth/onboarding/recommendations/communities', () =>
+    ok({
+      retryRequired: false,
+      completedSteps: ['interests', 'recommended-users', 'recommended-communities'],
+      lastStep: 'recommended-communities' as const,
+      nextStep: 'complete' as const,
+    }),
+  ),
+  http.post('/api/auth/onboarding/complete', () => ok({ onboardingStatus: 'COMPLETED' as const })),
+  http.post('/api/auth/onboarding/skip', () => ok({ onboardingStatus: 'SKIPPED' as const })),
+  http.post('/api/auth/logout', () => ok({ loggedOut: true as const })),
   http.get('/api/feeds/following', async () => {
     await delay(180);
-    return ok(cursorPage(posts));
+    return ok(cursorPage(posts.map((post) => mockFeedListItem(post.id))));
   }),
   http.get('/api/feeds/for-you', async () => {
     await delay(180);
-    return ok(cursorPage([...posts].reverse()));
+    return ok(cursorPage([...posts].reverse().map((post) => mockFeedListItem(post.id))));
   }),
-  http.get('/api/feeds/explore/posts', () => ok(cursorPage(posts.slice(0, 2)))),
+  http.get('/api/feeds/explore/posts', () =>
+    ok(cursorPage(posts.slice(0, 2).map((post) => mockFeedListItem(post.id)))),
+  ),
   http.get('/api/feeds/explore/topics', () =>
     ok([
       { id: 't1', title: '#人工智能', count: 123000 },
@@ -1717,18 +2049,32 @@ export const handlers = [
   http.get('/api/search', ({ request }) => {
     const url = new URL(request.url);
     const q = url.searchParams.get('q')?.toLowerCase() || '';
+    const tab = url.searchParams.get('tab') ?? 'posts';
+    if (tab === 'users') {
+      return ok({
+        currentTab: 'users' as const,
+        list: users
+          .filter((user) => user.displayName.toLowerCase().includes(q) || !q)
+          .map((user) => mockUserPublicCard(user.id))
+          .filter((user): user is UserPublicCardView => user !== null),
+        nextCursor: null,
+      });
+    }
+    if (tab === 'communities') {
+      return ok({
+        currentTab: 'communities' as const,
+        list: allCommunitySummaries()
+          .filter((community) => community.name.toLowerCase().includes(q) || !q)
+          .map(mockCommunityCard),
+        nextCursor: null,
+      });
+    }
     return ok({
-      posts: cursorPage(
-        posts.filter((post) => post.content.toLowerCase().includes(q) || q === '人工智能'),
-      ),
-      users: cursorPage(
-        users.filter((user) => user.displayName.toLowerCase().includes(q) || q === '人工智能'),
-      ),
-      communities: cursorPage(
-        communities.filter(
-          (community) => community.name.toLowerCase().includes(q) || q === '人工智能',
-        ),
-      ),
+      currentTab: 'posts' as const,
+      list: posts
+        .filter((post) => post.content.toLowerCase().includes(q) || !q)
+        .map((post) => requiredMockPostCard(post.id)),
+      nextCursor: null,
     });
   }),
   http.get('/api/posts/drafts', ({ request }) =>
@@ -1812,9 +2158,10 @@ export const handlers = [
     removeMockDraft(draftId);
     return ok({ ...result, draftId });
   }),
-  http.get('/api/posts/:postId', ({ params }) =>
-    ok(posts.find((post) => post.id === params.postId) || posts[0]),
-  ),
+  http.get('/api/posts/:postId', ({ params }) => {
+    const detail = mockPostDetail(String(params.postId));
+    return detail ? ok(detail) : apiError(404, 'POST_NOT_FOUND', 'Post not found');
+  }),
   http.post('/api/posts/publish', async ({ request }) => {
     if (!request.headers.get('idempotency-key')) {
       return apiError(400, 'POST_IDEMPOTENCY_KEY_REQUIRED', '缺少幂等键');
@@ -2023,6 +2370,15 @@ export const handlers = [
       targetUserId: requestItem.userId,
       rejected: true as const,
     } satisfies RejectFollowRequestResult;
+    return ok(response);
+  }),
+  http.get('/api/users/me', () => {
+    const response = {
+      userId: currentUser.id,
+      handle: currentUser.handle,
+      displayName: currentUser.displayName,
+      avatarUrl: currentUser.avatarUrl,
+    } satisfies CurrentUserCardView;
     return ok(response);
   }),
   http.get('/api/users/me/profile', () => ok({ ...mockEditableProfile })),
@@ -2499,44 +2855,36 @@ export const handlers = [
         : ('NONE' as const),
     });
   }),
-  http.get('/api/communities', () => ok(cursorPage(allCommunitySummaries()))),
-  http.get('/api/communities/slug/:slug/posts', () => ok(cursorPage(posts))),
-  http.get('/api/communities/slug/:slug', ({ params }) => {
-    const slug = String(params.slug);
-    const created = mockCreatedCommunities.find((item) => item.summary.slug === slug);
-    if (created) {
-      return ok({
-        ...created.summary,
-        coverUrl: null,
-        rules: created.input.rules ?? [],
-        visibility: 'public' as const,
-        joinMode:
-          created.input.joinPolicy === 'APPROVAL' ? ('approval' as const) : ('open' as const),
-      });
-    }
-    const summary = communities.find((item) => item.slug === slug);
-    if (!summary) return apiError(404, 'COMMUNITY_NOT_FOUND', '社群不存在');
+  http.get('/api/communities', ({ request }) => {
+    const search = new URL(request.url).searchParams;
+    const page = Math.max(1, Number(search.get('page') ?? 1));
+    const pageSize = Math.min(100, Math.max(1, Number(search.get('pageSize') ?? 20)));
+    return ok(pageResult(allCommunitySummaries().map(mockCommunityCard), page, pageSize));
+  }),
+  http.post('/api/communities/membership-states/_batch', async ({ request }) => {
+    const body = (await request.json()) as { communityIds: string[] };
     return ok({
-      ...summary,
-      membersCount:
-        summary.id === MOCK_COMMUNITY_ID ? mockCommunityMembers.length : summary.membersCount,
-      coverUrl: null,
-      rules: summary.id === MOCK_COMMUNITY_ID ? mockCommunityRules : [],
-      visibility:
-        summary.id === MOCK_COMMUNITY_ID && mockCommunitySettings.visibility === 'PRIVATE'
-          ? ('private' as const)
-          : ('public' as const),
-      joinMode:
-        summary.id === MOCK_COMMUNITY_ID && mockCommunitySettings.joinPolicy === 'APPROVAL'
-          ? ('approval' as const)
-          : ('open' as const),
+      list: body.communityIds.map((communityId) => {
+        const summary = allCommunitySummaries().find((item) => item.id === communityId);
+        return summary ? { communityId, joined: summary.joined, pending: false } : null;
+      }),
     });
   }),
-  http.get('/api/communities/:id', ({ params }) =>
-    String(params.id) === MOCK_COMMUNITY_ID
-      ? ok(mockCommunityDetail())
-      : apiError(404, 'COMMUNITY_NOT_FOUND', '社群不存在'),
+  http.get('/api/communities/slug/:slug/posts', () =>
+    ok(cursorPage(posts.map((post) => requiredMockPostCard(post.id)))),
   ),
+  http.get('/api/communities/slug/:slug', ({ params }) => {
+    const summary = allCommunitySummaries().find((item) => item.slug === String(params.slug));
+    return summary
+      ? ok(mockCommunityDetailForSummary(summary))
+      : apiError(404, 'COMMUNITY_NOT_FOUND', 'Community not found');
+  }),
+  http.get('/api/communities/:id', ({ params }) => {
+    const summary = allCommunitySummaries().find((item) => item.id === String(params.id));
+    return summary
+      ? ok(mockCommunityDetailForSummary(summary))
+      : apiError(404, 'COMMUNITY_NOT_FOUND', 'Community not found');
+  }),
   http.post('/api/communities/:id/join', ({ params }) =>
     ok({
       communityId: String(params.id),
@@ -3487,6 +3835,36 @@ export const handlers = [
   http.get('/api/me/content-center/deleted', ({ request }) =>
     ok(cursorPageView(mockDeletedContent, request)),
   ),
+  http.post('/api/me/history/posts', async ({ request }) => {
+    const body = (await request.json()) as RecordPostBrowseHistoryInput;
+    const postCard = mockPostCard(body.postId);
+    if (!postCard) return apiError(404, 'POST_NOT_FOUND', 'Post not found');
+
+    const now = new Date().toISOString();
+    const existingIndex = mockBrowseHistory.findIndex((item) => item.postId === body.postId);
+    const previous = existingIndex >= 0 ? mockBrowseHistory[existingIndex] : null;
+    const viewCount = (previous?.viewCount ?? 0) + 1;
+    if (existingIndex >= 0) mockBrowseHistory.splice(existingIndex, 1);
+    mockBrowseHistory.unshift({
+      postId: body.postId,
+      lastViewedAtIso: now,
+      viewCount,
+      sourceScene: body.sourceScene,
+      sourceModule: body.sourceModule,
+      itemState: 'ACTIVE',
+      placeholderReasonCode: null,
+      postCard,
+    });
+
+    return ok({
+      recorded: true,
+      deduped: false,
+      lastViewedAtTouched: true,
+      viewCountIncremented: true,
+      lastViewedAtIso: now,
+      viewCount,
+    });
+  }),
   http.get('/api/me/history/posts', ({ request }) =>
     ok(cursorPageView(mockBrowseHistory, request)),
   ),
@@ -3585,46 +3963,54 @@ export const handlers = [
     const item = mockNotifications.find(
       (candidate) => candidate.notificationId === String(params.notificationId),
     );
+    const available = Boolean(item?.entity?.actionUrl);
     return ok({
       notificationId: String(params.notificationId),
+      targetState: available ? ('ALLOW' as const) : ('MASKED' as const),
+      entityType: available ? (item?.entity?.entityType ?? null) : null,
+      entityId: available ? (item?.entity?.entityId ?? null) : null,
+      targetPostId: null,
+      commentId: null,
       actionUrl: item?.entity?.actionUrl ?? null,
-      available: Boolean(item?.entity?.actionUrl),
-      unavailableReasonCode: item?.entity?.actionUrl ? null : 'TARGET_UNAVAILABLE',
+      maskedReasonCode: available ? null : 'TARGET_PERMISSION_DENIED',
     });
   }),
   http.get('/api/settings/overview', () =>
     ok({
-      notificationEnabled: true,
-      privateAccount: false,
-      recommendationEnabled: true,
-      interests: ['产品设计', 'AI', '摄影'],
+      privacy: { accountVisibility: mockPermissionPolicy.accountVisibility },
+      notification: { inAppChannelEnabled: mockNotificationSettings.inAppChannelEnabled },
+      recommendation: { allowPersonalizedRecommendation: true },
     }),
   ),
-  http.get('/api/settings/notifications', () =>
-    ok({
-      comments: true,
-      likes: true,
-      follows: true,
-      communities: true,
-      mentions: true,
-      reposts: false,
-      emailDigest: true,
-      push: true,
-    }),
-  ),
-  http.patch('/api/settings/notifications', async ({ request }) => ok(await request.json())),
-  http.get('/api/settings/interests', () => ok(['产品设计', '人工智能', '摄影'])),
-  http.put('/api/settings/interests', async ({ request }) => {
-    const body = (await request.json()) as { interests: string[] };
-    return ok(body.interests);
+  http.get('/api/settings/notifications', () => ok(mockNotificationSettings)),
+  http.patch('/api/settings/notifications', async ({ request }) => {
+    const patch = (await request.json()) as Partial<typeof mockNotificationSettings>;
+    mockNotificationSettings = { ...mockNotificationSettings, ...patch };
+    return ok(mockNotificationSettings);
   }),
-  http.patch('/api/permissions/me/policy', async ({ request }) => ok(await request.json())),
+  http.get('/api/settings/interests/catalog', () =>
+    ok({
+      dictionaryVersion: 'mock-interest-catalog-v1',
+      items: mockInterestTagCatalog,
+      allowedInterestTagCodes: mockInterestTagCatalog.map((item) => item.interestTagCode),
+    }),
+  ),
+  http.get('/api/settings/interests', () =>
+    ok({ list: mockInterestTagCodes.map((interestTagCode) => ({ interestTagCode })) }),
+  ),
+  http.put('/api/settings/interests', async ({ request }) => {
+    const body = (await request.json()) as { items: Array<{ interestTagCode: string }> };
+    mockInterestTagCodes = body.items.map((item) => item.interestTagCode);
+    return ok({ list: mockInterestTagCodes.map((interestTagCode) => ({ interestTagCode })) });
+  }),
+  http.get('/api/permissions/me/policy', () => ok(mockPermissionPolicy)),
+  http.patch('/api/permissions/me/policy', async ({ request }) => {
+    const patch = (await request.json()) as Partial<typeof mockPermissionPolicy>;
+    mockPermissionPolicy = { ...mockPermissionPolicy, ...patch };
+    return ok({ snapshot: mockPermissionPolicy });
+  }),
   http.post('/api/permissions/me/policy/preview', async ({ request }) => {
-    const policy = (await request.json()) as PermissionPolicy;
-    return ok({
-      profileSummary: policy.profileVisibility === 'private' ? '新关注者需要审批' : '公开资料可见',
-      interactionSummary: `私信权限：${policy.allowMessages}`,
-      discoverySummary: policy.searchEngineIndexing ? '允许搜索引擎收录' : '禁止搜索引擎收录',
-    });
+    const patch = (await request.json()) as Partial<typeof mockPermissionPolicy>;
+    return ok({ previewPolicy: { ...mockPermissionPolicy, ...patch } });
   }),
 ];

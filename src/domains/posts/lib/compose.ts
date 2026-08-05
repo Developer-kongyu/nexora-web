@@ -13,7 +13,7 @@ export const POST_COMPOSER_META = {
   normalizationVersion: 'POST_TEXT_NORMALIZATION_V1',
 } as const;
 
-const HTTP_URL_PATTERN = /https?:\/\/[^\s<>{}\[\]"']+/iu;
+const HTTP_URL_PATTERN = /https?:\/\/[^\s<>{}\[\]"'，。！？；：、“”‘’]+/giu;
 const URL_TERMINAL_PUNCTUATION_PATTERN = /[.,!?;:，。！？；：、"'“”‘’]+$/u;
 const MENTION_PATTERN = /(^|[\s(\[（【{，。！？、；："'“‘])@([A-Za-z0-9_]{1,30})/gu;
 const HASHTAG_PATTERN = /(^|[\s(\[（【{，。！？、；："'“‘])#([\p{L}\p{N}_]{1,50})/gu;
@@ -35,6 +35,12 @@ export interface BuildPostComposeInputOptions {
   repostOfPostId?: string | null;
   linkCardDisabled?: boolean;
 }
+export interface PostHttpUrlRange {
+  entityType: 'LINK';
+  url: string;
+  startOffset: number;
+  endOffset: number;
+}
 
 export function normalizePostBodyText(value: string): string | null {
   const normalized = value.replace(/\r\n?/gu, '\n').trim();
@@ -42,9 +48,25 @@ export function normalizePostBodyText(value: string): string | null {
 }
 
 export function extractFirstHttpUrl(value: string): string | null {
-  const matched = value.match(HTTP_URL_PATTERN)?.[0];
-  if (!matched) return null;
-  return matched.replace(URL_TERMINAL_PUNCTUATION_PATTERN, '') || null;
+  return buildPostHttpUrlRanges(value)[0]?.url ?? null;
+}
+
+export function buildPostHttpUrlRanges(value: string): PostHttpUrlRange[] {
+  const ranges: PostHttpUrlRange[] = [];
+
+  for (const match of value.matchAll(HTTP_URL_PATTERN)) {
+    if (match.index === undefined) continue;
+    const url = match[0].replace(URL_TERMINAL_PUNCTUATION_PATTERN, '');
+    if (!url) continue;
+    ranges.push({
+      entityType: 'LINK',
+      url,
+      startOffset: match.index,
+      endOffset: match.index + url.length,
+    });
+  }
+
+  return ranges;
 }
 
 export function buildPostComposeEntityRanges(bodyText: string): PostComposeEntityRangeInput[] {

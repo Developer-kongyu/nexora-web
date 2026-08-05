@@ -1,9 +1,9 @@
 {
-  "name": "lct-web",
+  "name": "nexora-web",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "LCT 现代兴趣社交网络完整前端实现",
+  "description": "Nexora 开放兴趣社交网络前端实现",
   "engines": {
     "node": ">=22.12.0",
     "npm": ">=10.0.0"

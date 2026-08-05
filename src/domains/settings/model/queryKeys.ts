@@ -1,6 +1,9 @@
+const SETTINGS_QUERY_ROOT = ['settings'] as const;
+
 export const settingsKeys = {
-  all: ['settings'] as const,
-  overview: ['settings', 'overview'] as const,
-  notifications: ['settings', 'notifications'] as const,
-  interests: ['settings', 'interests'] as const,
+  all: SETTINGS_QUERY_ROOT,
+  overview: [...SETTINGS_QUERY_ROOT, 'overview'] as const,
+  notifications: [...SETTINGS_QUERY_ROOT, 'notifications'] as const,
+  interests: [...SETTINGS_QUERY_ROOT, 'interests'] as const,
+  interestCatalog: [...SETTINGS_QUERY_ROOT, 'interests', 'catalog'] as const,
 };

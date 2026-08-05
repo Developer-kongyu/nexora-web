@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { Compass, Flame, Globe2, Hash, MapPin, Sparkles, TrendingUp } from 'lucide-react';
+import { Compass, Flame, Globe2, Hash } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { communitiesApi, communityKeys } from '@/domains/communities';
-import { useExploreFeed } from '@/domains/feed';
+import { communitiesApi, type CommunitySummary } from '@/domains/communities';
+import { feedApi, feedKeys, useExploreFeed, type ExplorePostTab } from '@/domains/feed';
 import { paths } from '@/shared/config/paths';
 import { mergeCursorItems } from '@/shared/api/pagination';
 import { useCopyTextFeedback } from '@/shared/hooks/useCopyTextFeedback';
+import { formatCount } from '@/shared/lib/format';
 import { Badge, Button } from '@/shared/ui';
 import { CommunityCard } from '@/widgets/community-card/CommunityCard';
 import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
@@ -14,23 +15,60 @@ import { PostCard } from '@/widgets/post-card/PostCard';
 import { LoadingRows, SideCard } from '../_shared/PageParts';
 import styles from '../_shared/ProductPages.module.css';
 
-const EXPLORE_TABS = ['热门', '最新', '图片', '视频'] as const;
-type ExploreTab = (typeof EXPLORE_TABS)[number];
-
-const topics = [
-  { name: '人工智能', count: '12.3万', growth: '+32%', tone: 'brand' as const },
-  { name: '城市摄影', count: '3.9万', growth: '+18%', tone: 'success' as const },
-  { name: '独立开发', count: '2.7万', growth: '+16%', tone: 'warning' as const },
-  { name: '旅行灵感', count: '5.1万', growth: '+12%', tone: 'neutral' as const },
+const EXPLORE_TABS: ReadonlyArray<{ value: ExplorePostTab; label: string }> = [
+  { value: 'HOT', label: '热门' },
+  { value: 'IMAGE', label: '图片' },
+  { value: 'VIDEO', label: '视频' },
 ];
 
+const POST_SECTION_COPY: Record<ExplorePostTab, { title: string; description: string }> = {
+  HOT: { title: '热门帖子', description: '按后端热门榜单展示的公开内容' },
+  IMAGE: { title: '图片帖子', description: '包含可用图片的公开内容' },
+  VIDEO: { title: '视频帖子', description: '包含可用视频的公开内容' },
+};
+
+function formatSnapshotWindow(start: string | null, end: string | null): string {
+  if (!start || !end) return '快照尚未生成';
+  const formatter = new Intl.DateTimeFormat('zh-CN', {
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  return `${formatter.format(new Date(start))} 至 ${formatter.format(new Date(end))}`;
+}
+
 export function ExplorePage() {
-  const [tab, setTab] = useState<ExploreTab>('热门');
-  const feed = useExploreFeed();
+  const [tab, setTab] = useState<ExplorePostTab>('HOT');
+  const feed = useExploreFeed(tab);
   const posts = feed.data ? mergeCursorItems(feed.data.pages) : [];
+  const topics = useQuery({
+    queryKey: feedKeys.exploreTopics('HOT_24H'),
+    queryFn: ({ signal }) => feedApi.exploreTopics('HOT_24H', 8, signal),
+  });
   const communities = useQuery({
-    queryKey: communityKeys.explore,
-    queryFn: () => communitiesApi.list(),
+    queryKey: feedKeys.exploreCommunities('FEATURED_BY_INTEREST'),
+    queryFn: async ({ signal }) => {
+      const response = await feedApi.exploreCommunities('FEATURED_BY_INTEREST', 6, signal);
+      const membership = await communitiesApi
+        .getMembershipStates(
+          response.list.map((item) => item.card.communityId),
+          signal,
+        )
+        .catch(() => ({ list: response.list.map(() => null) }));
+      return {
+        ...response,
+        list: response.list.map(({ card }, index): CommunitySummary => ({
+          id: card.communityId,
+          slug: card.slug,
+          name: card.name,
+          description: card.description ?? '',
+          avatarUrl: card.avatarUrl,
+          membersCount: card.memberCount,
+          joined: membership.list[index]?.joined ?? false,
+        })),
+      };
+    },
   });
 
   const copyExploreLink = useCopyTextFeedback({ successTitle: '访客链接已复制' });
@@ -72,34 +110,23 @@ export function ExplorePage() {
               </Button>
             </div>
           </SideCard>
-          <SideCard title="趋势来源">
+          <SideCard title="实时数据">
             <ul>
-              <li>过去 2 小时互动增长</li>
-              <li>与你的兴趣标签相关</li>
-              <li>已过滤不可见与低质量内容</li>
+              <li>
+                话题窗口：
+                {topics.isLoading
+                  ? '读取中'
+                  : formatSnapshotWindow(
+                      topics.data?.windowStartedAtIso ?? null,
+                      topics.data?.windowEndedAtIso ?? null,
+                    )}
+              </li>
+              <li>热门话题：{topics.isError ? '加载失败' : `${topics.data?.list.length ?? 0} 个`}</li>
+              <li>
+                推荐社群：
+                {communities.isError ? '加载失败' : `${communities.data?.list.length ?? 0} 个`}
+              </li>
             </ul>
-          </SideCard>
-          <SideCard title="正在发生">
-            <div className={styles.list}>
-              <div className={styles.listRow} style={{ padding: '10px 0' }}>
-                <span className={styles.featureCardIcon}>
-                  <MapPin size={16} />
-                </span>
-                <span className={styles.listCopy}>
-                  <strong>上海 · 创意市集</strong>
-                  <small>326 人正在讨论</small>
-                </span>
-              </div>
-              <div className={styles.listRow} style={{ padding: '10px 0' }}>
-                <span className={styles.featureCardIcon}>
-                  <Sparkles size={16} />
-                </span>
-                <span className={styles.listCopy}>
-                  <strong>AI 创作周</strong>
-                  <small>今晚 20:00 线上分享</small>
-                </span>
-              </div>
-            </div>
           </SideCard>
         </>
       }
@@ -110,11 +137,11 @@ export function ExplorePage() {
             {EXPLORE_TABS.map((item) => (
               <button
                 type="button"
-                key={item}
-                className={tab === item ? styles.active : undefined}
-                onClick={() => setTab(item)}
+                key={item.value}
+                className={tab === item.value ? styles.active : undefined}
+                onClick={() => setTab(item.value)}
               >
-                {item}
+                {item.label}
               </button>
             ))}
           </div>
@@ -129,50 +156,108 @@ export function ExplorePage() {
               <h2>
                 <Flame size={18} color="#ef4444" /> 热门话题
               </h2>
-              <p>实时讨论热度与增长趋势</p>
+              <p>来自后端过去 24 小时的话题快照</p>
             </div>
-            <Link to="/search?q=热门">查看完整榜单</Link>
           </header>
           <div className={styles.sectionBody}>
-            <div className={styles.cardGrid}>
-              {topics.map((topic, index) => (
-                <Link
-                  key={topic.name}
-                  to={paths.searchResults(topic.name)}
-                  className={styles.featureCard}
-                  style={{ minHeight: 105 }}
-                >
-                  <span className={styles.featureCardIcon}>
-                    {index < 2 ? <TrendingUp size={18} /> : <Hash size={18} />}
-                  </span>
-                  <h3>#{topic.name}</h3>
-                  <p>{topic.count} 条讨论</p>
-                  <Badge tone={topic.tone} style={{ position: 'absolute', right: 14, bottom: 14 }}>
-                    {topic.growth}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
+            {topics.isLoading ? (
+              <LoadingRows count={2} compact />
+            ) : topics.isError ? (
+              <div className={styles.emptyPanel}>
+                <h2>热门话题加载失败</h2>
+                <p>后端话题快照暂时无法读取。</p>
+                <Button size="sm" variant="secondary" onClick={() => void topics.refetch()}>
+                  重新加载
+                </Button>
+              </div>
+            ) : !topics.data || topics.data.list.length === 0 ? (
+              <div className={styles.emptyPanel}>
+                <span className={styles.emptyIcon}>
+                  <Hash size={22} />
+                </span>
+                <h2>暂无热门话题</h2>
+                <p>后端当前没有可展示的话题快照。</p>
+              </div>
+            ) : (
+              <div className={styles.cardGrid}>
+                {topics.data.list.map((topic) => (
+                  <Link
+                    key={topic.hashtagNormalized}
+                    to={paths.searchResults(topic.hashtagText)}
+                    className={styles.featureCard}
+                    style={{ minHeight: 105 }}
+                  >
+                    <span className={styles.featureCardIcon}>
+                      <Hash size={18} />
+                    </span>
+                    <h3>#{topic.hashtagText}</h3>
+                    <p>
+                      {formatCount(topic.postCount24h)} 条帖子 ·{' '}
+                      {formatCount(topic.contributorCount24h)} 位创作者
+                    </p>
+                    <Badge
+                      tone="neutral"
+                      style={{ position: 'absolute', right: 14, bottom: 14 }}
+                    >
+                      第 {topic.rankPosition} 位
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
-        {feed.isLoading ? (
-          <LoadingRows count={2} />
-        ) : (
-          <section>
-            <div className={styles.sectionHeader} style={{ padding: '0 2px 12px', border: 0 }}>
-              <div>
-                <h2>热门帖子</h2>
-                <p>高质量公开内容</p>
+        <section>
+          <div className={styles.sectionHeader} style={{ padding: '0 2px 12px', border: 0 }}>
+            <div>
+              <h2>{POST_SECTION_COPY[tab].title}</h2>
+              <p>{POST_SECTION_COPY[tab].description}</p>
+            </div>
+          </div>
+          {feed.isLoading ? (
+            <LoadingRows count={2} />
+          ) : feed.isError ? (
+            <div className={styles.emptyPanel}>
+              <h2>帖子加载失败</h2>
+              <p>当前分类暂时无法从后端读取。</p>
+              <Button size="sm" variant="secondary" onClick={() => void feed.refetch()}>
+                重新加载
+              </Button>
+            </div>
+          ) : posts.length === 0 ? (
+            <div className={styles.emptyPanel}>
+              <span className={styles.emptyIcon}>
+                <Compass size={22} />
+              </span>
+              <h2>当前分类暂无内容</h2>
+              <p>
+                后端没有返回可展示的
+                {EXPLORE_TABS.find((item) => item.value === tab)?.label}
+                帖子。
+              </p>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: 'grid', gap: 14 }}>
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
               </div>
-            </div>
-            <div style={{ display: 'grid', gap: 14 }}>
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-          </section>
-        )}
+              {feed.hasNextPage ? (
+                <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 14 }}>
+                  <Button
+                    variant="secondary"
+                    loading={feed.isFetchingNextPage}
+                    onClick={() => void feed.fetchNextPage()}
+                  >
+                    加载更多
+                  </Button>
+                </div>
+              ) : null}
+            </>
+          )}
+        </section>
 
         <section className={styles.section}>
           <header className={styles.sectionHeader}>
@@ -185,8 +270,21 @@ export function ExplorePage() {
           <div className={styles.sectionBody} style={{ display: 'grid', gap: 12 }}>
             {communities.isLoading ? (
               <LoadingRows count={2} compact />
+            ) : communities.isError ? (
+              <div className={styles.emptyPanel}>
+                <h2>推荐社群加载失败</h2>
+                <p>后端推荐榜单暂时无法读取。</p>
+                <Button size="sm" variant="secondary" onClick={() => void communities.refetch()}>
+                  重新加载
+                </Button>
+              </div>
+            ) : !communities.data || communities.data.list.length === 0 ? (
+              <div className={styles.emptyPanel}>
+                <h2>暂无推荐社群</h2>
+                <p>后端当前没有可展示的推荐社群快照。</p>
+              </div>
             ) : (
-              communities.data?.list.map((community) => (
+              communities.data.list.map((community) => (
                 <CommunityCard key={community.id} community={community} />
               ))
             )}

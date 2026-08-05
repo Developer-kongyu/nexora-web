@@ -1,4 +1,4 @@
-import type { PostCardBriefView } from '@/domains/posts/model/types';
+import type { PostCardBriefView, PostViewModel } from '@/domains/posts/model/types';
 import type { UserRelationSnapshotView } from '@/domains/users/model/types';
 import type { PublicPrivateVisibility } from '@/shared/model/visibility';
 
@@ -23,6 +23,7 @@ export interface CommunityDetail extends CommunitySummary {
   rules: string[];
   visibility: PublicPrivateVisibility;
   joinMode: 'open' | 'approval';
+  posts: PostViewModel[];
 }
 
 export const COMMUNITY_MAX_TAG_COUNT = 10;

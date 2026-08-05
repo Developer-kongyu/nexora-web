@@ -7,6 +7,9 @@ export type PostPublishState = 'PUBLISHED' | 'PUBLISHING';
 export type PostPublishMode = 'IMMEDIATE' | 'WAIT_MEDIA_READY';
 export type PostDeleteOutcome = 'DELETED_NOW' | 'ALREADY_DELETED';
 
+export const POST_READ_STATUSES = ['PUBLISHING', 'PUBLISHED', 'PUBLISH_FAILED', 'DELETED'] as const;
+export type PostReadStatus = (typeof POST_READ_STATUSES)[number];
+
 export const POST_VISIBILITIES = ['PUBLIC', 'UNLISTED', 'FOLLOWERS', 'PRIVATE'] as const;
 export type PostVisibility = (typeof POST_VISIBILITIES)[number];
 
@@ -135,6 +138,8 @@ export interface PostPermissions {
 
 export interface PostViewModel {
   id: string;
+  contentPostId?: string;
+  postKind?: PostKind;
   author: UserSummary;
   authorProfileAvailable?: boolean;
   content: string;
@@ -146,6 +151,16 @@ export interface PostViewModel {
   stats: PostStats;
   permissions: PostPermissions;
   viewer: { liked: boolean; bookmarked: boolean; reposted: boolean };
+  relation?: {
+    kind: 'REPLY' | 'REPOST';
+    actor: UserSummary;
+    actorProfileAvailable: boolean;
+    targetAuthor?: UserSummary;
+    targetProfileAvailable?: boolean;
+    targetPostId: string | null;
+    rootPostId: string | null;
+    createdAt: string;
+  };
   variant?: 'feed' | 'detail' | 'search' | 'profile' | 'bookmark' | 'community' | 'announcement';
 }
 
@@ -280,6 +295,8 @@ export interface PostInteractionSummaryView {
   commentCount: number;
   quoteCount: number;
   repostCount: number;
+  impressionCount?: number;
+  dedupedVideoViewCount?: number;
   viewerState: {
     liked: boolean;
     reposted: boolean;
@@ -294,13 +311,45 @@ export interface PostCardBriefView {
   postKind: PostKind;
   bodyTextPreview: string | null;
   visibility: PostVisibility;
-  status: 'PUBLISHING' | 'PUBLISHED' | 'PUBLISH_FAILED' | 'DELETED';
+  status: PostReadStatus;
   publishedAtIso: string | null;
   author: UserIdentityBriefView | null;
   community: PostCommunityBriefView | null;
   attachedMedia: PostAttachedMediaView[];
   linkCard: PostLinkCardView | null;
   interactionSummary: PostInteractionSummaryView | null;
+}
+
+export interface PostDetailDto {
+  postId: string;
+  authorUserId: string;
+  postKind: PostKind;
+  replyToPostId: string | null;
+  quoteOfPostId: string | null;
+  repostOfPostId: string | null;
+  rootPostId: string | null;
+  bodyText: string | null;
+  status: PostReadStatus;
+  author: UserIdentityBriefView | null;
+  community: {
+    communityId: string;
+    slug: string | null;
+    displayName: string;
+    avatarUrl: string | null;
+  } | null;
+  attachedMedia: PostAttachedMediaView[];
+  hashtags: Array<{ tagNormalized: string }>;
+  linkCard: PostLinkCardView | null;
+  interactionSummary: PostInteractionSummaryView;
+  interactionPermission: {
+    canView: boolean;
+    canLike: boolean;
+    canBookmark: boolean;
+    canComment: boolean;
+    canQuote: boolean;
+    canRepost: boolean;
+  };
+  publishedAtIso: string | null;
 }
 
 export interface ReplyRelationMetaView {

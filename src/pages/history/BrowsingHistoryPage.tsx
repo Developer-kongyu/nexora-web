@@ -24,6 +24,7 @@ import { settleBatch } from '@/shared/lib/settleBatch';
 import { Badge, Button, Modal, useToast } from '@/shared/ui';
 import { PageLayout } from '@/widgets/layout/PageLayout';
 import { EmptyPanel, LoadingRows, PageTitle, SideCard } from '../_shared/PageParts';
+import { formatHistoryDeleteFailure } from './historyDeleteFeedback';
 import styles from './BrowsingHistoryPage.module.css';
 
 const PAGE_SIZE = 20;
@@ -80,9 +81,8 @@ export function BrowsingHistoryPage() {
       const fulfilledIds = new Set(
         results.filter((item) => item.status === 'fulfilled').map((item) => item.input),
       );
-      const failedIds = results
-        .filter((item) => item.status === 'rejected')
-        .map((item) => item.input);
+      const failedResults = results.filter((item) => item.status === 'rejected');
+      const failedIds = failedResults.map((item) => item.input);
 
       queryClient.setQueryData<InfiniteData<PostBrowseHistoryPageView>>(
         libraryKeys.history,
@@ -93,7 +93,7 @@ export function BrowsingHistoryPage() {
         tone: failedIds.length ? 'warning' : 'success',
         title: `已删除 ${fulfilledIds.size} 条浏览记录`,
         description: failedIds.length
-          ? `${failedIds.length} 条删除失败，仍保留选中状态。`
+          ? formatHistoryDeleteFailure(failedIds.length, failedResults[0]?.reason)
           : undefined,
       });
       void queryClient.invalidateQueries({ queryKey: libraryKeys.history });

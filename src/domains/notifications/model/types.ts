@@ -85,7 +85,11 @@ export interface NotificationDeltaResponse {
 
 export interface NotificationTargetResolution {
   notificationId: string;
+  targetState: 'ALLOW' | 'MASKED' | 'DELETED';
+  entityType: string | null;
+  entityId: string | null;
+  targetPostId: string | null;
+  commentId: string | null;
   actionUrl: string | null;
-  available: boolean;
-  unavailableReasonCode: string | null;
+  maskedReasonCode: string | null;
 }

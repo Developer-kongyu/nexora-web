@@ -165,6 +165,21 @@ export type BrowseHistorySourceScene =
 export type BrowseHistorySourceModule =
   'POST' | 'SEARCH' | 'COMMUNITY' | 'PROFILE' | 'NOTIFICATION';
 
+export interface RecordPostBrowseHistoryInput {
+  postId: string;
+  sourceScene: BrowseHistorySourceScene | null;
+  sourceModule: BrowseHistorySourceModule | null;
+}
+
+export interface RecordPostBrowseHistoryResult {
+  recorded: boolean;
+  deduped: boolean;
+  lastViewedAtTouched: boolean;
+  viewCountIncremented: boolean;
+  lastViewedAtIso: string;
+  viewCount: number;
+}
+
 interface PostBrowseHistoryItemBase {
   postId: string;
   lastViewedAtIso: string;

@@ -3,7 +3,7 @@ import { AppShellLayout } from '@/app/layouts/AppShellLayout';
 import { OnboardingLayout } from '@/app/layouts/OnboardingLayout';
 import { PublicLayout } from '@/app/layouts/PublicLayout';
 import { RootErrorBoundary } from '@/app/error/RootErrorBoundary';
-import { RequireAuth } from './guards';
+import { RequireAuth, RequireCompletedOnboarding, RequireOnboarding } from './guards';
 
 const loadFollowListPage = async () => ({
   Component: (await import('@/pages/follows/FollowListPage')).FollowListPage,
@@ -52,9 +52,9 @@ const router = createBrowserRouter([
       {
         path: 'onboarding',
         element: (
-          <RequireAuth>
+          <RequireOnboarding>
             <OnboardingLayout />
-          </RequireAuth>
+          </RequireOnboarding>
         ),
         children: [
           { index: true, element: <Navigate to="interests" replace /> },
@@ -80,9 +80,9 @@ const router = createBrowserRouter([
       },
       {
         element: (
-          <RequireAuth>
+          <RequireCompletedOnboarding>
             <AppShellLayout />
-          </RequireAuth>
+          </RequireCompletedOnboarding>
         ),
         children: [
           {

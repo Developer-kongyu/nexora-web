@@ -284,7 +284,8 @@ function ComposeEditorForm({
   }, [autosaveDraftMutation, currentCompose, currentFingerprint, draftId, draftVersion]);
 
   useEffect(() => {
-    const uploadAbortController = uploadAbortControllerRef.current;
+    const uploadAbortController = new AbortController();
+    uploadAbortControllerRef.current = uploadAbortController;
     return () => {
       uploadAbortController.abort(createAbortError('发帖编辑器已卸载。'));
       clearUploads();

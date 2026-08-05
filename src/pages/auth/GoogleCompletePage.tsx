@@ -1,74 +1,91 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
-import { useCompleteGoogleProfile } from '@/domains/auth';
+import { onboardingPathForStatus, useCompleteGoogleProfile } from '@/domains/auth';
 import { Button, TextField, useToast } from '@/shared/ui';
 import { AuthFormShell } from './AuthFormShell';
 import styles from './AuthPages.module.css';
 
 const schema = z.object({
-  displayName: z.string().trim().min(2, '展示名称至少 2 个字符').max(32, '展示名称最多 32 个字符'),
   handle: z
     .string()
     .trim()
     .min(3, 'Handle 至少 3 个字符')
     .max(24, 'Handle 最多 24 个字符')
-    .regex(/^[A-Za-z0-9_]+$/, '仅支持字母、数字与下划线'),
-  bio: z.string().trim().max(160, '个人简介最多 160 个字符').optional(),
+    .regex(/^[A-Za-z][A-Za-z0-9_]*$/, 'Handle 需以字母开头，仅支持字母、数字与下划线'),
 });
 
 type GoogleCompleteValues = z.infer<typeof schema>;
 
+function readPendingGoogleProfile(params: URLSearchParams) {
+  const fromQuery = {
+    pendingUserId: params.get('pendingUserId'),
+    completionToken: params.get('completionToken'),
+  };
+  if (fromQuery.pendingUserId && fromQuery.completionToken) return fromQuery;
+  try {
+    const stored = JSON.parse(sessionStorage.getItem('google-profile-completion') ?? 'null') as {
+      pendingUserId?: string;
+      completionToken?: string;
+    } | null;
+    return {
+      pendingUserId: stored?.pendingUserId ?? null,
+      completionToken: stored?.completionToken ?? null,
+    };
+  } catch {
+    return fromQuery;
+  }
+}
+
 export function GoogleCompletePage() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const [flowError, setFlowError] = useState<string | null>(null);
   const { showToast } = useToast();
   const completeProfile = useCompleteGoogleProfile();
+  const pending = readPendingGoogleProfile(params);
   const form = useForm<GoogleCompleteValues>({
     resolver: zodResolver(schema),
-    defaultValues: { displayName: '', handle: '', bio: '' },
+    defaultValues: { handle: '' },
   });
 
   const submit = form.handleSubmit(async (values) => {
-    await completeProfile.mutateAsync(values);
-    showToast({ tone: 'success', title: '资料已保存' });
-    void navigate('/onboarding/interests', { replace: true });
+    if (!pending.pendingUserId || !pending.completionToken) {
+      setFlowError('Google 登录上下文已缺失或过期，请返回登录页重新验证 Google 账号。');
+      return;
+    }
+    const session = await completeProfile.mutateAsync({
+      pendingUserId: pending.pendingUserId,
+      completionToken: pending.completionToken,
+      handle: values.handle,
+    });
+    sessionStorage.removeItem('google-profile-completion');
+    showToast({ tone: 'success', title: 'Google 账号资料已完成' });
+    void navigate(onboardingPathForStatus(session.onboardingStatus) ?? '/home', { replace: true });
   });
 
   return (
     <AuthFormShell
       eyebrow="首次登录"
-      title="完善公开资料"
-      description="确认展示名称与唯一 handle，之后仍可在设置中修改。"
+      title="选择公开 Handle"
+      description="Google 资料已经由服务端验证；这里只需选择站内唯一 Handle。"
       backTo="/auth/login"
     >
       <form className={styles.form} onSubmit={submit}>
-        <TextField
-          label="展示名称"
-          autoComplete="name"
-          placeholder="你的公开名称"
-          {...form.register('displayName')}
-          error={form.formState.errors.displayName?.message}
-        />
         <TextField
           label="Handle"
           autoCapitalize="none"
           autoCorrect="off"
           placeholder="例如 zhiqiu"
-          hint="仅支持字母、数字与下划线"
+          hint="以字母开头，仅支持字母、数字与下划线"
           {...form.register('handle')}
           error={form.formState.errors.handle?.message}
         />
-        <TextField
-          label="个人简介（可选）"
-          multiline
-          placeholder="简单介绍你的兴趣与创作方向"
-          {...form.register('bio')}
-          error={form.formState.errors.bio?.message}
-        />
-        {completeProfile.error ? (
+        {flowError || completeProfile.error ? (
           <p className={styles.error} role="alert">
-            {completeProfile.error.message}
+            {flowError ?? completeProfile.error?.message}
           </p>
         ) : null}
         <Button

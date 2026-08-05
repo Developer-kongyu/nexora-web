@@ -1,4 +1,7 @@
-export type UploadableMediaKind = 'IMAGE' | 'VIDEO';
+export const MEDIA_ASSET_KINDS = ['IMAGE', 'VIDEO'] as const;
+export type MediaAssetKind = (typeof MEDIA_ASSET_KINDS)[number];
+
+export type UploadableMediaKind = MediaAssetKind;
 export type MediaImageRole = 'avatar' | 'cover';
 
 export type MediaAssetScene =

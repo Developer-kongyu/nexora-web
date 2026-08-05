@@ -11,3 +11,7 @@ test-results
 *.log
 .vscode/*
 !.vscode/extensions.json
+
+# Local analysis and design-import artifacts
+.VSCodeCounter/
+LCT_MVP_*/

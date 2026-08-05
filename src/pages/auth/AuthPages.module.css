@@ -219,12 +219,13 @@
 .codeRow {
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: end;
+  align-items: start;
   gap: 10px;
 }
 
-.codeRow button {
+.codeButton {
   height: 44px;
+  margin-top: 25px;
 }
 
 .terms {
@@ -261,20 +262,40 @@
     grid-template-columns: 1fr;
   }
 
-  .codeRow button {
+  .codeButton {
     width: 100%;
+    margin-top: 0;
   }
 }
 
-.continueLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 42px;
-  color: var(--color-primary);
-  font-size: 14px;
-  font-weight: 800;
-  background: var(--color-primary-soft);
-  border-radius: 10px;
+.emailResetNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  color: #175cd3;
+  line-height: 1.55;
+  background: #eff8ff;
+  border: 1px solid #b2ddff;
+  border-radius: 11px;
+}
+
+.emailResetNotice svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.emailResetNotice span {
+  display: grid;
+  gap: 4px;
+}
+
+.emailResetNotice strong {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.emailResetNotice small {
+  color: var(--color-muted);
+  font-size: 13px;
 }

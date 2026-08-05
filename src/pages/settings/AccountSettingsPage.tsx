@@ -1,5 +1,6 @@
 import { KeyRound, Laptop, LockKeyhole, Mail, ShieldCheck, Smartphone, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { APP_BRAND } from '@/shared/config/brand';
 import { cn } from '@/shared/lib/cn';
 import { Button, Card, Modal, TextField, useToast } from '@/shared/ui';
 import { SettingsPage } from '../_shared/SettingsPage';
@@ -141,7 +142,7 @@ export function AccountSettingsPage() {
                 <Smartphone size={20} />
               </span>
               <div>
-                <strong>iPhone · LCT App</strong>
+                <strong>iPhone · {APP_BRAND.name} App</strong>
                 <p>上海 · IP 203.0.113.28</p>
                 <small>活跃于 2 小时前</small>
               </div>
@@ -292,7 +293,7 @@ export function AccountSettingsPage() {
         <div className={styles.dangerConfirm}>
           <ShieldCheck size={20} />
           <p>
-            设置密钥：<strong>LCTC-IRCL-2FA7-ZQIU</strong>
+            设置密钥：<strong>NXRA-2FA7-ZQIU-2026</strong>
           </p>
           <TextField label="6 位验证码" name="twoFactorCode" inputMode="numeric" maxLength={6} />
         </div>

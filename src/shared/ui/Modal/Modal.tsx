@@ -1,6 +1,7 @@
 import { X } from 'lucide-react';
 import {
   useEffect,
+  useEffectEvent,
   useId,
   useRef,
   type MouseEvent as ReactMouseEvent,
@@ -22,6 +23,7 @@ export function Modal({ open, title, description, children, onClose, footer }: M
   const descriptionId = useId();
   const dialogRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const handleClose = useEffectEvent(onClose);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -35,7 +37,7 @@ export function Modal({ open, title, description, children, onClose, footer }: M
         ? activeElement
         : null;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') handleClose();
     };
 
     ownerDocument.addEventListener('keydown', handleKeyDown);
@@ -45,7 +47,7 @@ export function Modal({ open, title, description, children, onClose, footer }: M
       ownerDocument.removeEventListener('keydown', handleKeyDown);
       if (previouslyFocused?.isConnected) previouslyFocused.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 

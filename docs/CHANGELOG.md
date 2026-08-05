@@ -1,5 +1,24 @@
 # 修改记录
 
+## 2026-08-03 · 当前用户导航卡与冷启动会话水合
+
+- B02 users owner 新增 `CurrentUserCardView` 与 `usersApi.getCurrentUserCard()`，对接后端 `GET /api/users/me`。
+- `AuthBootstrap` 在 Refresh 成功并提交新 Token 后读取当前用户卡，更新 `id/handle/displayName/avatarUrl`，同时保留既有 onboarding 状态。
+- 用户卡请求关闭 401 自动刷新，避免 refresh handler 递归等待；401 清空会话，404/503/网络错误保留已认证占位会话。
+- Refresh generation/stale guard 同时保护 Token 和用户卡写回，退出或新一轮刷新后旧响应不能污染 Auth Store。
+- MSW 增加精确静态 `/api/users/me` handler，并置于动态用户路由之前。
+- 增加 users API 与 AuthBootstrap 覆盖：成功水合、503 降级、401 失效且不递归、Refresh 401 不读取用户卡。
+- 资料编辑成功继续复用 `updateAuthUser`，使导航摘要与刚保存的昵称/头像即时收敛。
+
+### 全仓复用门禁残留收口
+
+- B05 media owner 新增 canonical `MediaAssetKind`，上传语义 `UploadableMediaKind` 改为兼容别名，B09 Feed 媒体槽位复用 owner 类型。
+- B03 permissions owner 新增 canonical `AccountVisibility`，权限策略与 B12 Settings Overview 共同复用，不把后端大写枚举混入前端小写展示类型。
+- B04 posts owner 新增 `PostReadStatus`，卡片与详情 DTO 共同复用；`PostDetailDto` 从 adapter 迁回 owner model。
+- Auth onboarding 与 Permissions 分别新增 `model/queryKeys.ts`，推荐用户、推荐社区和当前隐私策略页面不再手写 Query Key。
+- 隐私策略保存成功后使用 `permissionKeys.currentPolicy` 同步 Query Cache，读取与写回保持同一缓存身份。
+- `npm run reuse:check` 实际扫描 212 个生产文件并通过，重复联合、重复声明和公共能力绕过均为 0。
+
 ## 2026-07-28 · 阶段 002：通知与用户关系闭环
 
 ### 备份与可恢复性

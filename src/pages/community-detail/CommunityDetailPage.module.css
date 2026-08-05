@@ -58,6 +58,8 @@
 }
 
 .avatar {
+  position: relative;
+  z-index: 1;
   margin-top: -43px;
   border: 5px solid #fff;
 }
@@ -241,6 +243,163 @@
   margin-top: 5px;
 }
 
+.mutedText {
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.sectionHeading,
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sectionHeading {
+  padding: 2px 4px;
+}
+
+.sectionHeading h2,
+.panelHeader h2 {
+  font-size: 16px;
+}
+
+.sectionHeading p,
+.panelHeader p {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.contentPanel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 17px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panelBody {
+  padding: 19px;
+}
+
+.memberList {
+  display: grid;
+}
+
+.memberRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 19px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.memberRow:last-child {
+  border-bottom: 0;
+}
+
+.memberIdentity {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.memberIdentity strong {
+  font-size: 13px;
+}
+
+.memberIdentity span,
+.memberIdentity small {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 19px;
+  background: var(--color-surface-soft);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagination span {
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.aboutContent {
+  display: grid;
+  gap: 22px;
+  padding: 19px;
+}
+
+.aboutContent section {
+  display: grid;
+  gap: 10px;
+}
+
+.aboutContent h3 {
+  font-size: 13px;
+}
+
+.aboutContent section > p {
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.managerList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.managerRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px;
+  color: var(--color-text);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+}
+
+.managerRow > span {
+  display: grid;
+  min-width: 0;
+}
+
+.managerRow strong,
+.managerRow small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.managerRow strong {
+  font-size: 12px;
+}
+
+.managerRow small {
+  color: var(--color-muted);
+  font-size: 10px;
+}
+
+.modalActions {
+  display: grid;
+  gap: 10px;
+}
 @media (max-width: 600px) {
   .header {
     grid-template-columns: auto 1fr;

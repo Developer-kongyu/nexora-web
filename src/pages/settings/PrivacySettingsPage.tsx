@@ -1,7 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Eye, MessageCircle, Repeat2, Search, Shield, UserRound } from 'lucide-react';
 import { useState } from 'react';
-import { permissionsApi, type PermissionPolicy } from '@/domains/permissions';
+import { permissionKeys, permissionsApi, type PermissionPolicy } from '@/domains/permissions';
+import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { Button, Card, Modal, Select, Switch, useToast } from '@/shared/ui';
 import { SettingsPage } from '../_shared/SettingsPage';
 import styles from './SettingsPages.module.css';
@@ -32,7 +33,12 @@ const mentionLabels: Record<PermissionPolicy['allowMentions'], string> = {
 };
 
 export function PrivacySettingsPage() {
-  const [policy, setPolicy] = useState(initialPolicy);
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: permissionKeys.currentPolicy,
+    queryFn: permissionsApi.get,
+  });
+  const [policy, setPolicy] = useSynchronizedState(query.data, query.data ?? initialPolicy);
   const [previewOpen, setPreviewOpen] = useState(false);
   const { showToast } = useToast();
 
@@ -49,7 +55,8 @@ export function PrivacySettingsPage() {
 
   const saveMutation = useMutation({
     mutationFn: () => permissionsApi.update(policy),
-    onSuccess: () => {
+    onSuccess: (savedPolicy) => {
+      queryClient.setQueryData(permissionKeys.currentPolicy, savedPolicy);
       setPreviewOpen(false);
       showToast({ tone: 'success', title: '隐私设置已保存' });
     },

@@ -1,14 +1,27 @@
 import { create } from 'zustand';
 import type { UserSummary } from '@/domains/users/model/types';
 import { authSession } from '@/shared/api/authSession';
-import type { AuthStatus } from './types';
+import type { AuthOnboardingStatus, AuthStatus } from './types';
 
 interface AuthState {
   status: AuthStatus;
   user: UserSummary | null;
   onboardingCompleted: boolean;
-  setSession: (token: string, user: UserSummary, onboardingCompleted: boolean) => void;
-  setRefreshedSession: (token: string, user: UserSummary, onboardingCompleted: boolean) => void;
+  onboardingStatus: AuthOnboardingStatus | null;
+  setSession: (
+    token: string,
+    user: UserSummary,
+    onboardingCompleted: boolean,
+    csrfToken?: string,
+    onboardingStatus?: AuthOnboardingStatus,
+  ) => void;
+  setRefreshedSession: (
+    token: string,
+    user: UserSummary,
+    onboardingCompleted: boolean,
+    csrfToken?: string,
+    onboardingStatus?: AuthOnboardingStatus,
+  ) => void;
   updateUser: (patch: Partial<UserSummary>) => void;
   setAnonymous: () => void;
   setBootstrapping: () => void;
@@ -18,6 +31,7 @@ interface AuthenticatedState {
   status: 'authenticated';
   user: UserSummary;
   onboardingCompleted: boolean;
+  onboardingStatus: AuthOnboardingStatus | null;
 }
 
 function commitSession(
@@ -26,27 +40,44 @@ function commitSession(
   user: UserSummary,
   onboardingCompleted: boolean,
   invalidateInFlightRefresh: boolean,
+  csrfToken?: string,
+  onboardingStatus: AuthOnboardingStatus | null = null,
 ): void {
   if (invalidateInFlightRefresh) authSession.invalidateRefresh();
   authSession.setAccessToken(token);
-  setState({ status: 'authenticated', user, onboardingCompleted });
+  if (csrfToken) authSession.setCsrfToken(csrfToken);
+  setState({ status: 'authenticated', user, onboardingCompleted, onboardingStatus });
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   status: 'bootstrapping',
   user: null,
   onboardingCompleted: false,
-  setSession: (token, user, onboardingCompleted) => {
-    commitSession(set, token, user, onboardingCompleted, true);
+  onboardingStatus: null,
+  setSession: (token, user, onboardingCompleted, csrfToken, onboardingStatus) => {
+    commitSession(set, token, user, onboardingCompleted, true, csrfToken, onboardingStatus ?? null);
   },
-  setRefreshedSession: (token, user, onboardingCompleted) => {
-    commitSession(set, token, user, onboardingCompleted, false);
+  setRefreshedSession: (token, user, onboardingCompleted, csrfToken, onboardingStatus) => {
+    commitSession(
+      set,
+      token,
+      user,
+      onboardingCompleted,
+      false,
+      csrfToken,
+      onboardingStatus ?? null,
+    );
   },
   updateUser: (patch) =>
     set((state) => ({ user: state.user ? { ...state.user, ...patch } : null })),
   setAnonymous: () => {
     authSession.clear();
-    set({ status: 'anonymous', user: null, onboardingCompleted: false });
+    set({
+      status: 'anonymous',
+      user: null,
+      onboardingCompleted: false,
+      onboardingStatus: null,
+    });
   },
   setBootstrapping: () => set({ status: 'bootstrapping' }),
 }));

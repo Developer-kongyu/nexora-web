@@ -1,5 +1,9 @@
 import { ArrowLeft } from 'lucide-react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { onboardingApi, useAuthStore } from '@/domains/auth';
+import { APP_BRAND } from '@/shared/config/brand';
+import { BrandMark, useToast } from '@/shared/ui';
 import styles from './OnboardingLayout.module.css';
 
 const ONBOARDING_STEPS = [
@@ -10,20 +14,40 @@ const ONBOARDING_STEPS = [
 
 export function OnboardingLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [skipping, setSkipping] = useState(false);
+  const { showToast } = useToast();
   const currentStepIndex = Math.max(
     0,
     ONBOARDING_STEPS.findIndex((step) => location.pathname === step.path),
   );
   const currentStepNumber = currentStepIndex + 1;
 
+  const skipOnboarding = async () => {
+    if (skipping) return;
+    setSkipping(true);
+    try {
+      const result = await onboardingApi.skip();
+      useAuthStore.setState({
+        onboardingCompleted: true,
+        onboardingStatus: result.onboardingStatus,
+      });
+      void navigate('/home', { replace: true });
+    } catch {
+      showToast({ tone: 'error', title: '暂时无法退出引导，请稍后重试' });
+    } finally {
+      setSkipping(false);
+    }
+  };
+
   return (
     <main className={styles.page}>
       <section className={styles.shell}>
         <header>
           <Link className={styles.brand} to="/home">
-            <span>L</span>
+            <BrandMark className={styles.logo} />
             <div>
-              <strong>LCT Circle</strong>
+              <strong>{APP_BRAND.name}</strong>
               <small>个性化欢迎引导</small>
             </div>
           </Link>
@@ -33,10 +57,15 @@ export function OnboardingLayout() {
               第 {currentStepNumber} / {ONBOARDING_STEPS.length} 步
             </span>
           </div>
-          <Link className={styles.exit} to="/home">
+          <button
+            type="button"
+            className={styles.exit}
+            disabled={skipping}
+            onClick={() => void skipOnboarding()}
+          >
             <ArrowLeft size={16} />
-            稍后完成
-          </Link>
+            {skipping ? '正在退出…' : '稍后完成'}
+          </button>
         </header>
 
         <div

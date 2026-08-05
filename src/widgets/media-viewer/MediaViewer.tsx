@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight, Download, Expand, Pause, Play, Volume2, X } 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { PostViewModel } from '@/domains/posts';
 import { Avatar, IconButton, useToast } from '@/shared/ui';
+import { PostRichText } from '@/widgets/post-card/PostRichText';
 import styles from './MediaViewer.module.css';
 
 interface MediaViewerProps {
@@ -242,12 +243,7 @@ export function MediaViewer({ post, initialIndex = 0, onClose }: MediaViewerProp
                 <small>@{post.author.handle}</small>
               </span>
             </div>
-            <p>{post.content}</p>
-            <div className={styles.tags}>
-              {post.tags.map((tag) => (
-                <span key={tag}>#{tag}</span>
-              ))}
-            </div>
+            <PostRichText text={post.content} />
           </section>
         </aside>
       </div>

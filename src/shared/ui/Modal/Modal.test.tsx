@@ -1,6 +1,22 @@
+import { useState } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { Modal } from './Modal';
+
+function TypingModal() {
+  const [value, setValue] = useState('');
+
+  return (
+    <Modal open title="Create collection" onClose={() => undefined}>
+      <input
+        aria-label="Collection name"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+      />
+    </Modal>
+  );
+}
 
 describe('Modal', () => {
   it('focuses the close control, handles Escape, and restores the previous focus', () => {
@@ -35,5 +51,17 @@ describe('Modal', () => {
       </>,
     );
     expect(screen.getByRole('button', { name: '打开弹窗' })).toHaveFocus();
+  });
+
+  it('keeps focus in a controlled input when an inline onClose changes identity', async () => {
+    const user = userEvent.setup();
+    render(<TypingModal />);
+    const input = screen.getByRole('textbox', { name: 'Collection name' });
+
+    await user.click(input);
+    await user.type(input, 'collection');
+
+    expect(input).toHaveValue('collection');
+    expect(input).toHaveFocus();
   });
 });

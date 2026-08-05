@@ -16,6 +16,8 @@ import type {
   MoveBookmarkCollectionItemsInput,
   MoveBookmarkCollectionItemsResult,
   PostBrowseHistoryPageView,
+  RecordPostBrowseHistoryInput,
+  RecordPostBrowseHistoryResult,
   RemoveBookmarkCollectionItemsInput,
   RemoveBookmarkCollectionItemsResult,
   RemovePostBookmarkResult,
@@ -118,6 +120,13 @@ export const libraryApi = {
     apiClient.request<ContentCenterDeletedPageView>({
       path: `/api/me/content-center/deleted${buildCursorQuery(params)}`,
       signal,
+    }),
+
+  recordHistory: (input: RecordPostBrowseHistoryInput) =>
+    apiClient.request<RecordPostBrowseHistoryResult, RecordPostBrowseHistoryInput>({
+      path: '/api/me/history/posts',
+      method: 'POST',
+      body: input,
     }),
 
   history: (params: CursorRequest = {}, signal?: AbortSignal) =>

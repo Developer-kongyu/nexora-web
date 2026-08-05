@@ -278,9 +278,22 @@ describe('libraryApi B07 contract', () => {
     ]);
   });
 
-  it('uses the formal history list, single-delete, and clear routes', async () => {
+  it('uses the formal history record, list, single-delete, and clear routes', async () => {
     const calls: Array<{ method: string; url: string }> = [];
+    let recordBody: unknown = null;
     server.use(
+      http.post('/api/me/history/posts', async ({ request }) => {
+        calls.push({ method: request.method, url: request.url });
+        recordBody = await request.json();
+        return apiSuccessResponse({
+          recorded: true,
+          deduped: false,
+          lastViewedAtTouched: true,
+          viewCountIncremented: true,
+          lastViewedAtIso: '2026-08-05T00:00:00.000Z',
+          viewCount: 1,
+        });
+      }),
       http.get('/api/me/history/posts', ({ request }) => {
         calls.push({ method: request.method, url: request.url });
         return apiSuccessResponse({ list: [], nextCursor: null });
@@ -295,9 +308,20 @@ describe('libraryApi B07 contract', () => {
       }),
     );
 
+    await libraryApi.recordHistory({
+      postId: 'post-history-1',
+      sourceScene: 'POST_DETAIL',
+      sourceModule: 'POST',
+    });
     await libraryApi.history({ cursor: 'history / cursor', limit: 15 });
     await libraryApi.deleteHistoryItem('post / 1');
     await libraryApi.clearHistory();
+
+    expect(recordBody).toEqual({
+      postId: 'post-history-1',
+      sourceScene: 'POST_DETAIL',
+      sourceModule: 'POST',
+    });
 
     expect(
       calls.map(({ method, url }) => {
@@ -309,6 +333,11 @@ describe('libraryApi B07 contract', () => {
         };
       }),
     ).toEqual([
+      {
+        method: 'POST',
+        pathname: '/api/me/history/posts',
+        query: {},
+      },
       {
         method: 'GET',
         pathname: '/api/me/history/posts',

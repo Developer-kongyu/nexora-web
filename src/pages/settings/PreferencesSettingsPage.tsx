@@ -1,16 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, Globe2, MapPin, Plus, Search, Sparkles } from 'lucide-react';
-import { RECOMMENDATION_INTEREST_OPTIONS, settingsApi, settingsKeys } from '@/domains/settings';
+import { settingsApi, settingsKeys } from '@/domains/settings';
 import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { cn } from '@/shared/lib/cn';
 import { toggleArrayValue } from '@/shared/lib/set';
 import { Button, Card, Select, Switch, useToast } from '@/shared/ui';
 import { SettingsPage } from '../_shared/SettingsPage';
+
 import styles from './SettingsPages.module.css';
 
-function retainSupportedInterests(interests: readonly string[] | undefined): string[] {
+function retainSupportedInterests(
+  interests: readonly string[] | undefined,
+  supportedCodes: readonly string[],
+): string[] {
   if (!interests) return [];
-  const supported = new Set<string>(RECOMMENDATION_INTEREST_OPTIONS);
+  const supported = new Set(supportedCodes);
   return interests.filter((interest) => supported.has(interest));
 }
 
@@ -20,9 +24,20 @@ export function PreferencesSettingsPage() {
     queryKey: settingsKeys.interests,
     queryFn: settingsApi.interests,
   });
+  const catalogQuery = useQuery({
+    queryKey: settingsKeys.interestCatalog,
+    queryFn: settingsApi.interestCatalog,
+    staleTime: 5 * 60 * 1000,
+  });
+  const enabledTags = catalogQuery.data?.items.filter((item) => item.enabled) ?? [];
+  const supportedCodes = enabledTags.map((item) => item.interestTagCode);
+  const selectionRevision =
+    query.data && catalogQuery.data
+      ? `${catalogQuery.data.dictionaryVersion}:${query.data.join(',')}`
+      : null;
   const [selected, setSelected] = useSynchronizedState(
-    query.data,
-    retainSupportedInterests(query.data),
+    selectionRevision,
+    retainSupportedInterests(query.data, supportedCodes),
   );
   const { showToast } = useToast();
   const mutation = useMutation({
@@ -54,21 +69,22 @@ export function PreferencesSettingsPage() {
             <span className={styles.headerBadge}>{selected.length} 个已选择</span>
           </header>
           <div className={styles.interests}>
-            {RECOMMENDATION_INTEREST_OPTIONS.map((interest) => {
-              const active = selected.includes(interest);
+            {enabledTags.map((interest) => {
+              const active = selected.includes(interest.interestTagCode);
               return (
                 <button
                   type="button"
-                  key={interest}
+                  key={interest.interestTagCode}
                   className={cn(active && styles.interestActive)}
                   aria-pressed={active}
-                  onClick={() => toggleInterest(interest)}
+                  onClick={() => toggleInterest(interest.interestTagCode)}
                 >
-                  {active ? <Check size={14} /> : <Plus size={14} />} {interest}
+                  {active ? <Check size={14} /> : <Plus size={14} />} {interest.displayName}
                 </button>
               );
             })}
           </div>
+          {catalogQuery.isError ? <p role="alert">兴趣标签字典加载失败，请稍后重试。</p> : null}
           <p className={styles.hint}>至少保留 3 个兴趣，以获得更稳定的推荐结果。</p>
         </Card>
 
@@ -144,7 +160,13 @@ export function PreferencesSettingsPage() {
           </span>
           <Button
             loading={mutation.isPending}
-            disabled={query.isLoading || query.isError || selected.length < 3}
+            disabled={
+              query.isLoading ||
+              query.isError ||
+              catalogQuery.isLoading ||
+              catalogQuery.isError ||
+              selected.length < 3
+            }
             onClick={() => mutation.mutate()}
           >
             保存偏好

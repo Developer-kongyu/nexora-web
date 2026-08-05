@@ -2,7 +2,6 @@ import {
   BookOpen,
   ChevronRight,
   ClipboardList,
-  FileText,
   LayoutDashboard,
   Pin,
   Settings,
@@ -10,7 +9,7 @@ import {
   UsersRound,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
-import type { CommunityDetailView } from '@/domains/communities';
+import { COMMUNITY_MEMBER_ROLE_LABELS, type CommunityDetailView } from '@/domains/communities';
 import { Avatar, Badge } from '@/shared/ui';
 import type { CommunityManageSection } from './communityManage.model';
 import styles from './CommunityManagePage.module.css';
@@ -25,7 +24,6 @@ const navigation: NavItem[] = [
   { id: 'overview', label: '概览', icon: LayoutDashboard },
   { id: 'requests', label: '加入申请', icon: UserCheck },
   { id: 'members', label: '成员与角色', icon: UsersRound },
-  { id: 'content', label: '内容管理', icon: FileText },
   { id: 'pinned', label: '置顶与公告', icon: Pin },
   { id: 'rules', label: '社群规则', icon: BookOpen },
   { id: 'logs', label: '操作日志', icon: ClipboardList },
@@ -35,6 +33,7 @@ const navigation: NavItem[] = [
 interface CommunityManageSidebarProps {
   detail: CommunityDetailView;
   active: CommunityManageSection;
+  availableSections: readonly CommunityManageSection[];
   pendingRequestCount: number;
   onSelect: (section: CommunityManageSection) => void;
 }
@@ -42,10 +41,12 @@ interface CommunityManageSidebarProps {
 export function CommunityManageSidebar({
   detail,
   active,
+  availableSections,
   pendingRequestCount,
   onSelect,
 }: CommunityManageSidebarProps) {
   const community = detail.community;
+  const visibleNavigation = navigation.filter((item) => availableSections.includes(item.id));
 
   return (
     <aside className={styles.sidebar}>
@@ -58,11 +59,16 @@ export function CommunityManageSidebar({
         />
         <div>
           <strong>{community.name}</strong>
-          <span>管理员工作区</span>
+          <span>
+            {detail.viewerContext?.actorRole === 'VISITOR'
+              ? '访客'
+              : COMMUNITY_MEMBER_ROLE_LABELS[detail.viewerContext?.actorRole ?? 'MEMBER']}{' '}
+            · 管理工作区
+          </span>
         </div>
       </div>
       <nav aria-label="社群管理导航">
-        {navigation.map((item) => {
+        {visibleNavigation.map((item) => {
           const Icon = item.icon;
           const badge = item.id === 'requests' ? pendingRequestCount : 0;
           return (

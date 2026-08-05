@@ -1,49 +1,49 @@
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { onboardingApi, onboardingKeys, useAuthStore } from '@/domains/auth';
 import { OnboardingSelection, type OnboardingOption } from './OnboardingSelection';
 
-const COMMUNITY_OPTIONS = [
-  {
-    id: 'ai-product',
-    title: 'AI 产品讨论组',
-    description: '工作流、提示词与真实案例',
-    meta: '12.8k 成员 · 今日 86 条讨论',
-    tone: 'purple',
-    initials: 'AI',
-  },
-  {
-    id: 'pm-lab',
-    title: '产品经理交流圈',
-    description: '需求、增长与路线图',
-    meta: '8.7k 成员 · 每周精选复盘',
-    tone: 'cyan',
-    initials: '产',
-  },
-  {
-    id: 'urban-photo',
-    title: '城市摄影散步',
-    description: '街区、建筑与日常光线',
-    meta: '4.6k 成员 · 周末线下活动',
-    tone: 'green',
-    initials: '摄',
-  },
-  {
-    id: 'frontend',
-    title: '前端工程实践',
-    description: '性能、架构与开发体验',
-    meta: '6.1k 成员 · 高质量技术讨论',
-    tone: 'pink',
-    initials: '前',
-  },
-] satisfies OnboardingOption[];
-
 export function CommunitiesPage() {
+  const query = useQuery({
+    queryKey: onboardingKeys.recommendedCommunities,
+    queryFn: onboardingApi.recommendedCommunities,
+  });
+  const options = useMemo<OnboardingOption[]>(
+    () =>
+      query.data?.list.map(({ card, membership }) => ({
+        id: card.communityId,
+        title: card.displayName,
+        description: card.description ?? `/${card.slug}`,
+        meta: `${card.memberCount.toLocaleString()} 位成员${membership.joined ? ' · 已加入' : membership.pending ? ' · 审核中' : ''}`,
+        tone: 'purple',
+        initials: card.displayName.slice(0, 2),
+      })) ?? [],
+    [query.data],
+  );
+
+  const submit = async (selected: string[]) => {
+    if (!query.data) throw new Error('推荐结果尚未加载');
+    if (query.data.submittable) {
+      const result = await onboardingApi.submitCommunities(query.data, selected);
+      if (result.retryRequired) throw new Error('部分入群操作失败，请重试后再继续');
+    }
+    await onboardingApi.complete();
+    useAuthStore.setState({ onboardingCompleted: true, onboardingStatus: 'COMPLETED' });
+  };
+
   return (
     <OnboardingSelection
+      key={query.data?.snapshotVersion ?? 'loading'}
       kind="community"
-      title="加入推荐社群"
-      description="选择适合长期交流的空间，随时可以退出。"
-      options={COMMUNITY_OPTIONS}
+      title="加入推荐社区"
+      description="候选社区与成员状态来自后端当前推荐快照。"
+      options={options}
       nextPath="/home"
       final
+      loading={query.isLoading}
+      error={query.error?.message ?? null}
+      onSubmit={submit}
+      onSkip={() => submit([])}
     />
   );
 }

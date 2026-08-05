@@ -4,8 +4,9 @@ import type { CommunitySummary } from '@/domains/communities';
 import { useFeed, type FeedTab } from '@/domains/feed';
 import type { UserSummary } from '@/domains/users';
 import { mergeCursorItems } from '@/shared/api/pagination';
+import { APP_BRAND } from '@/shared/config/brand';
 import { paths } from '@/shared/config/paths';
-import { Button } from '@/shared/ui';
+import { Button, useToast } from '@/shared/ui';
 import { CommunityCard } from '@/widgets/community-card/CommunityCard';
 import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
 import { PostCard } from '@/widgets/post-card/PostCard';
@@ -58,9 +59,21 @@ const TRENDING_TOPICS = [
 
 export function HomePage() {
   const [params] = useSearchParams();
+  const { showToast } = useToast();
   const tab: FeedTab = params.get('tab') === 'for-you' ? 'for-you' : 'following';
   const feed = useFeed(tab);
   const posts = feed.data ? mergeCursorItems(feed.data.pages) : [];
+
+  const handleRefresh = () => {
+    if (feed.isRefreshing) return;
+    void feed.refresh().catch(() => {
+      showToast({
+        tone: 'error',
+        title: '刷新失败',
+        description: '当前内容已为你保留，请稍后重试。',
+      });
+    });
+  };
 
   const aside = (
     <>
@@ -114,7 +127,7 @@ export function HomePage() {
         }}
       >
         关于 · 帮助 · 隐私 · 服务条款
-        <br />© 2026 LCT Circle
+        <br />© 2026 {APP_BRAND.name}
       </p>
     </>
   );
@@ -146,9 +159,18 @@ export function HomePage() {
 
         <Notice
           action={
-            <button type="button" onClick={() => void feed.refetch()}>
-              <RefreshCw size={13} />
-              刷新
+            <button
+              type="button"
+              aria-busy={feed.isRefreshing}
+              disabled={feed.isRefreshing}
+              onClick={handleRefresh}
+            >
+              <RefreshCw
+                aria-hidden="true"
+                className={feed.isRefreshing ? styles.refreshIconSpinning : undefined}
+                size={13}
+              />
+              {feed.isRefreshing ? '刷新中' : '刷新'}
             </button>
           }
         >

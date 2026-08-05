@@ -16,9 +16,10 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore, useLogout } from '@/domains/auth';
 import { useUnreadSummary } from '@/domains/notifications';
 import { getCurrentUserPresentation } from '@/domains/users';
+import { APP_BRAND } from '@/shared/config/brand';
 import { paths } from '@/shared/config/paths';
 import { cn } from '@/shared/lib/cn';
-import { Avatar, Badge, Button } from '@/shared/ui';
+import { Avatar, Badge, BrandMark, Button } from '@/shared/ui';
 import styles from './Sidebar.module.css';
 
 type NavigationTarget = string | ((profilePath: string) => string);
@@ -103,11 +104,11 @@ function formatUnreadCount(count: number): number | string | undefined {
 
 function Logo() {
   return (
-    <NavLink className={styles.brand} to={paths.home} aria-label="LCT Circle 首页">
-      <span className={styles.logoMark}>L</span>
+    <NavLink className={styles.brand} to={paths.home} aria-label={`${APP_BRAND.name} 首页`}>
+      <BrandMark className={styles.logoMark} />
       <span>
-        <strong>LCT Circle</strong>
-        <small>发现同频的人</small>
+        <strong>{APP_BRAND.name}</strong>
+        <small>{APP_BRAND.tagline}</small>
       </span>
     </NavLink>
   );

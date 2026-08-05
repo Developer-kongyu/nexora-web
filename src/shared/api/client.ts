@@ -42,6 +42,10 @@ async function parseResponse<T>(response: Response): Promise<T> {
   }
   const payload = (await response.json()) as Partial<ApiEnvelope<T>> & {
     fieldErrors?: Record<string, string[]>;
+    retryable?: boolean;
+    details?: {
+      fieldErrors?: Record<string, string[]>;
+    };
   };
   if (!response.ok) {
     throw new ApiError({
@@ -49,7 +53,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
       code: payload.code || 'API_ERROR',
       message: payload.message || '请求失败',
       requestId: response.headers.get('x-request-id') || undefined,
-      fieldErrors: payload.fieldErrors,
+      fieldErrors: payload.details?.fieldErrors ?? payload.fieldErrors,
       retryAfterSeconds: Number(response.headers.get('retry-after')) || undefined,
     });
   }
@@ -73,6 +77,11 @@ async function requestInternal<TResponse, TBody>(
   if (options.body !== undefined && !(options.body instanceof FormData))
     headers.set('content-type', 'application/json');
   if (options.auth !== false && token) headers.set('authorization', `Bearer ${token}`);
+  const method = options.method ?? 'GET';
+  const csrfToken = authSession.getCsrfToken();
+  if (method !== 'GET' && csrfToken && !headers.has('x-csrf-token')) {
+    headers.set('x-csrf-token', csrfToken);
+  }
   if (options.idempotencyKey) headers.set('idempotency-key', options.idempotencyKey);
   const abortListener = () => controller.abort(toError(options.signal?.reason, '请求已取消'));
   if (options.signal?.aborted) {
@@ -86,7 +95,7 @@ async function requestInternal<TResponse, TBody>(
       throw toError(controller.signal.reason, '请求已取消或超时');
     }
     const response = await fetch(joinUrl(env.VITE_API_BASE_URL, options.path), {
-      method: options.method ?? 'GET',
+      method,
       credentials: 'include',
       headers,
       body:

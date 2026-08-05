@@ -187,7 +187,7 @@ export function NotificationsPage() {
 
     try {
       const target = await notificationsApi.resolveTarget(item.notificationId);
-      if (target.available && target.actionUrl) {
+      if (target.targetState === 'ALLOW' && target.actionUrl) {
         openActionUrl(target.actionUrl, navigate);
         return;
       }

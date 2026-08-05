@@ -31,7 +31,7 @@ import {
   type BookmarkCollectionVisibility,
   type ListOwnBookmarkCollectionsResult,
 } from '@/domains/library';
-import { postCardBriefToViewModel } from '@/domains/posts/lib/postCardAdapter';
+import { hydratePostCardBrief, type PostViewModel } from '@/domains/posts';
 import { mergeInfiniteDataItemsBy, removeInfiniteDataItemsByKey } from '@/shared/api/infiniteData';
 import { paths } from '@/shared/config/paths';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
@@ -44,6 +44,33 @@ import { EmptyPanel, LoadingRows } from '../_shared/PageParts';
 import styles from './BookmarksPage.module.css';
 
 const PAGE_SIZE = 20;
+
+type BookmarkCollectionItem = BookmarkCollectionItemsPage['list'][number];
+type ActiveBookmarkCollectionItem = Extract<BookmarkCollectionItem, { itemState: 'ACTIVE' }>;
+type HydratedBookmarkCollectionItem =
+  | (ActiveBookmarkCollectionItem & { postView: PostViewModel })
+  | Extract<BookmarkCollectionItem, { itemState: 'PLACEHOLDER' }>;
+type HydratedBookmarkCollectionItemsPage = Omit<BookmarkCollectionItemsPage, 'list'> & {
+  list: HydratedBookmarkCollectionItem[];
+};
+
+async function hydrateBookmarkCollectionPage(
+  page: BookmarkCollectionItemsPage,
+  signal?: AbortSignal,
+): Promise<HydratedBookmarkCollectionItemsPage> {
+  return {
+    ...page,
+    list: await Promise.all(
+      page.list.map(async (item): Promise<HydratedBookmarkCollectionItem> => {
+        if (item.itemState === 'PLACEHOLDER') return item;
+        return {
+          ...item,
+          postView: await hydratePostCardBrief(item.postCard, 'bookmark', signal),
+        };
+      }),
+    ),
+  };
+}
 
 interface CollectionUiState {
   folderOpen: boolean;
@@ -132,13 +159,14 @@ export function BookmarksPage() {
 
   const items = useInfiniteQuery({
     queryKey: libraryKeys.bookmarkCollectionItems(currentCollectionId),
-    queryFn: ({ pageParam, signal }) => {
+    queryFn: async ({ pageParam, signal }) => {
       const collectionId = requireCollectionId(currentCollectionId);
-      return libraryApi.collectionItems(
+      const page = await libraryApi.collectionItems(
         collectionId,
         { cursor: pageParam, limit: PAGE_SIZE },
         signal,
       );
+      return hydrateBookmarkCollectionPage(page, signal);
     },
     enabled: Boolean(currentCollectionId),
     initialPageParam: undefined as string | undefined,
@@ -261,7 +289,7 @@ export function BookmarksPage() {
     },
     onSuccess: (result) => {
       const moved = new Set(result.movedItemIds);
-      queryClient.setQueryData<InfiniteData<BookmarkCollectionItemsPage>>(
+      queryClient.setQueryData<InfiniteData<HydratedBookmarkCollectionItemsPage>>(
         libraryKeys.bookmarkCollectionItems(currentCollectionId),
         (data) => removeInfiniteDataItemsByKey(data, moved, (item) => item.bookmarkItemId),
       );
@@ -291,7 +319,7 @@ export function BookmarksPage() {
     mutationFn: (itemIds: string[]) => libraryApi.removeCollectionItems({ itemIds }),
     onSuccess: (result) => {
       const removed = new Set(result.removedItemIds);
-      queryClient.setQueryData<InfiniteData<BookmarkCollectionItemsPage>>(
+      queryClient.setQueryData<InfiniteData<HydratedBookmarkCollectionItemsPage>>(
         libraryKeys.bookmarkCollectionItems(currentCollectionId),
         (data) => removeInfiniteDataItemsByKey(data, removed, (item) => item.bookmarkItemId),
       );
@@ -502,7 +530,7 @@ export function BookmarksPage() {
                     </label>
                   ) : null}
                   {item.itemState === 'ACTIVE' ? (
-                    <PostCard post={postCardBriefToViewModel(item.postCard, 'bookmark')} />
+                    <PostCard post={item.postView} />
                   ) : (
                     <Card className={styles.placeholderCard}>
                       <span>

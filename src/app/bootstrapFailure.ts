@@ -1,3 +1,5 @@
+import { APP_BRAND } from '@/shared/config/brand';
+
 export interface BootstrapFailureOptions {
   onRetry: () => void;
 }
@@ -16,7 +18,7 @@ export function renderBootstrapFailure(
   card.setAttribute('aria-describedby', 'app-bootstrap-failure-description');
 
   const eyebrow = ownerDocument.createElement('span');
-  eyebrow.textContent = 'LCT CIRCLE · STARTUP ERROR';
+  eyebrow.textContent = `${APP_BRAND.name.toUpperCase()} · STARTUP ERROR`;
 
   const title = ownerDocument.createElement('h1');
   title.id = 'app-bootstrap-failure-title';

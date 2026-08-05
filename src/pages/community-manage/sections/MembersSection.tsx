@@ -39,7 +39,16 @@ interface ChangeRoleVariables {
   nextRole: CommunityAssignableMemberRole;
 }
 
-export function MembersSection({ communityId }: CommunityManageSectionProps) {
+interface MembersSectionProps extends CommunityManageSectionProps {
+  canChangeMemberRoles: boolean;
+  canRemoveMembers: boolean;
+}
+
+export function MembersSection({
+  communityId,
+  canChangeMemberRoles,
+  canRemoveMembers,
+}: MembersSectionProps) {
   const currentUserId = useAuthStore((state) => state.user?.id ?? null);
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -192,7 +201,12 @@ export function MembersSection({ communityId }: CommunityManageSectionProps) {
                       aria-label={`${card.displayName} 的角色`}
                       label="调整角色"
                       value={member.role}
-                      disabled={immutable || changeRole.isPending || removeMember.isPending}
+                      disabled={
+                        immutable ||
+                        !canChangeMemberRoles ||
+                        changeRole.isPending ||
+                        removeMember.isPending
+                      }
                       onChange={(event) =>
                         changeRole.mutate({
                           member,
@@ -207,7 +221,9 @@ export function MembersSection({ communityId }: CommunityManageSectionProps) {
                     size="sm"
                     label={`将 ${card.displayName} 移出社群`}
                     icon={<Trash2 size={15} />}
-                    disabled={immutable || isChanging || removeMember.isPending}
+                    disabled={
+                      immutable || !canRemoveMembers || isChanging || removeMember.isPending
+                    }
                     onClick={() => {
                       setRemoving(member);
                       setRemoveReason('');

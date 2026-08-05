@@ -173,11 +173,35 @@
 }
 
 .infoBanner button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--color-primary);
   font-size: 12px;
   font-weight: 800;
   background: transparent;
   cursor: pointer;
+}
+
+.infoBanner button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.refreshIconSpinning {
+  animation: refresh-spin 0.75s linear infinite;
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refreshIconSpinning {
+    animation: none;
+  }
 }
 
 .successBanner {

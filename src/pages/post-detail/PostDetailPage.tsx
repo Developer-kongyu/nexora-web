@@ -1,9 +1,10 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, MessageCircle, Send, ShieldCheck, Smile, Trash2 } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/domains/auth';
 import { engagementApi } from '@/domains/engagement';
+import { libraryApi, libraryKeys } from '@/domains/library';
 import {
   createTextEngagementInput,
   postKeys,
@@ -12,6 +13,7 @@ import {
 } from '@/domains/posts';
 import { usePost } from '@/domains/posts/hooks/usePost';
 import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
+import { paths } from '@/shared/config/paths';
 import { formatRelativeTime } from '@/shared/lib/format';
 import { Avatar, Button, Card, IconButton, useToast } from '@/shared/ui';
 import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
@@ -35,14 +37,39 @@ interface CommentLikeState {
   likeCount: number;
 }
 
+interface ReplyContextPlaceholderProps {
+  label: string;
+  title: string;
+  description: string;
+}
+
+function ReplyContextPlaceholder({ label, title, description }: ReplyContextPlaceholderProps) {
+  return (
+    <div className={styles.threadItem}>
+      <span className={styles.contextLabel}>{label}</span>
+      <Card className={styles.contextPlaceholder}>
+        <span className={styles.contextPlaceholderIcon}>
+          <MessageCircle size={20} />
+        </span>
+        <div>
+          <strong>{title}</strong>
+          <p>{description}</p>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 interface CommentRowProps {
   item: ReplyPostListItemView;
   rootPostId: string;
+  parentName?: string;
   onReply: (target: ReplyTarget) => void;
 }
 
-function CommentRow({ item, rootPostId, onReply }: CommentRowProps) {
+export function CommentRow({ item, rootPostId, parentName, onReply }: CommentRowProps) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const currentUser = useAuthStore((state) => state.user);
   const { showToast } = useToast();
   const card = item.postCard;
@@ -57,6 +84,44 @@ function CommentRow({ item, rootPostId, onReply }: CommentRowProps) {
     liked: initialLiked,
     likeCount: initialLikeCount,
   });
+  const [repliesExpanded, setRepliesExpanded] = useState(false);
+  const childReplies = useQuery({
+    queryKey: postKeys.commentReplies(rootPostId, item.relation.commentId),
+    queryFn: ({ signal }) =>
+      postsApi.listCommentReplies(rootPostId, item.relation.commentId, { limit: 50 }, signal),
+    enabled: item.relation.status === 'ACTIVE' && card !== null,
+  });
+  const childReplyItems = childReplies.data?.list ?? [];
+  const replyCount = childReplyItems.length;
+  const replyCountLabel = childReplies.data?.nextCursor
+    ? `${replyCount}+ 条回复`
+    : `${replyCount} 条回复`;
+  const toggleReplies = () => {
+    if (replyCount > 0) setRepliesExpanded((current) => !current);
+  };
+  const openCommentDetail = () => {
+    if (!card) return;
+    const searchParams = new URLSearchParams({
+      rootPostId,
+      commentId: item.relation.commentId,
+    });
+    void navigate(`${paths.post(card.postId)}?${searchParams.toString()}`);
+  };
+  const handleCommentClick = (event: MouseEvent<HTMLElement>) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    const target = event.target;
+    if (target instanceof Element && target.closest('button, a')) return;
+    openCommentDetail();
+  };
 
   const likeMutation = useMutation({
     mutationFn: (nextLiked: boolean) => {
@@ -111,73 +176,148 @@ function CommentRow({ item, rootPostId, onReply }: CommentRowProps) {
   const name = author?.displayName ?? '资料暂不可用';
   const handle = author?.handle ? `@${author.handle}` : '用户资料占位';
   const ownComment = currentUser?.id === item.relation.authorUserId;
-  const replyCount = card.interactionSummary?.commentCount ?? 0;
 
   return (
-    <article className={styles.comment}>
-      <Avatar size="md" fallback={name.slice(0, 1)} alt={name} src={author?.avatarUrl} />
-      <div>
-        <header>
-          <strong>{name}</strong>
-          <span>
-            {handle} · {formatRelativeTime(item.relation.createdAtIso)}
-          </span>
-        </header>
-        <p>{card.bodyTextPreview || '该评论没有可展示的文本内容。'}</p>
-        <div className={styles.commentActions}>
-          <button
-            type="button"
-            onClick={() => onReply({ commentId: item.relation.commentId, name })}
-          >
-            回复
-          </button>
-          <button
-            type="button"
-            disabled={likeMutation.isPending}
-            aria-pressed={likeState.liked}
-            onClick={() => likeMutation.mutate(!likeState.liked)}
-          >
-            {likeState.liked ? '已赞' : '赞'} {likeState.likeCount}
-          </button>
-          {replyCount > 0 ? (
-            <span className={styles.replyCount} title="后端当前未公开楼中楼读取接口">
-              {replyCount} 条回复
+    <div className={styles.commentBranch}>
+      <article className={styles.comment} data-clickable="true" onClick={handleCommentClick}>
+        <Avatar size="md" fallback={name.slice(0, 1)} alt={name} src={author?.avatarUrl} />
+        <div>
+          <header>
+            <strong>{name}</strong>
+            <span>
+              {handle} · {formatRelativeTime(item.relation.createdAtIso)}
             </span>
+          </header>
+          {item.relation.parentCommentId && parentName ? (
+            <span className={styles.replyingTo}>回复 {parentName}</span>
           ) : null}
-          {ownComment ? (
+          <p>{card.bodyTextPreview || '该评论没有可展示的文本内容。'}</p>
+          <div className={styles.commentActions}>
             <button
               type="button"
-              className={styles.deleteAction}
-              disabled={deleteMutation.isPending}
-              onClick={() => deleteMutation.mutate()}
+              onClick={() => onReply({ commentId: item.relation.commentId, name })}
             >
-              <Trash2 size={12} /> 删除
+              回复
             </button>
-          ) : null}
+            <button type="button" onClick={openCommentDetail}>
+              查看详情
+            </button>
+            <button
+              type="button"
+              disabled={likeMutation.isPending}
+              aria-pressed={likeState.liked}
+              onClick={() => likeMutation.mutate(!likeState.liked)}
+            >
+              {likeState.liked ? '已赞' : '赞'} {likeState.likeCount}
+            </button>
+            {childReplies.isLoading ? (
+              <span className={styles.replyCount}>读取回复…</span>
+            ) : replyCount > 0 ? (
+              <button
+                type="button"
+                className={styles.replyCount}
+                aria-expanded={repliesExpanded}
+                onClick={toggleReplies}
+              >
+                {repliesExpanded ? '收起回复' : replyCountLabel}
+              </button>
+            ) : null}
+            {ownComment ? (
+              <button
+                type="button"
+                className={styles.deleteAction}
+                disabled={deleteMutation.isPending}
+                onClick={() => deleteMutation.mutate()}
+              >
+                <Trash2 size={12} /> 删除
+              </button>
+            ) : null}
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+      {repliesExpanded ? (
+        <div className={styles.childReplies}>
+          {childReplyItems.map((child) => (
+            <CommentRow
+              key={child.relation.commentId}
+              item={child}
+              rootPostId={rootPostId}
+              parentName={name}
+              onReply={onReply}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
 export function PostDetailPage() {
   const { postId = '' } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const threadRootPostId = searchParams.get('rootPostId') ?? '';
+  const threadParentCommentId = searchParams.get('commentId') ?? '';
   const queryClient = useQueryClient();
   const post = usePost(postId);
+  const replyRelation = post.data?.relation?.kind === 'REPLY' ? post.data.relation : null;
+  const isCommentDetail = Boolean(threadParentCommentId);
+  const repliesRootPostId = threadRootPostId || replyRelation?.rootPostId || postId;
+  const repliesQueryKey = isCommentDetail
+    ? postKeys.commentReplies(repliesRootPostId, threadParentCommentId)
+    : postKeys.replies(postId);
+
+  const parentPostId = replyRelation?.targetPostId ?? '';
+  const rootContextPostId = threadRootPostId || replyRelation?.rootPostId || parentPostId;
+  const parentPost = usePost(parentPostId);
+  const rootPost = usePost(
+    rootContextPostId && rootContextPostId !== parentPostId ? rootContextPostId : '',
+  );
+  const parentIsRoot = Boolean(parentPostId && parentPostId === rootContextPostId);
+  const hasSeparateRootContext = Boolean(rootContextPostId && rootContextPostId !== parentPostId);
   const currentUser = useAuthStore((state) => state.user);
   const { showToast } = useToast();
   const editorRef = useRef<HTMLTextAreaElement>(null);
+  const recordedHistoryKeyRef = useRef<string | null>(null);
   const [reply, setReply] = useState('');
   const [replyTo, setReplyTo] = useState<ReplyTarget | null>(null);
 
+  useEffect(() => {
+    if (!currentUser || !post.data) return;
+
+    const recordKey = `${currentUser.id}:${post.data.id}`;
+    if (recordedHistoryKeyRef.current === recordKey) return;
+    recordedHistoryKeyRef.current = recordKey;
+
+    const isCommunityPost = Boolean(post.data.community);
+    void libraryApi
+      .recordHistory({
+        postId: post.data.id,
+        sourceScene: isCommunityPost ? 'COMMUNITY_POST' : 'POST_DETAIL',
+        sourceModule: isCommunityPost ? 'COMMUNITY' : 'POST',
+      })
+      .then(() => queryClient.invalidateQueries({ queryKey: libraryKeys.history }))
+      .catch(() => {
+        if (recordedHistoryKeyRef.current === recordKey) {
+          recordedHistoryKeyRef.current = null;
+        }
+      });
+  }, [currentUser, post.data, queryClient]);
+
   const replies = useInfiniteQuery({
-    queryKey: postKeys.replies(postId),
+    queryKey: repliesQueryKey,
     queryFn: ({ pageParam, signal }) =>
-      postsApi.listReplies(postId, { cursor: pageParam, limit: 20 }, signal),
+      isCommentDetail
+        ? postsApi.listCommentReplies(
+            repliesRootPostId,
+            threadParentCommentId,
+            { cursor: pageParam, limit: 20 },
+            signal,
+          )
+        : postsApi.listReplies(postId, { cursor: pageParam, limit: 20 }, signal),
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    enabled: Boolean(postId),
+    enabled: Boolean(isCommentDetail ? repliesRootPostId && threadParentCommentId : postId),
   });
 
   const comments = useMemo(
@@ -196,23 +336,30 @@ export function PostDetailPage() {
   const createComment = useMutation({
     mutationFn: ({ bodyText, target }: SubmitCommentVariables) => {
       const input = createTextEngagementInput(bodyText);
-      return target
-        ? postsApi.replyComment(target.commentId, input)
+      const targetCommentId = target?.commentId || threadParentCommentId;
+      return targetCommentId
+        ? postsApi.replyComment(targetCommentId, input)
         : postsApi.createComment(postId, input);
     },
     onSuccess: async (_result, variables) => {
+      const replyParentCommentId = variables.target?.commentId || threadParentCommentId;
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: postKeys.replies(postId) }),
+        queryClient.invalidateQueries({ queryKey: repliesQueryKey }),
         queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) }),
+        queryClient.invalidateQueries({ queryKey: postKeys.detail(repliesRootPostId) }),
       ]);
       setReply('');
+      if (replyParentCommentId) {
+        await queryClient.invalidateQueries({
+          queryKey: postKeys.commentReplies(repliesRootPostId, replyParentCommentId),
+        });
+      }
+
       setReplyTo(null);
       showToast({
         tone: 'success',
-        title: variables.target ? '回复已发布' : '评论已发布',
-        description: variables.target
-          ? '回复已写入服务端；当前公开接口暂不支持展开楼中楼历史。'
-          : undefined,
+        title: replyParentCommentId ? '回复已发布' : '评论已发布',
+        description: replyParentCommentId ? '可在对应评论下展开查看这条回复。' : undefined,
       });
     },
     onError: () => showToast({ tone: 'error', title: '评论发布失败', description: '请稍后重试。' }),
@@ -269,7 +416,52 @@ export function PostDetailPage() {
         {post.isLoading ? (
           <LoadingRows count={1} />
         ) : post.data ? (
-          <PostCard post={{ ...post.data, variant: 'detail' }} />
+          replyRelation ? (
+            <section className={styles.replyThread} aria-label="回复上下文">
+              {hasSeparateRootContext && rootPost.isLoading ? (
+                <LoadingRows count={1} compact />
+              ) : null}
+              {hasSeparateRootContext && rootPost.data ? (
+                <div className={styles.threadItem}>
+                  <span className={styles.contextLabel}>评论所在的帖子</span>
+                  <PostCard post={{ ...rootPost.data, variant: 'detail' }} />
+                </div>
+              ) : null}
+              {hasSeparateRootContext && rootPost.isError ? (
+                <ReplyContextPlaceholder
+                  label="评论所在的帖子"
+                  title="原帖已不存在"
+                  description="这条回复仍然有效，但它所在的帖子可能已删除、转为私密或当前不可查看。"
+                />
+              ) : null}
+              {parentPostId && parentPost.isLoading ? <LoadingRows count={1} compact /> : null}
+              {parentPostId && parentPost.data ? (
+                <div className={styles.threadItem}>
+                  <span className={styles.contextLabel}>
+                    {parentIsRoot ? '回复的帖子' : '直接回复的评论'}
+                  </span>
+                  <PostCard post={{ ...parentPost.data, variant: 'detail' }} />
+                </div>
+              ) : null}
+              {parentPostId && parentPost.isError ? (
+                <ReplyContextPlaceholder
+                  label={parentIsRoot ? '回复的帖子' : '直接回复的评论'}
+                  title={parentIsRoot ? '原帖已不存在' : '直接父评论不可用'}
+                  description={
+                    parentIsRoot
+                      ? '当前回复仍然有效，但被回复的帖子可能已删除、转为私密或当前不可查看。'
+                      : '当前回复仍然有效，但它直接回复的评论可能已删除、隐藏或当前不可查看。'
+                  }
+                />
+              ) : null}
+              <div className={styles.threadItem}>
+                <span className={styles.contextLabel}>当前回复</span>
+                <PostCard post={{ ...post.data, variant: 'detail' }} />
+              </div>
+            </section>
+          ) : (
+            <PostCard post={{ ...post.data, variant: 'detail' }} />
+          )
         ) : (
           <Card>
             <EmptyPanel
@@ -289,8 +481,14 @@ export function PostDetailPage() {
               src={currentUser?.avatarUrl}
             />
             <div>
-              <strong>{replyTo ? `回复 ${replyTo.name}` : '参与讨论'}</strong>
-              <p>{replyTo ? '回复会挂载到所选评论下方' : '保持友善，围绕帖子内容展开交流'}</p>
+              <strong>
+                {replyTo ? `回复 ${replyTo.name}` : isCommentDetail ? '回复当前评论' : '参与讨论'}
+              </strong>
+              <p>
+                {replyTo || isCommentDetail
+                  ? '回复会挂载到当前评论下方'
+                  : '保持友善，围绕帖子内容展开交流'}
+              </p>
             </div>
             {replyTo ? (
               <Button size="sm" variant="ghost" onClick={() => setReplyTo(null)}>
@@ -299,7 +497,9 @@ export function PostDetailPage() {
             ) : null}
           </header>
           <textarea
-            aria-label={replyTo ? `回复 ${replyTo.name}` : '发表评论'}
+            aria-label={
+              replyTo ? `回复 ${replyTo.name}` : isCommentDetail ? '回复当前评论' : '发表评论'
+            }
             ref={editorRef}
             value={reply}
             onChange={(event) => setReply(event.target.value)}
@@ -307,7 +507,9 @@ export function PostDetailPage() {
               canComment
                 ? replyTo
                   ? `回复 ${replyTo.name}…`
-                  : '写下你的回复…'
+                  : isCommentDetail
+                    ? '写下对这条评论的回复…'
+                    : '写下你的回复…'
                 : currentUser
                   ? '当前帖子不允许评论'
                   : '登录后参与讨论'
@@ -332,7 +534,7 @@ export function PostDetailPage() {
               loading={createComment.isPending}
               onClick={submitComment}
             >
-              <Send size={14} /> {replyTo ? '发送回复' : '发送评论'}
+              <Send size={14} /> {replyTo || isCommentDetail ? '发送回复' : '发送评论'}
             </Button>
           </footer>
         </Card>
@@ -340,8 +542,10 @@ export function PostDetailPage() {
         <section className={styles.commentSection}>
           <header>
             <h2>
-              <MessageCircle size={18} /> 全部评论{' '}
-              <span>{post.data?.stats.comments ?? comments.length}</span>
+              <MessageCircle size={18} /> {isCommentDetail ? '全部回复' : '全部评论'}{' '}
+              <span>
+                {isCommentDetail ? comments.length : (post.data?.stats.comments ?? comments.length)}
+              </span>
             </h2>
             <span className={styles.orderLabel}>按发布时间</span>
           </header>
@@ -373,15 +577,16 @@ export function PostDetailPage() {
                 <CommentRow
                   key={comment.relation.commentId}
                   item={comment}
-                  rootPostId={postId}
+                  rootPostId={repliesRootPostId}
+                  parentName={isCommentDetail ? post.data?.author.displayName : undefined}
                   onReply={startReply}
                 />
               ))}
               {!comments.length ? (
                 <div className={styles.commentEmpty}>
                   <MessageCircle size={24} />
-                  <strong>还没有评论</strong>
-                  <p>成为第一个参与讨论的人。</p>
+                  <strong>{isCommentDetail ? '还没有回复' : '还没有评论'}</strong>
+                  <p>{isCommentDetail ? '回复这条评论，继续对话。' : '成为第一个参与讨论的人。'}</p>
                 </div>
               ) : null}
             </div>
