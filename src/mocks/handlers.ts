@@ -1932,6 +1932,17 @@ export const handlers = [
     await delay(260);
     return ok(mockAuthSession('PENDING_INTERESTS'));
   }),
+  http.post('/api/auth/verification/phone/request', async () => {
+    await delay(160);
+    return ok({
+      accepted: true as const,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+    });
+  }),
+  http.post('/api/auth/register/phone', async () => {
+    await delay(260);
+    return ok(mockAuthSession('PENDING_INTERESTS', 'PHONE_CODE'));
+  }),
   http.post('/api/auth/password/reset/request', async () => {
     await delay(160);
     return ok({ requested: true as const });

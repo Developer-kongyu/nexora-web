@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { authApi, onboardingApi } from '@/domains/auth';
 
 describe('authApi default MSW contract', () => {
-  it('uses the canonical password, phone-code, and email-registration routes', async () => {
+  it('uses the canonical password, phone-code, email-registration, and phone-registration routes', async () => {
     const passwordSession = await authApi.login({ identifier: '@tester', password: 'Password123' });
     expect(passwordSession).toMatchObject({
       user: { id: 'user-current', handle: 'tester' },
@@ -24,6 +24,7 @@ describe('authApi default MSW contract', () => {
     expect(phoneSession.onboardingStatus).toBe('COMPLETED');
 
     const registered = await authApi.register({
+      mode: 'email',
       email: 'tester@example.com',
       handle: 'tester',
       password: 'Password123',
@@ -31,6 +32,27 @@ describe('authApi default MSW contract', () => {
     expect(registered).toMatchObject({
       onboardingStatus: 'PENDING_INTERESTS',
       onboardingCompleted: false,
+    });
+
+    const registrationCode = await authApi.requestPhoneRegistrationCode({
+      phone: '+8613900139000',
+    });
+    expect(registrationCode).toMatchObject({
+      accepted: true,
+      retryAfterSeconds: 60,
+    });
+
+    const phoneRegistered = await authApi.register({
+      mode: 'phone',
+      phone: '+8613900139000',
+      code: '123456',
+      handle: 'phone_tester',
+      password: 'Password123',
+    });
+    expect(phoneRegistered).toMatchObject({
+      onboardingStatus: 'PENDING_INTERESTS',
+      onboardingCompleted: false,
+      user: { handle: 'phone_tester' },
     });
 
     const google = await authApi.verifyGoogleIdToken('mock-google-id-token');

@@ -1,144 +1,305 @@
-# LCT Web 完整前端工程
+> **前端代码库：<https://github.com/Developer-kongyu/nexora-web.git>**
+>
+> 后端代码库：<https://github.com/Developer-kongyu/nexora-backend.git>
 
-LCT 是一套现代兴趣社交网络前端。该工程依据压缩包中的 31 张 1440 × 1024 高保真图、逐页补充说明和后端模块文档完成，覆盖认证、引导、信息流、搜索、内容创作、个人主页、收藏、社群、通知、设置、浏览历史以及系统状态等完整业务页面。
+# Nexora Web：技术栈与启动指南
 
-本项目不是静态页面拼装：路由、领域 API、服务端状态、表单校验、写操作、Mock 契约、错误状态、响应式布局、测试与部署配置均已按正式工程组织。
+Nexora Web 是开放兴趣社交网络 Nexora 的正式前端工程，覆盖认证、新手引导、信息流、搜索、内容创作、个人主页、用户关系、收藏、社群、通知、浏览历史和设置等完整页面。工程通过统一 API Client 连接 Nexora Backend，并提供 Mock、单元测试、E2E、Storybook 和 Docker/Nginx 生产构建能力。
 
 ## 技术栈
 
-- React 19 + TypeScript（strict）
-- Vite 8 + React Router 7
-- TanStack Query：服务端状态、缓存与 Mutation
-- Zustand：认证内存态与上传队列等客户端状态
-- React Hook Form + Zod：表单状态与校验
-- CSS Modules + 全局设计令牌
-- Lucide React：统一图标体系
-- MSW：开发、单测和 E2E 共用接口模拟
-- Vitest + Testing Library + Playwright + Storybook
-- Docker + Nginx：生产构建与 SPA 路由回退
+| 技术                     | 当前版本 | 用途                           |
+| ------------------------ | -------- | ------------------------------ |
+| React                    | 19       | 页面、组件与交互               |
+| TypeScript               | 5.9      | 严格类型与领域契约             |
+| Vite                     | 8        | 开发服务器、代理与生产构建     |
+| React Router             | 7        | 路由、懒加载和导航             |
+| TanStack Query           | 5        | 服务端状态、缓存、刷新与写操作 |
+| Zustand                  | 5        | 认证内存态和跨页面客户端状态   |
+| React Hook Form          | 7        | 表单状态                       |
+| Zod                      | 4        | 表单与环境变量校验             |
+| CSS Modules              | —        | 页面级样式隔离                 |
+| Lucide React             | 1.24     | 统一图标体系                   |
+| MSW                      | 2        | 浏览器和测试接口模拟           |
+| Vitest + Testing Library | 4 / 16   | 单元与组件测试                 |
+| Playwright               | 1.61     | 端到端测试                     |
+| Storybook                | 10       | 组件工作台                     |
+| Nginx                    | 1.29     | 生产静态服务与 SPA 回退        |
 
-## 快速启动
+## 工程组织
 
-环境要求：Node.js 22.12+、npm 10+。
+```text
+src/
+├─ app/          # Providers、Router、布局、错误边界和全局样式
+├─ pages/        # 路由级页面与业务编排
+├─ widgets/      # PostCard、ComposeEditor、AppShell 等复合组件
+├─ domains/      # 按业务域拆分的 API、hooks、types 和局部状态
+├─ shared/       # API Client、环境配置、工具函数和基础 UI
+├─ mocks/        # MSW fixtures 与 handlers
+└─ test/         # Vitest / Testing Library 测试初始化
+```
 
-```bash
+依赖方向：
+
+```mermaid
+flowchart LR
+    app --> pages
+    pages --> widgets
+    widgets --> domains
+    domains --> shared
+```
+
+页面与组件通过 **shared/api/client.ts** 和 **domains/\*/api** 访问网络。TanStack Query 管理服务端事实，组件 state 管理页面临时交互，Zustand 只承载真正需要跨页面共享的客户端状态。
+
+## 环境要求
+
+- Node.js 22.12 或更高版本；
+- npm 10 或更高版本；
+- 连接真实功能时，需要已启动的 Nexora Backend；
+- 使用 Docker 模式时，需要 Docker Desktop 或 Docker Engine + Compose v2。
+
+确认环境：
+
+```powershell
+node --version
+npm --version
+```
+
+## 最快启动
+
+```powershell
+git clone https://github.com/Developer-kongyu/nexora-web.git
+Set-Location nexora-web
 npm ci
 npm run dev
 ```
 
-开发环境默认读取 `.env.development` 并启用 MSW。浏览器打开 Vite 输出的地址后，根路由会进入 `/home`；也可直接访问 `/auth/login` 检查完整认证流程。
+开发服务器固定监听 **http://localhost:5173**。当前仓库的 .env.development 默认设置为 **VITE_ENABLE_MOCK=false**，因此会连接真实后端；请先确保后端运行在 http://localhost:3000。
 
-接入真实后端时复制环境变量模板：
+常用入口：
 
-```bash
-cp .env.example .env.local
+- 登录：http://localhost:5173/auth/login
+- 注册：http://localhost:5173/auth/register
+- 首页：http://localhost:5173/home
+- 发现：http://localhost:5173/explore
+- 社群：http://localhost:5173/communities
+- 通知：http://localhost:5173/notifications
+- 设置：http://localhost:5173/settings
+
+## 连接真实后端
+
+### 1. 启动后端
+
+按后端仓库的[完整部署指南](https://github.com/Developer-kongyu/nexora-backend/blob/main/docs/DEPLOYMENT_GUIDE.md)启动 API、PostgreSQL、MongoDB、Redis、Kafka 和需要的 Worker。
+
+后端存活检查：
+
+```powershell
+Invoke-RestMethod http://localhost:3000/api
 ```
+
+### 2. 创建本地环境文件
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+填写：
 
 ```dotenv
 VITE_APP_ENV=local
 VITE_API_BASE_URL=http://localhost:3000
 VITE_SOCKET_URL=http://localhost:3000
-VITE_ENABLE_MOCK=false
+VITE_GOOGLE_CLIENT_ID=你的-Google-Web-Client-ID
 VITE_RELEASE=local
+VITE_SENTRY_DSN=
+VITE_ENABLE_MOCK=false
+VITE_API_TIMEOUT_MS=15000
 ```
 
-Access Token 仅保存在内存中；刷新会话通过携带 HttpOnly Cookie 的 `/api/auth/refresh` 完成，不把认证令牌写入 localStorage。
+### 3. 启动前端
 
-## 工程结构
-
-```text
-src/
-├─ app/          # 启动、Providers、Router、布局、错误边界、全局样式
-├─ pages/        # 路由级页面与页面编排
-├─ widgets/      # PostCard、ComposeEditor、AppShell 等跨页面业务组件
-├─ domains/      # 按业务 owner 拆分的 API、hooks、types、局部状态
-├─ shared/       # API 基础设施、环境配置、工具与基础 UI
-├─ mocks/        # 与领域 API 对齐的 MSW fixtures 和 handlers
-└─ test/         # 测试环境初始化
+```powershell
+npm run dev
 ```
 
-依赖方向固定为：
+Vite 配置会把 **/api** 和 **/socket.io** 代理到 VITE_DEV_PROXY_TARGET；未配置时默认目标为 http://localhost:3000。VITE_API_BASE_URL 为空时，也可以依赖该同源开发代理。
 
-```text
-app → pages → widgets → domains → shared
+### 4. 检查浏览器请求
+
+打开开发者工具的 Network 面板，确认：
+
+- /api 请求返回 2xx 或预期业务错误；
+- 请求目标是 localhost:3000 或 Vite 的 /api 代理；
+- 登录成功后刷新接口可以携带 Cookie；
+- 通知实时连接指向正确的 VITE_SOCKET_URL。
+
+## 使用 Mock 模式
+
+需要独立浏览页面、暂时不启动后端时，在 .env.local 设置：
+
+```dotenv
+VITE_ENABLE_MOCK=true
+VITE_API_BASE_URL=
+VITE_SOCKET_URL=
 ```
 
-页面和组件不得直接使用裸 `fetch`；网络请求集中在 `shared/api/client.ts` 与 `domains/*/api`。服务端事实由 TanStack Query 管理，页面临时交互使用组件 state，跨页面客户端状态使用 Zustand。
+然后重新启动开发服务器：
 
-## 已实现页面与关键交互
+```powershell
+npm run dev
+```
 
-- 认证：密码/验证码登录、注册验证码、注册、找回密码、重置密码、Google 资料补全。
-- 新手引导：兴趣选择、推荐关注、推荐社群，包含步骤状态和提交行为。
-- 信息流与发现：Following/推荐切换、快速发布、趋势与推荐区域、加载和空状态。
-- 搜索：帖子/用户/社群分类、排序、媒体/关系/时间筛选、清空与加载更多。
-- 内容创作：正文、可见范围、媒体预览、链接、提及、表情、地点、定时、草稿保存与发布。
-- 帖子详情：评论、回复、评论点赞、排序、权限切换、加载更多和不可用状态。
-- 个人主页与关系：关注/取关/取消请求、资料信息、内容 Tab、复制链接、静音/屏蔽；粉丝/关注正式 cursor 列表使用权威关系快照，支持搜索、关系筛选、`followedAt` 排序和加载更多。
-- 收藏与内容中心：收藏夹创建、重命名、可见范围、删除回迁、权限占位、跨收藏夹移动与批量移除；草稿按正式合同发布/删除；已删除内容按当前后端能力只读展示。
-- 社群：发现与筛选、加入/退出、详情 Tab、创建、成员/申请/内容/公告/规则/日志/设置管理。
-- 通知：分类、未读筛选、全部已读、关注请求、目标路由跳转和实时连接状态。
-- 设置：资料、账号与设备、隐私、通知、偏好、安全与停用账号，以及 owner-only 静音/屏蔽列表、不可见账号占位和可操作条目的解除流程；后端未开放的永久删除和双重验证入口明确禁用。
-- 浏览历史：筛选、单条删除、批量删除、全选和清空确认。
-- 系统状态：404、403、会话失效、媒体失败、加载与空状态统一展示。
+MSW 会加载 **src/mocks/browser.ts** 和 **src/mocks/handlers.ts**。Mock 用于界面开发和测试，不代表外部短信、Google 验签、数据库事务或真实异步 Worker 已运行。
 
-完整路由见 [`docs/ROUTE_MAP.md`](docs/ROUTE_MAP.md)，实现清单见 [`docs/IMPLEMENTATION.md`](docs/IMPLEMENTATION.md)。原设计第 15 页已在输入文档中删除，因此不创建页面。
+切换回真实后端时把 VITE_ENABLE_MOCK 改回 false，并重启 Vite。
 
-## Mock 与真实接口
+## 环境变量
 
-`VITE_ENABLE_MOCK=true` 时启动 `src/mocks/browser.ts`；`false` 时请求发送到 `VITE_API_BASE_URL`。Mock 数据和 handlers 与领域 API 使用同一请求路径及返回结构，涵盖认证、信息流、用户关系、帖子、收藏、社群、通知、设置和历史等链路。用户关系 Mock 会维护 follow edge、pending request、静音和屏蔽状态，并区分 Handle 解析失败与写入后权威回读降级。
+| 变量                  | 示例                           | 说明                           |
+| --------------------- | ------------------------------ | ------------------------------ |
+| VITE_APP_ENV          | local / production             | 当前运行环境                   |
+| VITE_API_BASE_URL     | http://localhost:3000          | API 根地址；留空可使用同源路径 |
+| VITE_SOCKET_URL       | http://localhost:3000          | 实时通知地址                   |
+| VITE_GOOGLE_CLIENT_ID | xxx.apps.googleusercontent.com | Google Web Client ID           |
+| VITE_RELEASE          | local / Git SHA                | 发布版本标识                   |
+| VITE_SENTRY_DSN       | 空或 DSN                       | 可选错误监控                   |
+| VITE_ENABLE_MOCK      | false / true                   | 是否启用 MSW                   |
+| VITE_API_TIMEOUT_MS   | 15000                          | API 超时毫秒数                 |
+| VITE_DEV_PROXY_TARGET | http://localhost:3000          | Vite 开发代理目标              |
 
-新增或调整接口时应同步修改：
+修改 VITE_ 开头的变量后需要重新启动开发服务器。
 
-1. `domains/<domain>/api` 中的契约和类型；
-2. TanStack Query hook 或页面 Mutation；
-3. `mocks/handlers.ts` 和 fixtures；
-4. 对应成功、失败或回滚测试。
+## Google 登录本地配置
+
+Google Cloud Console 中的 Web OAuth Client 需要登记当前前端 Origin：
+
+- http://localhost:5173
+- 如果使用 127.0.0.1，则还需单独登记 http://127.0.0.1:5173
+
+localhost 与 127.0.0.1、不同端口、HTTP 与 HTTPS 都属于不同 Origin。前端 VITE_GOOGLE_CLIENT_ID 必须与后端允许的 Client ID 一致。
 
 ## 常用命令
 
-| 命令                               | 说明                                         |
-| ---------------------------------- | -------------------------------------------- |
-| `npm run dev`                      | 启动开发服务器                               |
-| `npm run build`                    | TypeScript 工程构建并输出 `dist/`            |
-| `npm run preview`                  | 本地预览生产包                               |
-| `npm run typecheck`                | TypeScript 严格类型检查                      |
-| `npm run lint`                     | ESLint 检查                                  |
-| `npm run lint:css`                 | Stylelint 检查                               |
-| `npm run format`                   | Prettier 格式化                              |
-| `npm run test`                     | Vitest 单元与组件测试                        |
-| `npm run test:e2e`                 | Playwright E2E                               |
-| `npm run storybook`                | 启动组件工作台                               |
-| `npm run api:generate -- <schema>` | 从 OpenAPI 生成类型                          |
-| `npm run env:check -- <env-file>`  | 校验部署环境变量                             |
-| `npm run reuse:check`              | 检查重复类型、枚举、常量、函数和公共能力绕过 |
-| `npm run check`                    | 执行复用、格式、类型、Lint、测试和生产构建   |
+| 命令                    | 说明                                 |
+| ----------------------- | ------------------------------------ |
+| npm run dev             | 启动 Vite 开发服务器                 |
+| npm run build           | TypeScript 构建并生成 dist           |
+| npm run preview         | 本地预览生产构建                     |
+| npm run typecheck       | TypeScript 工程检查                  |
+| npm run lint            | ESLint 检查                          |
+| npm run lint:css        | Stylelint 检查                       |
+| npm run format          | Prettier 格式化                      |
+| npm run format:check    | 检查格式                             |
+| npm run test            | 运行 Vitest                          |
+| npm run test:watch      | Vitest 监听模式                      |
+| npm run test:e2e        | 运行 Playwright                      |
+| npm run storybook       | 启动 Storybook                       |
+| npm run storybook:build | 构建 Storybook                       |
+| npm run reuse:check     | 检查重复定义与公共能力绕过           |
+| npm run check           | 运行格式、类型、Lint、测试和构建检查 |
 
-首次运行 Playwright 需执行：
+只运行一个测试：
 
-```bash
+```powershell
+npm test -- --run src/pages/onboarding/FollowPage.test.tsx
+```
+
+首次运行 Playwright：
+
+```powershell
 npx playwright install chromium
 npm run test:e2e
 ```
 
-## 构建与部署
+## 生产构建
 
-```bash
+```powershell
+npm ci
 npm run build
+npm run preview
 ```
 
-生产产物位于 `dist/`。静态服务器必须把未知路由回退到 `index.html`。项目同时提供多阶段 `Dockerfile`、`docker-compose.yml` 和 Nginx 配置：
+构建产物位于 **dist/**。部署到静态服务器时，所有未知前端路由都必须回退到 index.html，否则直接刷新 /auth/login、/profile 或 /settings 等路径会返回 404。
 
-```bash
-docker compose up --build
+## Docker 启动
+
+仓库包含多阶段 Dockerfile：第一阶段使用 Node 构建，第二阶段使用 Nginx 提供静态文件。
+
+```powershell
+docker compose up --build -d
 ```
 
-Nginx 配置包含 SPA 回退、静态资源缓存和 `/healthz` 健康检查。
+访问：
 
-## 文档入口
+- 应用：http://localhost:8080
+- 健康检查：http://localhost:8080/healthz
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)：分层、状态、请求、实时通知与质量约束。
-- [`docs/BACKEND_MAPPING.md`](docs/BACKEND_MAPPING.md)：前端领域与后端 owner 对接表。
-- [`docs/DEVELOPMENT_GUIDE.md`](docs/DEVELOPMENT_GUIDE.md)：新增页面、接口和组件的开发规范。
-- [`docs/REUSE_GUIDELINES.md`](docs/REUSE_GUIDELINES.md)：唯一职责、权威实现位置与复用评审规则。
-- [`docs/VALIDATION_REPORT.md`](docs/VALIDATION_REPORT.md)：本次交付的实际检查结果与环境限制。
-- [`design-reference/`](design-reference/)：原始高保真图与逐页说明，便于继续视觉回归。
+查看日志：
+
+```powershell
+docker compose logs -f web
+```
+
+停止：
+
+```powershell
+docker compose down
+```
+
+当前 Nginx 配置包含：
+
+- SPA 路由回退；
+- JS、CSS、字体和图片的长期缓存；
+- HTML no-cache；
+- /healthz 存活检查。
+
+生产构建会在镜像构建阶段读取环境变量。如果部署地址与示例不同，应在 CI 构建前准备正确的生产环境变量，或按部署平台的构建参数注入。
+
+## 启动后常见问题
+
+### 页面请求失败或显示 Network Error
+
+1. 确认后端 3000 端口在监听；
+2. 检查 VITE_API_BASE_URL；
+3. 修改环境变量后重启 Vite；
+4. 检查后端 AUTH_ALLOWED_ORIGINS；
+5. 查看浏览器 Network 中的实际请求地址和响应。
+
+### 5173 端口被占用
+
+项目启用了 strictPort，不会自动换端口。查找监听进程：
+
+```powershell
+Get-NetTCPConnection -State Listen -LocalPort 5173
+```
+
+停止冲突进程后重新执行 npm run dev。
+
+### 登录后页面又回到登录页
+
+确认后端刷新 Cookie、CORS 和前端 API 地址属于同一套环境；同时检查浏览器是否阻止 Cookie，以及后端是否仍在运行。
+
+### Google 提示 origin_mismatch
+
+把浏览器地址栏的 Origin 原样加入 Google Cloud Console，并确认 VITE_GOOGLE_CLIENT_ID 与该 Web Client 对应。
+
+### 修改代码后页面没有更新
+
+先确认 Vite 终端没有编译错误；再执行浏览器强制刷新。依赖或环境变量变化时应停止并重新运行 npm run dev。
+
+### Docker 页面可以打开但 API 不通
+
+前端 Nginx 配置当前只提供静态文件，不会自动把 /api 代理到后端。生产构建应设置 VITE_API_BASE_URL 为公开 API 地址，或在外层反向代理统一配置 /api。
+
+## 启动完成标准
+
+- [ ] http://localhost:5173 可以打开
+- [ ] 登录和注册页面正常渲染
+- [ ] /api 请求到达预期后端或 Mock
+- [ ] TypeScript 类型检查通过
+- [ ] Vitest 测试通过
+- [ ] npm run build 成功
+- [ ] Docker 模式下 /healthz 返回 ok
+
+更多产品与后端架构说明见：[Nexora 项目全景](https://github.com/Developer-kongyu/nexora-backend/blob/main/docs/PROJECT_OVERVIEW.md)。

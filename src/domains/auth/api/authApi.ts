@@ -9,6 +9,7 @@ import type {
   LoginWithCodeInput,
   PasswordResetRequestInput,
   PasswordResetRequestResponse,
+  PhoneRegistrationCodeResponse,
   RegisterInput,
   ResetPasswordInput,
   VerificationCodeResponse,
@@ -96,24 +97,67 @@ export const authApi = {
     return toSession(response);
   },
 
-  register: async (input: RegisterInput) => {
+  requestPhoneRegistrationCode: async (input: { phone: string }) => {
     const response = await apiClient.request<
-      BackendAuthSessionResponse,
-      { email: string; password: string; handle: string; deviceName: null }
+      { accepted: true; expiresAt: string | null },
+      { purpose: 'REGISTER_PHONE_VERIFY'; phone: string }
     >({
       method: 'POST',
-      path: '/api/auth/register/email',
-      body: {
-        email: input.email.trim(),
-        password: input.password,
-        handle: input.handle.trim(),
-        deviceName: null,
-      },
+      path: '/api/auth/verification/phone/request',
+      body: { purpose: 'REGISTER_PHONE_VERIFY', phone: input.phone.trim() },
       auth: false,
       retry401: false,
-      idempotencyKey: crypto.randomUUID(),
     });
-    return toSession(response, { handle: input.handle.trim(), displayName: input.handle.trim() });
+    return {
+      ...response,
+      retryAfterSeconds: 60,
+    } satisfies PhoneRegistrationCodeResponse;
+  },
+
+  register: async (input: RegisterInput) => {
+    const handle = input.handle.trim();
+    const response =
+      input.mode === 'email'
+        ? await apiClient.request<
+            BackendAuthSessionResponse,
+            { email: string; password: string; handle: string; deviceName: null }
+          >({
+            method: 'POST',
+            path: '/api/auth/register/email',
+            body: {
+              email: input.email.trim(),
+              password: input.password,
+              handle,
+              deviceName: null,
+            },
+            auth: false,
+            retry401: false,
+            idempotencyKey: crypto.randomUUID(),
+          })
+        : await apiClient.request<
+            BackendAuthSessionResponse,
+            {
+              phone: string;
+              code: string;
+              password: string;
+              handle: string;
+              deviceName: null;
+            }
+          >({
+            method: 'POST',
+            path: '/api/auth/register/phone',
+            body: {
+              phone: input.phone.trim(),
+              code: input.code,
+              password: input.password,
+              handle,
+              deviceName: null,
+            },
+            auth: false,
+            retry401: false,
+            idempotencyKey: crypto.randomUUID(),
+          });
+    return toSession(response, { handle, displayName: handle });
   },
 
   requestPasswordReset: (input: PasswordResetRequestInput) =>

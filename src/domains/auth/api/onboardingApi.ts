@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+import { isApiError } from '@/shared/api/errors';
 import { createIdempotencyKey } from '@/shared/api/idempotency';
 import type { AuthOnboardingStatus } from '../model/types';
 
@@ -65,6 +66,12 @@ export interface OnboardingSubmitResult {
   completedSteps: OnboardingStepId[];
   lastStep: OnboardingStepId;
   nextStep: 'recommended-users' | 'recommended-communities' | 'complete';
+}
+
+export function shouldRefreshOnboardingRecommendation(error: unknown): boolean {
+  return (
+    isApiError(error) && error.httpStatus === 409 && error.code === 'AUTH_ONBOARDING_INVALID_STATE'
+  );
 }
 
 function userSubmitBody(view: RecommendedUsersView, selectedUserIds: string[]) {

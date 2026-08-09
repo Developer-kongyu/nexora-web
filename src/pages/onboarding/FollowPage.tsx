@@ -1,6 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { onboardingApi, onboardingKeys, useAuthStore } from '@/domains/auth';
+import {
+  onboardingApi,
+  onboardingKeys,
+  shouldRefreshOnboardingRecommendation,
+  useAuthStore,
+} from '@/domains/auth';
 import { OnboardingSelection, type OnboardingOption } from './OnboardingSelection';
 
 export function FollowPage() {
@@ -24,7 +29,28 @@ export function FollowPage() {
 
   const submit = async (selected: string[]) => {
     if (!query.data) throw new Error('推荐结果尚未加载');
-    const result = await onboardingApi.submitUsers(query.data, selected);
+    let result;
+    try {
+      result = await onboardingApi.submitUsers(query.data, selected);
+    } catch (error) {
+      if (!shouldRefreshOnboardingRecommendation(error)) throw error;
+      const refreshed = await query.refetch();
+      if (refreshed.isError || !refreshed.data?.submittable) {
+        throw new Error('推荐列表正在更新，请稍后再点击下一步');
+      }
+      const currentIds = new Set(refreshed.data.list.map((item) => item.card.userId));
+      try {
+        result = await onboardingApi.submitUsers(
+          refreshed.data,
+          selected.filter((userId) => currentIds.has(userId)),
+        );
+      } catch (retryError) {
+        if (shouldRefreshOnboardingRecommendation(retryError)) {
+          throw new Error('推荐列表正在更新，请稍后再点击下一步');
+        }
+        throw retryError;
+      }
+    }
     if (result.retryRequired) throw new Error('部分关注操作失败，请重试后再继续');
     useAuthStore.setState({ onboardingStatus: 'PENDING_RECOMMENDED_COMMUNITIES' });
   };

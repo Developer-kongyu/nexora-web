@@ -244,13 +244,6 @@ export function NotificationsPage() {
                 <Badge tone="brand">已配置</Badge>
               </div>
             </SideCard>
-            <SideCard title="通知说明">
-              <ul>
-                <li>关注申请直接读取待审批列表</li>
-                <li>已读状态与各分类计数同步更新</li>
-                <li>通知目标失效时不会跳转到错误页面</li>
-              </ul>
-            </SideCard>
           </>
         }
       >

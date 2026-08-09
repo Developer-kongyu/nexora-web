@@ -43,10 +43,25 @@ export interface LoginWithCodeInput {
   code: string;
 }
 
-export interface RegisterInput {
-  email: string;
-  handle: string;
-  password: string;
+export type RegisterInput =
+  | {
+      mode: 'email';
+      email: string;
+      handle: string;
+      password: string;
+    }
+  | {
+      mode: 'phone';
+      phone: string;
+      code: string;
+      handle: string;
+      password: string;
+    };
+
+export interface PhoneRegistrationCodeResponse {
+  accepted: true;
+  expiresAt: string | null;
+  retryAfterSeconds: number;
 }
 
 export interface PasswordResetRequestInput {
