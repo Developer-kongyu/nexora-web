@@ -14,6 +14,54 @@ const collection = {
   lastItemAddedAtIso: '2026-07-28T01:00:00.000Z',
 };
 
+function postDetailFixture(input: {
+  postId: string;
+  authorHandle: string;
+  postKind: 'ORIGINAL' | 'REPOST';
+  repostOfPostId?: string | null;
+  bodyText: string | null;
+}) {
+  const authorUserId = `${input.authorHandle}-id`;
+  return {
+    postId: input.postId,
+    authorUserId,
+    postKind: input.postKind,
+    replyToPostId: null,
+    quoteOfPostId: null,
+    repostOfPostId: input.repostOfPostId ?? null,
+    rootPostId: null,
+    bodyText: input.bodyText,
+    status: 'PUBLISHED' as const,
+    author: {
+      userId: authorUserId,
+      handle: input.authorHandle,
+      displayName: input.authorHandle,
+      avatarUrl: null,
+    },
+    community: null,
+    attachedMedia: [],
+    hashtags: [],
+    linkCard: null,
+    interactionSummary: {
+      likeCount: 0,
+      bookmarkCount: 0,
+      commentCount: 0,
+      quoteCount: 0,
+      repostCount: 0,
+      viewerState: null,
+    },
+    interactionPermission: {
+      canView: true,
+      canLike: true,
+      canBookmark: true,
+      canComment: true,
+      canQuote: true,
+      canRepost: true,
+    },
+    publishedAtIso: '2026-08-04T00:00:00.000Z',
+  };
+}
+
 describe('libraryApi B07 contract', () => {
   it('uses the collection resource routes, exact bodies, and create idempotency header', async () => {
     const calls: Array<{
@@ -354,5 +402,80 @@ describe('libraryApi B07 contract', () => {
         query: {},
       },
     ]);
+  });
+
+  it('hydrates repost history items with source text returned by the backend', async () => {
+    const detailRequests: string[] = [];
+    server.use(
+      http.get('/api/me/history/posts', () =>
+        apiSuccessResponse({
+          list: [
+            {
+              postId: 'history-repost-1',
+              lastViewedAtIso: '2026-08-05T00:00:00.000Z',
+              viewCount: 2,
+              sourceScene: 'POST_DETAIL' as const,
+              sourceModule: 'POST' as const,
+              itemState: 'ACTIVE' as const,
+              placeholderReasonCode: null,
+              postCard: {
+                postId: 'history-repost-1',
+                authorUserId: 'reposter-id',
+                postKind: 'REPOST' as const,
+                bodyTextPreview: null,
+                visibility: 'PUBLIC' as const,
+                status: 'PUBLISHED' as const,
+                publishedAtIso: '2026-08-04T00:00:00.000Z',
+                author: {
+                  userId: 'reposter-id',
+                  handle: 'reposter',
+                  displayName: 'Reposter',
+                  avatarUrl: null,
+                },
+                community: null,
+                attachedMedia: [],
+                linkCard: null,
+                interactionSummary: null,
+              },
+            },
+          ],
+          nextCursor: null,
+        }),
+      ),
+      http.get('/api/posts/:postId', ({ params }) => {
+        const postId = String(params.postId);
+        detailRequests.push(postId);
+        return apiSuccessResponse(
+          postId === 'history-repost-1'
+            ? postDetailFixture({
+                postId,
+                authorHandle: 'reposter',
+                postKind: 'REPOST',
+                repostOfPostId: 'history-source-1',
+                bodyText: null,
+              })
+            : postDetailFixture({
+                postId: 'history-source-1',
+                authorHandle: 'source_author',
+                postKind: 'ORIGINAL',
+                bodyText: 'source text returned by backend',
+              }),
+        );
+      }),
+    );
+
+    const page = await libraryApi.history();
+    const item = requireArrayItem(page.list, 0, 'hydrated history repost');
+
+    expect(detailRequests).toEqual(['history-repost-1', 'history-source-1']);
+    expect(item).toMatchObject({
+      postId: 'history-repost-1',
+      itemState: 'ACTIVE',
+      postCard: {
+        postId: 'history-repost-1',
+        postKind: 'REPOST',
+        bodyTextPreview: 'source text returned by backend',
+      },
+    });
   });
 });

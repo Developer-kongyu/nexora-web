@@ -67,8 +67,9 @@ function replyItem(input: {
 function postDetail(input: {
   postId: string;
   handle: string;
-  postKind?: 'ORIGINAL' | 'REPLY';
+  postKind?: 'ORIGINAL' | 'REPLY' | 'REPOST';
   replyToPostId?: string | null;
+  repostOfPostId?: string | null;
   rootPostId?: string | null;
 }) {
   const authorUserId = `${input.handle}-id`;
@@ -78,7 +79,7 @@ function postDetail(input: {
     postKind: input.postKind ?? ('ORIGINAL' as const),
     replyToPostId: input.replyToPostId ?? null,
     quoteOfPostId: null,
-    repostOfPostId: null,
+    repostOfPostId: input.repostOfPostId ?? null,
     rootPostId: input.rootPostId ?? null,
     bodyText: `content:${input.postId}`,
     status: 'PUBLISHED' as const,
@@ -346,5 +347,132 @@ describe('CommentRow direct replies', () => {
       '/posts/empty-comment-post?rootPostId=root-post&commentId=empty-comment',
     );
     expect(screen.getByRole('button', { name: '查看详情' })).toBeInTheDocument();
+  });
+});
+
+describe('PostDetailPage repost discussion', () => {
+  it('reads and creates comments against the hydrated source post', async () => {
+    const replyPostIds: string[] = [];
+    let createdCommentPostId = '';
+    useAuthStore.setState({
+      status: 'authenticated',
+      user: {
+        id: 'viewer-user',
+        handle: 'viewer',
+        displayName: 'Viewer',
+        avatarUrl: null,
+      },
+      onboardingCompleted: true,
+      onboardingStatus: 'COMPLETED',
+    });
+
+    server.use(
+      http.get('/api/posts/:postId', ({ params }) => {
+        const requestedPostId = String(params.postId);
+        return apiSuccessResponse(
+          requestedPostId === 'discussion-repost-1'
+            ? postDetail({
+                postId: requestedPostId,
+                handle: 'reposter',
+                postKind: 'REPOST',
+                repostOfPostId: 'discussion-source-1',
+              })
+            : postDetail({ postId: 'discussion-source-1', handle: 'source_author' }),
+        );
+      }),
+      http.get('/api/posts/:postId/replies', ({ params }) => {
+        replyPostIds.push(String(params.postId));
+        return apiSuccessResponse({
+          list: [
+            replyItem({
+              commentId: 'source-comment-1',
+              parentCommentId: null,
+              displayName: 'Commenter',
+              body: 'comment loaded from source post',
+            }),
+          ],
+          nextCursor: null,
+          degraded: false,
+          degradedReasons: [],
+          pageMayBeShort: false,
+          filteredCountHint: 0,
+        });
+      }),
+      http.post('/api/posts/:postId/comments', ({ params }) => {
+        createdCommentPostId = String(params.postId);
+        return apiSuccessResponse({
+          comment: {
+            commentId: 'created-comment-1',
+            commentPostId: 'created-comment-post-1',
+            rootPostId: 'discussion-source-1',
+            parentCommentId: null,
+            topLevelCommentId: null,
+            authorUserId: 'viewer-user',
+            depth: 0,
+            status: 'ACTIVE' as const,
+            directReplyCount: 0,
+            descendantReplyCount: 0,
+            createdAtIso: '2026-08-05T00:00:00.000Z',
+            activatedAtIso: '2026-08-05T00:00:00.000Z',
+            publishFailedAtIso: null,
+            deletedAtIso: null,
+          },
+          counters: {
+            likeCount: 0,
+            commentCount: 2,
+            quoteCount: 0,
+            repostCount: 0,
+            bookmarkCount: 0,
+            impressionCount: 0,
+            dedupedVideoViewCount: 0,
+          },
+          derivedPostPublish: {
+            publishState: 'PUBLISHED' as const,
+            publishMode: 'IMMEDIATE' as const,
+            pendingMediaAssetIds: [],
+          },
+        });
+      }),
+      http.post('/api/me/history/posts', () =>
+        apiSuccessResponse({
+          recorded: true,
+          deduped: false,
+          lastViewedAtTouched: true,
+          viewCountIncremented: true,
+          lastViewedAtIso: '2026-08-05T00:00:00.000Z',
+          viewCount: 1,
+        }),
+      ),
+    );
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/posts/discussion-repost-1']}>
+          <ToastProvider>
+            <Routes>
+              <Route path="/posts/:postId" element={<PostDetailPage />} />
+            </Routes>
+          </ToastProvider>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    expect(await screen.findByText('comment loaded from source post')).toBeInTheDocument();
+    expect(replyPostIds.length).toBeGreaterThan(0);
+    expect(replyPostIds.every((id) => id === 'discussion-source-1')).toBe(true);
+
+    const editor = screen.getByRole('textbox');
+    fireEvent.change(editor, { target: { value: 'new source comment' } });
+    const submitButton = Array.from(editor.parentElement?.querySelectorAll('button') ?? []).find(
+      (button) => button.querySelector('svg.lucide-send'),
+    );
+    expect(submitButton).toBeDefined();
+    fireEvent.click(submitButton as HTMLButtonElement);
+
+    await waitFor(() => expect(createdCommentPostId).toBe('discussion-source-1'));
+    expect(replyPostIds.every((id) => id === 'discussion-source-1')).toBe(true);
   });
 });

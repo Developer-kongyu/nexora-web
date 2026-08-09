@@ -262,10 +262,11 @@ export function PostDetailPage() {
   const post = usePost(postId);
   const replyRelation = post.data?.relation?.kind === 'REPLY' ? post.data.relation : null;
   const isCommentDetail = Boolean(threadParentCommentId);
-  const repliesRootPostId = threadRootPostId || replyRelation?.rootPostId || postId;
+  const discussionPostId = post.data?.contentPostId ?? '';
+  const repliesRootPostId = threadRootPostId || replyRelation?.rootPostId || discussionPostId;
   const repliesQueryKey = isCommentDetail
     ? postKeys.commentReplies(repliesRootPostId, threadParentCommentId)
-    : postKeys.replies(postId);
+    : postKeys.replies(repliesRootPostId);
 
   const parentPostId = replyRelation?.targetPostId ?? '';
   const rootContextPostId = threadRootPostId || replyRelation?.rootPostId || parentPostId;
@@ -314,10 +315,12 @@ export function PostDetailPage() {
             { cursor: pageParam, limit: 20 },
             signal,
           )
-        : postsApi.listReplies(postId, { cursor: pageParam, limit: 20 }, signal),
+        : postsApi.listReplies(repliesRootPostId, { cursor: pageParam, limit: 20 }, signal),
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    enabled: Boolean(isCommentDetail ? repliesRootPostId && threadParentCommentId : postId),
+    enabled: Boolean(
+      isCommentDetail ? repliesRootPostId && threadParentCommentId : post.data && repliesRootPostId,
+    ),
   });
 
   const comments = useMemo(
@@ -339,7 +342,7 @@ export function PostDetailPage() {
       const targetCommentId = target?.commentId || threadParentCommentId;
       return targetCommentId
         ? postsApi.replyComment(targetCommentId, input)
-        : postsApi.createComment(postId, input);
+        : postsApi.createComment(repliesRootPostId, input);
     },
     onSuccess: async (_result, variables) => {
       const replyParentCommentId = variables.target?.commentId || threadParentCommentId;

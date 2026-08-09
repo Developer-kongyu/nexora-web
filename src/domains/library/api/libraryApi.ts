@@ -1,3 +1,4 @@
+import { hydratePostCardBrief } from '@/domains/posts';
 import { apiClient } from '@/shared/api/client';
 import { createIdempotencyKey } from '@/shared/api/idempotency';
 import { buildCursorQuery, type CursorRequest } from '@/shared/api/pagination';
@@ -129,11 +130,29 @@ export const libraryApi = {
       body: input,
     }),
 
-  history: (params: CursorRequest = {}, signal?: AbortSignal) =>
-    apiClient.request<PostBrowseHistoryPageView>({
+  history: async (params: CursorRequest = {}, signal?: AbortSignal) => {
+    const page = await apiClient.request<PostBrowseHistoryPageView>({
       path: `/api/me/history/posts${buildCursorQuery(params)}`,
       signal,
-    }),
+    });
+    const list = await Promise.all(
+      page.list.map(async (item) => {
+        if (item.itemState !== 'ACTIVE' || item.postCard.postKind !== 'REPOST') return item;
+
+        const hydrated = await hydratePostCardBrief(item.postCard, 'bookmark', signal);
+        if (!hydrated.contentPostId || hydrated.contentPostId === item.postId) return item;
+
+        return {
+          ...item,
+          postCard: {
+            ...item.postCard,
+            bodyTextPreview: hydrated.content,
+          },
+        };
+      }),
+    );
+    return { ...page, list };
+  },
 
   deleteHistoryItem: (postId: string) =>
     apiClient.request<DeletePostBrowseHistoryItemResult>({

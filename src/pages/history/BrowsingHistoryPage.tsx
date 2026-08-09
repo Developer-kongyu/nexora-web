@@ -257,7 +257,7 @@ export function BrowsingHistoryPage() {
                           {active && item.postCard.author ? (
                             <span>作者 @{item.postCard.author.handle}</span>
                           ) : (
-                            <Badge tone="warning">不可用占位</Badge>
+                            <Badge tone="warning">作者 不可用</Badge>
                           )}
                           <i aria-hidden="true" />
                           <span>
