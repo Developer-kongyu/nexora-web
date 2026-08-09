@@ -33,6 +33,46 @@ export interface AuthSessionResponse {
   onboardingCompleted: boolean;
 }
 
+export interface AuthAccountSecurityIdentityView {
+  value: string;
+  isLoginEnabled: boolean;
+  verifiedAt: string | null;
+}
+
+export interface AuthAccountSecurityView {
+  userId: string;
+  status: 'ACTIVE';
+  handle: string;
+  email: AuthAccountSecurityIdentityView | null;
+  phone: AuthAccountSecurityIdentityView | null;
+  password: {
+    configured: boolean;
+    setAt: string | null;
+    updatedAt: string | null;
+  };
+}
+
+export interface AuthSessionItemView {
+  sessionId: string;
+  authMethod: 'PASSWORD' | 'PHONE_CODE' | 'GOOGLE_ID_TOKEN';
+  deviceName: string | null;
+  deviceFamily: string | null;
+  browserName: string | null;
+  osName: string | null;
+  lastActiveOrCreatedAtIso: string;
+  createdAtIso: string;
+  expiresAtIso: string;
+  isCurrent: boolean;
+  effectiveStatus: 'ACTIVE';
+}
+
+export interface AuthSessionListView {
+  list: AuthSessionItemView[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface LoginInput {
   identifier: string;
   password: string;
@@ -62,6 +102,20 @@ export interface PhoneRegistrationCodeResponse {
   accepted: true;
   expiresAt: string | null;
   retryAfterSeconds: number;
+}
+
+export type PhoneIdentityVerificationPurpose = 'BIND_PHONE_VERIFY' | 'CHANGE_PRIMARY_PHONE_VERIFY';
+
+export interface PhoneIdentityVerificationResponse {
+  accepted: true;
+  expiresAt: string | null;
+}
+
+export interface PhoneIdentityMutationResponse {
+  identityId: string;
+  phone: string;
+  isPrimary: boolean;
+  verifiedAtIso: string;
 }
 
 export interface PasswordResetRequestInput {

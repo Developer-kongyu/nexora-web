@@ -1856,6 +1856,9 @@ function mockAuthSession(
 }
 
 let mockNotificationSettings = {
+  userId: currentUser.id,
+  rowExists: true,
+  source: 'PERSISTED' as const,
   inAppChannelEnabled: true,
   emailChannelEnabled: true,
   smsChannelEnabled: false,
@@ -1872,6 +1875,7 @@ let mockNotificationSettings = {
   defaultCommunityNewPostMode: 'HIGHLIGHTS' as const,
   defaultCommunityAnnouncementMode: 'REALTIME' as const,
   defaultCommunityInteractionMode: 'RELATED_ONLY' as const,
+  notificationPreferenceVersion: 1,
 };
 
 let mockInterestTagCodes = ['design', 'machine-learning', 'photography'];
@@ -1895,6 +1899,50 @@ const mockInterestTagCatalog = mockInterestTagLabels.map(
     enabled: true,
   }),
 );
+
+let mockRecommendationSettings = {
+  userId: currentUser.id,
+  localeCode: 'zh-CN' as string | null,
+  regionCode: 'CN' as string | null,
+  allowPersonalizedRecommendation: true,
+  allowCrossLanguageRecommendation: true,
+  allowCommunityRecommendation: true,
+  interestTagCodes: [...mockInterestTagCodes],
+  recommendationPreferenceVersion: 1,
+};
+
+let mockSearchSettings = {
+  userId: currentUser.id,
+  localeCode: mockRecommendationSettings.localeCode,
+  regionCode: mockRecommendationSettings.regionCode,
+  searchHistoryEnabled: true,
+  searchAnalyticsEnabled: true,
+  allowSearchTermsForTrending: true,
+  searchPreferenceVersion: 1,
+};
+
+let mockHandle = currentUser.handle;
+let mockEmailVerifiedAt: string | null = null;
+let mockPhone: {
+  value: string;
+  isLoginEnabled: boolean;
+  verifiedAt: string;
+} | null = null;
+let mockSessions = [
+  {
+    sessionId: 'mock-session-id',
+    authMethod: 'PASSWORD' as const,
+    deviceName: null,
+    deviceFamily: 'desktop',
+    browserName: 'Mock Browser',
+    osName: 'Mock OS',
+    lastActiveOrCreatedAtIso: '2026-08-09T01:00:00.000Z',
+    createdAtIso: '2026-08-09T01:00:00.000Z',
+    expiresAtIso: '2030-02-01T00:00:00.000Z',
+    isCurrent: true,
+    effectiveStatus: 'ACTIVE' as const,
+  },
+];
 
 const baseMockPermissionPolicy = {
   accountVisibility: 'PUBLIC' as const,
@@ -1951,6 +1999,106 @@ export const handlers = [
     await delay(220);
     return ok({ reset: true as const, userId: currentUser.id, securityVersion: 2 });
   }),
+  http.get('/api/auth/account/security', () =>
+    ok({
+      userId: currentUser.id,
+      status: 'ACTIVE' as const,
+      handle: mockHandle,
+      email: {
+        value: 'mock-user@example.test',
+        isLoginEnabled: true,
+        verifiedAt: mockEmailVerifiedAt,
+      },
+      phone: mockPhone,
+      password: {
+        configured: true,
+        setAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-07-01T00:00:00.000Z',
+      },
+    }),
+  ),
+  http.get('/api/auth/sessions', () =>
+    ok({
+      list: mockSessions,
+      total: mockSessions.length,
+      page: 1,
+      pageSize: 100,
+    }),
+  ),
+  http.delete('/api/auth/sessions/:sessionId', ({ params }) => {
+    const sessionId = String(params.sessionId);
+    mockSessions = mockSessions.filter((session) => session.sessionId !== sessionId);
+    return ok({ revoked: true as const, sessionId });
+  }),
+  http.patch('/api/auth/identities/handle', async ({ request }) => {
+    const body = (await request.json()) as { newHandle: string };
+    mockHandle = body.newHandle;
+    return ok({
+      result: 'CHANGED' as const,
+      userId: currentUser.id,
+      handle: mockHandle,
+      profileVersion: 2,
+    });
+  }),
+  http.post('/api/auth/verification/email/request', () =>
+    ok({
+      accepted: true as const,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+    }),
+  ),
+  http.post('/api/auth/verification/email/confirm', () => {
+    mockEmailVerifiedAt = new Date().toISOString();
+    return ok({
+      verified: true as const,
+      userId: currentUser.id,
+      identityId: 'mock-email-identity',
+    });
+  }),
+  http.post('/api/auth/identities/phone/bind', async ({ request }) => {
+    const body = (await request.json()) as { phone: string; verificationCode: string };
+    const verifiedAtIso = new Date().toISOString();
+    mockPhone = {
+      value: body.phone,
+      isLoginEnabled: true,
+      verifiedAt: verifiedAtIso,
+    };
+    return ok({
+      identityId: 'mock-phone-identity',
+      phone: body.phone,
+      isPrimary: false,
+      verifiedAtIso,
+    });
+  }),
+  http.post('/api/auth/identities/phone/change-primary', async ({ request }) => {
+    const body = (await request.json()) as { phone: string; verificationCode: string };
+    const verifiedAtIso = new Date().toISOString();
+    mockPhone = {
+      value: body.phone,
+      isLoginEnabled: true,
+      verifiedAt: verifiedAtIso,
+    };
+    return ok({
+      identityId: 'mock-phone-primary-identity',
+      phone: body.phone,
+      isPrimary: true,
+      verifiedAtIso,
+    });
+  }),
+  http.post('/api/auth/password/change', () =>
+    ok({
+      changed: true as const,
+      userId: currentUser.id,
+      securityVersion: 2,
+      clientAction: 'RELOGIN_REQUIRED' as const,
+    }),
+  ),
+  http.post('/api/auth/deactivate', () =>
+    ok({
+      deactivated: true as const,
+      userId: currentUser.id,
+      clientAction: 'RELOGIN_REQUIRED' as const,
+    }),
+  ),
   http.post('/api/auth/oauth/google/verify-id-token', async () => {
     await delay(220);
     return ok({ mode: 'LOGIN_SUCCESS' as const, authSession: mockAuthSession() });
@@ -3988,16 +4136,97 @@ export const handlers = [
   }),
   http.get('/api/settings/overview', () =>
     ok({
-      privacy: { accountVisibility: mockPermissionPolicy.accountVisibility },
-      notification: { inAppChannelEnabled: mockNotificationSettings.inAppChannelEnabled },
-      recommendation: { allowPersonalizedRecommendation: true },
+      profile: {
+        userId: currentUser.id,
+        handle: mockHandle,
+        displayName: currentUser.displayName,
+        avatarUrl: currentUser.avatarUrl,
+        coverUrl: currentUser.coverUrl,
+        bio: currentUser.bio,
+        location: currentUser.location,
+        websiteUrl: currentUser.website,
+        updatedAt: '2026-08-09T01:00:00.000Z',
+      },
+      account: {
+        status: 'ACTIVE' as const,
+        activeSessionCount: mockSessions.length,
+      },
+      privacy: {
+        accountVisibility: mockPermissionPolicy.accountVisibility,
+        allowSearchIndex: mockPermissionPolicy.allowSearchIndex,
+        defaultPostVisibility: mockPermissionPolicy.defaultPostVisibility,
+        defaultCommentPermission: mockPermissionPolicy.defaultCommentPermission,
+        defaultQuotePermission: mockPermissionPolicy.defaultQuotePermission,
+        mentionPermission: mockPermissionPolicy.mentionPermission,
+      },
+      notification: {
+        userId: mockNotificationSettings.userId,
+        rowExists: mockNotificationSettings.rowExists,
+        source: mockNotificationSettings.source,
+        inAppChannelEnabled: mockNotificationSettings.inAppChannelEnabled,
+        emailChannelEnabled: mockNotificationSettings.emailChannelEnabled,
+        smsChannelEnabled: mockNotificationSettings.smsChannelEnabled,
+        communityNotificationEnabled: mockNotificationSettings.communityNotificationEnabled,
+        quietHoursEnabled: mockNotificationSettings.quietHoursEnabled,
+        notificationPreferenceVersion: mockNotificationSettings.notificationPreferenceVersion,
+      },
+      search: mockSearchSettings,
+      recommendation: {
+        userId: mockRecommendationSettings.userId,
+        localeCode: mockRecommendationSettings.localeCode,
+        regionCode: mockRecommendationSettings.regionCode,
+        allowPersonalizedRecommendation: mockRecommendationSettings.allowPersonalizedRecommendation,
+        allowCrossLanguageRecommendation:
+          mockRecommendationSettings.allowCrossLanguageRecommendation,
+        allowCommunityRecommendation: mockRecommendationSettings.allowCommunityRecommendation,
+        interestTagCount: mockRecommendationSettings.interestTagCodes.length,
+        recommendationPreferenceVersion: mockRecommendationSettings.recommendationPreferenceVersion,
+      },
     }),
   ),
   http.get('/api/settings/notifications', () => ok(mockNotificationSettings)),
   http.patch('/api/settings/notifications', async ({ request }) => {
     const patch = (await request.json()) as Partial<typeof mockNotificationSettings>;
-    mockNotificationSettings = { ...mockNotificationSettings, ...patch };
+    mockNotificationSettings = {
+      ...mockNotificationSettings,
+      ...patch,
+      userId: currentUser.id,
+      rowExists: true,
+      source: 'PERSISTED',
+      notificationPreferenceVersion: mockNotificationSettings.notificationPreferenceVersion + 1,
+    };
     return ok(mockNotificationSettings);
+  }),
+  http.get('/api/settings/recommendation', () => ok(mockRecommendationSettings)),
+  http.patch('/api/settings/recommendation', async ({ request }) => {
+    const patch = (await request.json()) as Partial<typeof mockRecommendationSettings>;
+    mockRecommendationSettings = {
+      ...mockRecommendationSettings,
+      ...patch,
+      userId: currentUser.id,
+      interestTagCodes: mockRecommendationSettings.interestTagCodes,
+      recommendationPreferenceVersion:
+        mockRecommendationSettings.recommendationPreferenceVersion + 1,
+    };
+    mockSearchSettings = {
+      ...mockSearchSettings,
+      localeCode: mockRecommendationSettings.localeCode,
+      regionCode: mockRecommendationSettings.regionCode,
+    };
+    return ok(mockRecommendationSettings);
+  }),
+  http.get('/api/settings/search', () => ok(mockSearchSettings)),
+  http.patch('/api/settings/search', async ({ request }) => {
+    const patch = (await request.json()) as Partial<typeof mockSearchSettings>;
+    mockSearchSettings = {
+      ...mockSearchSettings,
+      ...patch,
+      userId: currentUser.id,
+      localeCode: mockRecommendationSettings.localeCode,
+      regionCode: mockRecommendationSettings.regionCode,
+      searchPreferenceVersion: mockSearchSettings.searchPreferenceVersion + 1,
+    };
+    return ok(mockSearchSettings);
   }),
   http.get('/api/settings/interests/catalog', () =>
     ok({
@@ -4012,6 +4241,12 @@ export const handlers = [
   http.put('/api/settings/interests', async ({ request }) => {
     const body = (await request.json()) as { items: Array<{ interestTagCode: string }> };
     mockInterestTagCodes = body.items.map((item) => item.interestTagCode);
+    mockRecommendationSettings = {
+      ...mockRecommendationSettings,
+      interestTagCodes: [...mockInterestTagCodes],
+      recommendationPreferenceVersion:
+        mockRecommendationSettings.recommendationPreferenceVersion + 1,
+    };
     return ok({ list: mockInterestTagCodes.map((interestTagCode) => ({ interestTagCode })) });
   }),
   http.get('/api/permissions/me/policy', () => ok(mockPermissionPolicy)),

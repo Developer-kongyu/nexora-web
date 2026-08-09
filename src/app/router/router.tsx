@@ -42,6 +42,12 @@ const router = createBrowserRouter([
             }),
           },
           {
+            path: 'email/verify',
+            lazy: async () => ({
+              Component: (await import('@/pages/auth/EmailVerificationPage')).EmailVerificationPage,
+            }),
+          },
+          {
             path: 'google/complete',
             lazy: async () => ({
               Component: (await import('@/pages/auth/GoogleCompletePage')).GoogleCompletePage,

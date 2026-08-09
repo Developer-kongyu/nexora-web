@@ -1,7 +1,9 @@
 import { apiClient } from '@/shared/api/client';
 import type { UserSummary } from '@/domains/users/model/types';
 import type {
+  AuthAccountSecurityView,
   AuthSessionResponse,
+  AuthSessionListView,
   BackendAuthSessionResponse,
   GoogleProfileInput,
   GoogleVerificationResult,
@@ -9,6 +11,9 @@ import type {
   LoginWithCodeInput,
   PasswordResetRequestInput,
   PasswordResetRequestResponse,
+  PhoneIdentityMutationResponse,
+  PhoneIdentityVerificationPurpose,
+  PhoneIdentityVerificationResponse,
   PhoneRegistrationCodeResponse,
   RegisterInput,
   ResetPasswordInput,
@@ -243,6 +248,124 @@ export const authApi = {
     });
     return toSession(response);
   },
+
+  accountSecurity: () =>
+    apiClient.request<AuthAccountSecurityView>({
+      path: '/api/auth/account/security',
+    }),
+
+  sessions: () =>
+    apiClient.request<AuthSessionListView>({
+      path: '/api/auth/sessions?page=1&pageSize=100',
+    }),
+
+  revokeSession: (sessionId: string) =>
+    apiClient.request<{ revoked: true; sessionId: string }>({
+      method: 'DELETE',
+      path: '/api/auth/sessions/' + encodeURIComponent(sessionId),
+    }),
+
+  requestEmailVerification: () =>
+    apiClient.request<
+      { accepted: true; expiresAt: string },
+      { purpose: 'REGISTER_EMAIL_VERIFY'; email: null }
+    >({
+      method: 'POST',
+      path: '/api/auth/verification/email/request',
+      body: { purpose: 'REGISTER_EMAIL_VERIFY', email: null },
+    }),
+
+  confirmEmailVerification: (token: string) =>
+    apiClient.request<{ verified: true; userId: string; identityId: string }, { token: string }>({
+      method: 'POST',
+      path: '/api/auth/verification/email/confirm',
+      body: { token },
+      auth: false,
+      retry401: false,
+    }),
+
+  requestPhoneIdentityVerification: (input: {
+    phone: string;
+    purpose: PhoneIdentityVerificationPurpose;
+  }) =>
+    apiClient.request<
+      PhoneIdentityVerificationResponse,
+      { phone: string; purpose: PhoneIdentityVerificationPurpose }
+    >({
+      method: 'POST',
+      path: '/api/auth/verification/phone/request',
+      body: {
+        phone: input.phone.trim(),
+        purpose: input.purpose,
+      },
+    }),
+
+  bindPhone: (input: { phone: string; verificationCode: string }) =>
+    apiClient.request<PhoneIdentityMutationResponse, { phone: string; verificationCode: string }>({
+      method: 'POST',
+      path: '/api/auth/identities/phone/bind',
+      body: {
+        phone: input.phone.trim(),
+        verificationCode: input.verificationCode.trim(),
+      },
+      idempotencyKey: crypto.randomUUID(),
+    }),
+
+  changePrimaryPhone: (input: { phone: string; verificationCode: string }) =>
+    apiClient.request<PhoneIdentityMutationResponse, { phone: string; verificationCode: string }>({
+      method: 'POST',
+      path: '/api/auth/identities/phone/change-primary',
+      body: {
+        phone: input.phone.trim(),
+        verificationCode: input.verificationCode.trim(),
+      },
+      idempotencyKey: crypto.randomUUID(),
+    }),
+
+  changeHandle: (newHandle: string) =>
+    apiClient.request<
+      {
+        result: 'CHANGED' | 'NO_OP' | 'ALREADY_APPLIED';
+        userId: string;
+        handle: string;
+        profileVersion: number;
+      },
+      { newHandle: string }
+    >({
+      method: 'PATCH',
+      path: '/api/auth/identities/handle',
+      body: { newHandle },
+      idempotencyKey: crypto.randomUUID(),
+    }),
+
+  changePassword: (input: { currentPassword: string | null; newPassword: string }) =>
+    apiClient.request<
+      {
+        changed: true;
+        userId: string;
+        securityVersion: number;
+        clientAction: 'RELOGIN_REQUIRED';
+      },
+      { currentPassword: string | null; newPassword: string }
+    >({
+      method: 'POST',
+      path: '/api/auth/password/change',
+      body: input,
+      idempotencyKey: crypto.randomUUID(),
+      retry401: false,
+    }),
+
+  deactivate: (password: string | null) =>
+    apiClient.request<
+      { deactivated: true; userId: string; clientAction: 'RELOGIN_REQUIRED' },
+      { password: string | null }
+    >({
+      method: 'POST',
+      path: '/api/auth/deactivate',
+      body: { password },
+      idempotencyKey: crypto.randomUUID(),
+      retry401: false,
+    }),
 
   logout: () =>
     apiClient.request<void>({

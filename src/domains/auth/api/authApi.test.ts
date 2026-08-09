@@ -62,6 +62,78 @@ describe('authApi default MSW contract', () => {
     });
   });
 
+  it('reads account security and supports email verification plus phone binding', async () => {
+    const account = await authApi.accountSecurity();
+    expect(account).toMatchObject({
+      userId: 'user-current',
+      status: 'ACTIVE',
+      handle: 'zhiqiu',
+      email: {
+        value: 'mock-user@example.test',
+        verifiedAt: null,
+      },
+      phone: null,
+      password: { configured: true },
+    });
+
+    const sessions = await authApi.sessions();
+    expect(sessions).toMatchObject({
+      total: 1,
+      list: [{ sessionId: 'mock-session-id', isCurrent: true }],
+    });
+
+    await expect(authApi.requestEmailVerification()).resolves.toMatchObject({
+      accepted: true,
+    });
+    await expect(authApi.confirmEmailVerification('mock-email-token')).resolves.toMatchObject({
+      verified: true,
+      userId: 'user-current',
+    });
+
+    const verified = await authApi.accountSecurity();
+    expect(verified.email?.verifiedAt).not.toBeNull();
+
+    const firstPhone = '+8613800138000';
+    await expect(
+      authApi.requestPhoneIdentityVerification({
+        phone: firstPhone,
+        purpose: 'BIND_PHONE_VERIFY',
+      }),
+    ).resolves.toMatchObject({ accepted: true });
+    await expect(
+      authApi.bindPhone({ phone: firstPhone, verificationCode: '123456' }),
+    ).resolves.toMatchObject({
+      phone: firstPhone,
+      isPrimary: false,
+    });
+
+    const bound = await authApi.accountSecurity();
+    expect(bound.phone).toMatchObject({
+      value: firstPhone,
+      isLoginEnabled: true,
+    });
+
+    const replacementPhone = '+8613900139000';
+    await expect(
+      authApi.requestPhoneIdentityVerification({
+        phone: replacementPhone,
+        purpose: 'CHANGE_PRIMARY_PHONE_VERIFY',
+      }),
+    ).resolves.toMatchObject({ accepted: true });
+    await expect(
+      authApi.changePrimaryPhone({
+        phone: replacementPhone,
+        verificationCode: '654321',
+      }),
+    ).resolves.toMatchObject({
+      phone: replacementPhone,
+      isPrimary: true,
+    });
+
+    const changed = await authApi.accountSecurity();
+    expect(changed.phone?.value).toBe(replacementPhone);
+  });
+
   it('exposes canonical onboarding recommendation snapshots', async () => {
     const users = await onboardingApi.recommendedUsers();
     expect(users.submittable).toBe(true);

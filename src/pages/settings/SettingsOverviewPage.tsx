@@ -10,9 +10,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuthStore } from '@/domains/auth';
 import { settingsApi, settingsKeys } from '@/domains/settings';
-import { getCurrentUserPresentation } from '@/domains/users';
 import { paths } from '@/shared/config/paths';
 import { Badge, Card } from '@/shared/ui';
 import { SettingsPage } from '../_shared/SettingsPage';
@@ -36,19 +34,19 @@ const SETTINGS_ITEMS = [
   {
     to: paths.settingsNotifications,
     title: '通知设置',
-    description: '站内、邮件与社群通知偏好',
+    description: '站内、邮件、短信与社群通知偏好',
     icon: Bell,
     tone: 'pink',
   },
   {
     to: paths.settingsPreferences,
     title: '推荐与兴趣',
-    description: '兴趣标签、地区与个性化推荐',
+    description: '兴趣标签、语言地区、推荐与搜索',
     icon: SlidersHorizontal,
     tone: 'green',
   },
   {
-    to: `${paths.settingsAccount}#devices`,
+    to: paths.settingsAccount + '#devices',
     title: '设备与登录',
     description: '查看活跃设备并远程退出',
     icon: Laptop,
@@ -64,78 +62,90 @@ const SETTINGS_ITEMS = [
 ] as const;
 
 export function SettingsOverviewPage() {
-  const user = useAuthStore((state) => state.user);
   const query = useQuery({
     queryKey: settingsKeys.overview,
     queryFn: settingsApi.overview,
   });
-  const currentUser = getCurrentUserPresentation(user);
   const overview = query.data;
   const syncState = query.isPending
     ? {
-        title: '正在同步设置摘要',
-        description: '正在读取当前账号的设置状态。',
-        badge: '同步中',
+        title: '正在读取设置摘要',
+        description: '账号设置正在从服务端加载。',
+        badge: '加载中',
         tone: 'neutral' as const,
       }
     : query.isError || !overview
       ? {
-          title: '设置摘要同步失败',
-          description: '请检查网络后刷新页面；现有服务端设置不会被覆盖。',
+          title: '设置摘要加载失败',
+          description: '页面未使用前端默认值，请检查服务后重试。',
           badge: '需要重试',
           tone: 'warning' as const,
         }
       : {
-          title: '所有设置均已同步',
-          description: '后续变更会自动同步到当前账号。',
-          badge: '最新',
+          title: '设置摘要来自服务端',
+          description: '当前展示与账号的服务端状态一致。',
+          badge: '已读取',
           tone: 'success' as const,
         };
 
   const aside = (
     <>
       <section className={styles.accountSummary}>
-        <div>
-          <span>
-            <UserRound size={18} />
-          </span>
-          <div>
-            <strong>{currentUser.displayName}</strong>
-            <small>{currentUser.handle ? `@${currentUser.handle}` : '资料加载中'}</small>
-          </div>
-        </div>
-        <dl>
-          <div>
-            <dt>账号状态</dt>
-            <dd>
-              <Badge tone="success">正常</Badge>
-            </dd>
-          </div>
-          <div>
-            <dt>个人资料</dt>
-            <dd>
-              <Link to={paths.settingsProfile}>查看与完善</Link>
-            </dd>
-          </div>
-          <div>
-            <dt>双重验证</dt>
-            <dd>暂未开放</dd>
-          </div>
-        </dl>
+        {overview ? (
+          <>
+            <div>
+              <span>
+                <UserRound size={18} />
+              </span>
+              <div>
+                <strong>{overview.profile.displayName}</strong>
+                <small>@{overview.profile.handle}</small>
+              </div>
+            </div>
+            <dl>
+              <div>
+                <dt>账号状态</dt>
+                <dd>
+                  <Badge tone="success">
+                    {overview.account.status === 'ACTIVE' ? '正常' : overview.account.status}
+                  </Badge>
+                </dd>
+              </div>
+              <div>
+                <dt>活跃设备</dt>
+                <dd>{overview.account.activeSessionCount} 台</dd>
+              </div>
+              <div>
+                <dt>个人资料</dt>
+                <dd>
+                  <Link to={paths.settingsProfile}>查看与完善</Link>
+                </dd>
+              </div>
+            </dl>
+          </>
+        ) : query.isPending ? (
+          <p>正在读取账号摘要…</p>
+        ) : (
+          <p>账号摘要暂不可用。</p>
+        )}
       </section>
 
       <section>
         <h2>当前摘要</h2>
-        {query.isPending ? (
-          <p>正在读取设置…</p>
-        ) : query.isError || !overview ? (
-          <p>设置摘要暂不可用，请稍后刷新。</p>
-        ) : (
+        {overview ? (
           <ul>
-            <li>通知：{overview.notificationEnabled ? '已开启' : '已关闭'}</li>
-            <li>账号：{overview.privateAccount ? '私密' : '公开'}</li>
-            <li>推荐：{overview.recommendationEnabled ? '个性化' : '基础模式'}</li>
+            <li>站内通知：{overview.notification.inAppChannelEnabled ? '开启' : '关闭'}</li>
+            <li>
+              账号可见性：{overview.privacy.accountVisibility === 'PRIVATE' ? '私密' : '公开'}
+            </li>
+            <li>
+              个性化推荐：
+              {overview.recommendation.allowPersonalizedRecommendation ? '开启' : '关闭'}
+            </li>
+            <li>兴趣标签：{overview.recommendation.interestTagCount} 个</li>
           </ul>
+        ) : (
+          <p>摘要只会在服务端成功响应后显示。</p>
         )}
       </section>
     </>

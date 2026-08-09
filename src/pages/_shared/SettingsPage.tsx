@@ -10,7 +10,6 @@ import {
 import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/shared/lib/cn';
-import { Badge, useToast } from '@/shared/ui';
 import { PageTitle } from './PageParts';
 import styles from './SettingsPage.module.css';
 
@@ -39,7 +38,6 @@ export function SettingsPage({ title, description, children, aside }: SettingsPa
         <aside className={styles.nav}>
           <div className={styles.navTitle}>
             <strong>设置</strong>
-            <Badge tone="success">已同步</Badge>
           </div>
           <nav>
             {SETTINGS_ITEMS.map(({ to, label, icon: Icon, ...linkProps }) => (
@@ -55,7 +53,7 @@ export function SettingsPage({ title, description, children, aside }: SettingsPa
               </NavLink>
             ))}
           </nav>
-          <p>设置会通过账号同步到你登录的所有设备。</p>
+          <p>保存成功的设置会通过账号同步到登录设备。</p>
         </aside>
         <main>{children}</main>
         <aside className={styles.aside}>{aside ?? <DefaultAside />}</aside>
@@ -65,33 +63,19 @@ export function SettingsPage({ title, description, children, aside }: SettingsPa
 }
 
 function DefaultAside() {
-  const { showToast } = useToast();
-
   return (
     <>
       <section>
         <h2>设置提示</h2>
         <ul>
-          <li>重要更改可能需要验证密码或验证码</li>
-          <li>隐私和安全设置保存后立即生效</li>
-          <li>设备会话可随时远程退出</li>
+          <li>页面中的账号状态与开关均读取自服务端</li>
+          <li>重要更改可能要求当前密码或验证码</li>
+          <li>设备会话可以在账号安全页远程退出</li>
         </ul>
       </section>
       <section>
-        <h2>需要帮助？</h2>
-        <p>查看账号安全指南，或联系支持团队处理无法自行解决的问题。</p>
-        <button
-          type="button"
-          onClick={() =>
-            showToast({
-              tone: 'info',
-              title: '帮助中心已打开',
-              description: '账号安全、隐私与申诉指南可在支持中心查看。',
-            })
-          }
-        >
-          打开帮助中心
-        </button>
+        <h2>数据说明</h2>
+        <p>加载失败时页面不会使用示例账号、示例设备或前端默认值替代服务端数据。</p>
       </section>
     </>
   );

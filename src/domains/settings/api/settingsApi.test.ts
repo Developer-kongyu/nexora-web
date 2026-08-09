@@ -23,27 +23,48 @@ describe('settings and permissions default MSW contract', () => {
     ]);
 
     const notification = await settingsApi.notification();
-    const saved = await settingsApi.updateNotification({ ...notification, follows: false });
-    expect(saved.follows).toBe(false);
+    const saved = await settingsApi.updateNotification({
+      ...notification,
+      interactionNotificationEnabled: false,
+    });
+    expect(saved.interactionNotificationEnabled).toBe(false);
+
+    const recommendation = await settingsApi.recommendation();
+    const savedRecommendation = await settingsApi.updateRecommendation({
+      localeCode: recommendation.localeCode,
+      regionCode: recommendation.regionCode,
+      allowPersonalizedRecommendation: false,
+      allowCrossLanguageRecommendation: recommendation.allowCrossLanguageRecommendation,
+      allowCommunityRecommendation: recommendation.allowCommunityRecommendation,
+    });
+    expect(savedRecommendation.allowPersonalizedRecommendation).toBe(false);
+
+    const search = await settingsApi.search();
+    const savedSearch = await settingsApi.updateSearch({
+      searchHistoryEnabled: false,
+      searchAnalyticsEnabled: search.searchAnalyticsEnabled,
+      allowSearchTermsForTrending: search.allowSearchTermsForTrending,
+    });
+    expect(savedSearch.searchHistoryEnabled).toBe(false);
   });
 
   it('wraps policy updates and previews in backend snapshots', async () => {
     const policy = await permissionsApi.get();
     const updated = await permissionsApi.update({
       ...policy,
-      profileVisibility: 'private',
-      searchEngineIndexing: false,
+      accountVisibility: 'PRIVATE',
+      allowSearchIndex: false,
     });
     expect(updated).toMatchObject({
-      profileVisibility: 'private',
-      searchEngineIndexing: false,
+      accountVisibility: 'PRIVATE',
+      allowSearchIndex: false,
     });
 
     const preview = await permissionsApi.preview(updated);
-    expect(preview).toEqual({
-      profileSummary: 'PRIVATE',
-      interactionSummary: 'EVERYONE',
-      discoverySummary: 'NOT_INDEXED',
+    expect(preview).toMatchObject({
+      accountVisibility: 'PRIVATE',
+      allowSearchIndex: false,
+      defaultCommentPermission: 'EVERYONE',
     });
   });
 });

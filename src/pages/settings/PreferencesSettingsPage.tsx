@@ -1,26 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, Globe2, MapPin, Plus, Search, Sparkles } from 'lucide-react';
-import { settingsApi, settingsKeys } from '@/domains/settings';
+import {
+  settingsApi,
+  settingsKeys,
+  type RecommendationPreferenceView,
+  type SearchPreferenceView,
+} from '@/domains/settings';
 import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { cn } from '@/shared/lib/cn';
 import { toggleArrayValue } from '@/shared/lib/set';
-import { Button, Card, Select, Switch, useToast } from '@/shared/ui';
+import { Button, Card, Switch, TextField, useToast } from '@/shared/ui';
 import { SettingsPage } from '../_shared/SettingsPage';
-
 import styles from './SettingsPages.module.css';
 
+interface EditablePreferences {
+  recommendation: RecommendationPreferenceView;
+  search: SearchPreferenceView;
+  selectedInterests: string[];
+}
+
 function retainSupportedInterests(
-  interests: readonly string[] | undefined,
+  interests: readonly string[],
   supportedCodes: readonly string[],
 ): string[] {
-  if (!interests) return [];
   const supported = new Set(supportedCodes);
   return interests.filter((interest) => supported.has(interest));
 }
 
 export function PreferencesSettingsPage() {
   const queryClient = useQueryClient();
-  const query = useQuery({
+  const recommendationQuery = useQuery({
+    queryKey: settingsKeys.recommendation,
+    queryFn: settingsApi.recommendation,
+  });
+  const searchQuery = useQuery({
+    queryKey: settingsKeys.search,
+    queryFn: settingsApi.search,
+  });
+  const interestsQuery = useQuery({
     queryKey: settingsKeys.interests,
     queryFn: settingsApi.interests,
   });
@@ -29,33 +46,149 @@ export function PreferencesSettingsPage() {
     queryFn: settingsApi.interestCatalog,
     staleTime: 5 * 60 * 1000,
   });
+  const { showToast } = useToast();
+
   const enabledTags = catalogQuery.data?.items.filter((item) => item.enabled) ?? [];
   const supportedCodes = enabledTags.map((item) => item.interestTagCode);
-  const selectionRevision =
-    query.data && catalogQuery.data
-      ? `${catalogQuery.data.dictionaryVersion}:${query.data.join(',')}`
+  const sourceRevision =
+    recommendationQuery.data && searchQuery.data && interestsQuery.data && catalogQuery.data
+      ? [
+          recommendationQuery.data.recommendationPreferenceVersion,
+          searchQuery.data.searchPreferenceVersion,
+          catalogQuery.data.dictionaryVersion,
+          interestsQuery.data.join(','),
+        ].join(':')
       : null;
-  const [selected, setSelected] = useSynchronizedState(
-    selectionRevision,
-    retainSupportedInterests(query.data, supportedCodes),
-  );
-  const { showToast } = useToast();
+  const sourceValue: EditablePreferences | null =
+    recommendationQuery.data && searchQuery.data && interestsQuery.data && catalogQuery.data
+      ? {
+          recommendation: recommendationQuery.data,
+          search: searchQuery.data,
+          selectedInterests: retainSupportedInterests(interestsQuery.data, supportedCodes),
+        }
+      : null;
+  const [values, setValues] = useSynchronizedState(sourceRevision, sourceValue);
+
   const mutation = useMutation({
-    mutationFn: () => settingsApi.updateInterests(selected),
-    onSuccess: (saved) => {
-      queryClient.setQueryData(settingsKeys.interests, saved);
-      showToast({ tone: 'success', title: '推荐偏好已保存' });
+    mutationFn: async (next: EditablePreferences) => {
+      const recommendation = await settingsApi.updateRecommendation({
+        localeCode: next.recommendation.localeCode,
+        regionCode: next.recommendation.regionCode,
+        allowPersonalizedRecommendation: next.recommendation.allowPersonalizedRecommendation,
+        allowCrossLanguageRecommendation: next.recommendation.allowCrossLanguageRecommendation,
+        allowCommunityRecommendation: next.recommendation.allowCommunityRecommendation,
+      });
+      const search = await settingsApi.updateSearch({
+        searchHistoryEnabled: next.search.searchHistoryEnabled,
+        searchAnalyticsEnabled: next.search.searchAnalyticsEnabled,
+        allowSearchTermsForTrending: next.search.allowSearchTermsForTrending,
+      });
+      const interests = await settingsApi.updateInterests(next.selectedInterests);
+      return { recommendation, search, interests };
     },
-    onError: () =>
-      showToast({ tone: 'error', title: '推荐偏好保存失败', description: '请稍后重试。' }),
+    onSuccess: (saved) => {
+      queryClient.setQueryData(settingsKeys.recommendation, saved.recommendation);
+      queryClient.setQueryData(settingsKeys.search, saved.search);
+      queryClient.setQueryData(settingsKeys.interests, saved.interests);
+      void queryClient.invalidateQueries({ queryKey: settingsKeys.overview });
+      showToast({ tone: 'success', title: '推荐与兴趣设置已保存' });
+    },
+    onError: (error) => {
+      void queryClient.invalidateQueries({ queryKey: settingsKeys.recommendation });
+      void queryClient.invalidateQueries({ queryKey: settingsKeys.search });
+      void queryClient.invalidateQueries({ queryKey: settingsKeys.interests });
+      showToast({
+        tone: 'error',
+        title: '偏好设置保存失败',
+        description: error.message,
+      });
+    },
   });
 
+  const queries = [recommendationQuery, searchQuery, interestsQuery, catalogQuery] as const;
+  const isLoading = queries.some((query) => query.isPending);
+  const isError = queries.some((query) => query.isError);
+
+  if (isLoading || (!values && !isError)) {
+    return (
+      <SettingsPage title="推荐与兴趣" description="管理服务端保存的内容偏好与搜索设置。">
+        <Card className={styles.section}>
+          <div className={styles.smallEmpty} role="status">
+            <Sparkles size={22} />
+            <strong>正在读取偏好设置</strong>
+            <p>页面不会在加载期间使用前端默认值。</p>
+          </div>
+        </Card>
+      </SettingsPage>
+    );
+  }
+
+  if (isError || !values) {
+    return (
+      <SettingsPage title="推荐与兴趣" description="管理服务端保存的内容偏好与搜索设置。">
+        <Card className={styles.section}>
+          <div className={styles.smallEmpty} role="alert">
+            <Sparkles size={22} />
+            <strong>偏好设置加载失败</strong>
+            <p>未使用示例数据替代，请恢复服务后重新加载。</p>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                for (const query of queries) void query.refetch();
+              }}
+            >
+              重新加载
+            </Button>
+          </div>
+        </Card>
+      </SettingsPage>
+    );
+  }
+
+  const updateRecommendation = <Key extends keyof RecommendationPreferenceView>(
+    key: Key,
+    value: RecommendationPreferenceView[Key],
+  ) => {
+    setValues((current) =>
+      current
+        ? {
+            ...current,
+            recommendation: { ...current.recommendation, [key]: value },
+          }
+        : current,
+    );
+  };
+
+  const updateSearch = <Key extends keyof SearchPreferenceView>(
+    key: Key,
+    value: SearchPreferenceView[Key],
+  ) => {
+    setValues((current) =>
+      current
+        ? {
+            ...current,
+            search: { ...current.search, [key]: value },
+          }
+        : current,
+    );
+  };
+
   const toggleInterest = (interest: string) => {
-    setSelected((current) => toggleArrayValue(current, interest));
+    setValues((current) =>
+      current
+        ? {
+            ...current,
+            selectedInterests: toggleArrayValue(current.selectedInterests, interest),
+          }
+        : current,
+    );
   };
 
   return (
-    <SettingsPage title="推荐与兴趣" description="调整内容主题、语言地区和个性化推荐方式。">
+    <SettingsPage
+      title="推荐与兴趣"
+      description="调整服务端保存的内容主题、语言地区与个性化推荐方式。"
+    >
       <div className={styles.stack}>
         <Card className={styles.section}>
           <header>
@@ -64,13 +197,13 @@ export function PreferencesSettingsPage() {
             </span>
             <div>
               <h2>兴趣标签</h2>
-              <p>用于首页推荐、发现页排序和社群推荐。</p>
+              <p>标签名称和可用状态来自后端兴趣字典。</p>
             </div>
-            <span className={styles.headerBadge}>{selected.length} 个已选择</span>
+            <span className={styles.headerBadge}>{values.selectedInterests.length} 个已选择</span>
           </header>
           <div className={styles.interests}>
             {enabledTags.map((interest) => {
-              const active = selected.includes(interest.interestTagCode);
+              const active = values.selectedInterests.includes(interest.interestTagCode);
               return (
                 <button
                   type="button"
@@ -84,8 +217,12 @@ export function PreferencesSettingsPage() {
               );
             })}
           </div>
-          {catalogQuery.isError ? <p role="alert">兴趣标签字典加载失败，请稍后重试。</p> : null}
-          <p className={styles.hint}>至少保留 3 个兴趣，以获得更稳定的推荐结果。</p>
+          {enabledTags.length === 0 ? (
+            <p className={styles.hint}>后端当前没有启用的兴趣标签。</p>
+          ) : null}
+          <p className={styles.hint}>
+            字典版本 {catalogQuery.data?.dictionaryVersion}；至少保留 3 个兴趣。
+          </p>
         </Card>
 
         <Card className={styles.section}>
@@ -95,28 +232,29 @@ export function PreferencesSettingsPage() {
             </span>
             <div>
               <h2>语言与地区</h2>
-              <p>影响趋势、社群和本地内容的优先级。</p>
+              <p>直接编辑后端保存的 localeCode 与 regionCode，不推测所在城市。</p>
             </div>
           </header>
           <div className={styles.selectGrid}>
-            <Select label="内容语言" defaultValue="简体中文">
-              <option>简体中文</option>
-              <option>简体中文 + English</option>
-              <option>不限语言</option>
-            </Select>
-            <Select label="所在地区" defaultValue="中国 · 台湾">
-              <option>中国 · 上海</option>
-              <option>中国 · 台湾</option>
-              <option>不限地区</option>
-            </Select>
-            <Select label="时区" defaultValue="Asia/Taipei (UTC+8)">
-              <option>Asia/Taipei (UTC+8)</option>
-              <option>Asia/Shanghai (UTC+8)</option>
-            </Select>
-            <Select label="日期与数字格式" defaultValue="中文格式">
-              <option>中文格式</option>
-              <option>国际格式</option>
-            </Select>
+            <TextField
+              label="语言代码"
+              name="localeCode"
+              placeholder="例如 zh-CN；留空表示未设置"
+              value={values.recommendation.localeCode ?? ''}
+              onChange={(event) =>
+                updateRecommendation('localeCode', event.target.value.trim() || null)
+              }
+            />
+            <TextField
+              label="地区代码"
+              name="regionCode"
+              placeholder="例如 CN；留空表示未设置"
+              maxLength={2}
+              value={values.recommendation.regionCode ?? ''}
+              onChange={(event) =>
+                updateRecommendation('regionCode', event.target.value.trim().toUpperCase() || null)
+              }
+            />
           </div>
         </Card>
 
@@ -127,47 +265,69 @@ export function PreferencesSettingsPage() {
             </span>
             <div>
               <h2>个性化推荐与搜索</h2>
-              <p>决定推荐系统可使用哪些行为信号。</p>
+              <p>每个开关都对应后端已公开的偏好字段。</p>
             </div>
+            <span className={styles.headerBadge}>
+              推荐 v{values.recommendation.recommendationPreferenceVersion} · 搜索 v
+              {values.search.searchPreferenceVersion}
+            </span>
           </header>
           <div className={styles.switchList}>
             <Switch
               label="启用个性化推荐"
-              description="使用关注、互动和兴趣标签改进内容排序"
-              defaultChecked
+              description="允许使用账号行为与兴趣改善推荐"
+              checked={values.recommendation.allowPersonalizedRecommendation}
+              onChange={(event) =>
+                updateRecommendation('allowPersonalizedRecommendation', event.target.checked)
+              }
             />
             <Switch
-              label="使用浏览历史优化推荐"
-              description="可随时在浏览历史中清理记录"
-              defaultChecked
+              label="允许跨语言推荐"
+              description="允许推荐不同语言的相关内容"
+              checked={values.recommendation.allowCrossLanguageRecommendation}
+              onChange={(event) =>
+                updateRecommendation('allowCrossLanguageRecommendation', event.target.checked)
+              }
             />
             <Switch
-              label="个性化搜索排序"
-              description="根据兴趣和关系优先展示相关结果"
-              defaultChecked
+              label="允许社群推荐"
+              description="允许推荐系统提供相关社群"
+              checked={values.recommendation.allowCommunityRecommendation}
+              onChange={(event) =>
+                updateRecommendation('allowCommunityRecommendation', event.target.checked)
+              }
             />
             <Switch
-              label="推荐本地活动和社群"
-              description="使用地区信息展示附近内容"
-              defaultChecked
+              label="保存搜索历史"
+              description="由后端保存并用于搜索体验"
+              checked={values.search.searchHistoryEnabled}
+              onChange={(event) => updateSearch('searchHistoryEnabled', event.target.checked)}
+            />
+            <Switch
+              label="允许搜索分析"
+              description="允许后端记录搜索分析数据"
+              checked={values.search.searchAnalyticsEnabled}
+              onChange={(event) => updateSearch('searchAnalyticsEnabled', event.target.checked)}
+            />
+            <Switch
+              label="允许搜索词用于趋势"
+              description="允许聚合搜索词用于趋势计算"
+              checked={values.search.allowSearchTermsForTrending}
+              onChange={(event) =>
+                updateSearch('allowSearchTermsForTrending', event.target.checked)
+              }
             />
           </div>
         </Card>
 
         <div className={styles.saveBar}>
           <span>
-            <MapPin size={16} /> 推荐模型可能需要一段时间适应新的偏好
+            <MapPin size={16} /> 保存结果以三个后端接口返回的数据为准
           </span>
           <Button
             loading={mutation.isPending}
-            disabled={
-              query.isLoading ||
-              query.isError ||
-              catalogQuery.isLoading ||
-              catalogQuery.isError ||
-              selected.length < 3
-            }
-            onClick={() => mutation.mutate()}
+            disabled={values.selectedInterests.length < 3}
+            onClick={() => mutation.mutate(values)}
           >
             保存偏好
           </Button>
