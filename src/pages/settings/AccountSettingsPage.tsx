@@ -2,10 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AtSign, KeyRound, Laptop, LockKeyhole, Mail, Phone, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import {
   authApi,
   authKeys,
   isE164Phone,
+  rememberPendingPrimaryEmail,
   strongPasswordSchema,
   useAuthStore,
   type AuthSessionItemView,
@@ -51,6 +53,8 @@ export function AccountSettingsPage() {
 
   const [handleOpen, setHandleOpen] = useState(false);
   const [handleValue, setHandleValue] = useState('');
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [emailValue, setEmailValue] = useState('');
   const [phoneOpen, setPhoneOpen] = useState(false);
   const [phoneMode, setPhoneMode] = useState<'bind' | 'change-primary'>('bind');
   const [phoneValue, setPhoneValue] = useState('');
@@ -84,7 +88,7 @@ export function AccountSettingsPage() {
       }),
   });
 
-  const emailVerificationMutation = useMutation({
+  const currentEmailVerificationMutation = useMutation({
     mutationFn: authApi.requestEmailVerification,
     onSuccess: () =>
       showToast({
@@ -96,6 +100,26 @@ export function AccountSettingsPage() {
       showToast({
         tone: 'error',
         title: '验证邮件发送失败',
+        description: error.message,
+      }),
+  });
+
+  const emailIdentityVerificationMutation = useMutation({
+    mutationFn: (email: string) => authApi.requestEmailIdentityVerification(email),
+    onSuccess: (result, email) => {
+      rememberPendingPrimaryEmail({ email, expiresAt: result.expiresAt });
+      setEmailOpen(false);
+      setEmailValue('');
+      showToast({
+        tone: 'success',
+        title: '邮箱确认链接已发送',
+        description: '请打开新邮箱中的链接，登录后完成绑定或换绑。',
+      });
+    },
+    onError: (error) =>
+      showToast({
+        tone: 'error',
+        title: '邮箱确认链接发送失败',
         description: error.message,
       }),
   });
@@ -128,7 +152,7 @@ export function AccountSettingsPage() {
       mode: 'bind' | 'change-primary';
       phone: string;
       verificationCode: string;
-    }) => (input.mode === 'bind' ? authApi.bindPhone(input) : authApi.changePrimaryPhone(input)),
+    }) => authApi.changePrimaryPhone(input),
     onSuccess: (saved, input) => {
       queryClient.setQueryData(authKeys.accountSecurity, (current) =>
         current
@@ -150,13 +174,13 @@ export function AccountSettingsPage() {
       setPhoneCodeRequested(false);
       showToast({
         tone: 'success',
-        title: input.mode === 'bind' ? '手机号已绑定' : '主手机号已更换',
+        title: input.mode === 'bind' ? '手机号已绑定' : '手机号已换绑',
       });
     },
     onError: (error) =>
       showToast({
         tone: 'error',
-        title: phoneMode === 'bind' ? '手机号绑定失败' : '手机号更换失败',
+        title: phoneMode === 'bind' ? '手机号绑定失败' : '手机号换绑失败',
         description: error.message,
       }),
   });
@@ -249,6 +273,9 @@ export function AccountSettingsPage() {
   const account = accountQuery.data;
   const passwordValidation = strongPasswordSchema.safeParse(newPassword);
   const handleValid = handlePattern.test(handleValue.trim());
+  const normalizedEmail = emailValue.trim();
+  const emailValid = z.string().email().safeParse(normalizedEmail).success;
+  const emailChanged = account.email?.value.toLowerCase() !== normalizedEmail.toLowerCase();
   const phoneValid = isE164Phone(phoneValue);
   const phoneCodeValid = /^[0-9]{6}$/.test(phoneCode);
   const passwordValid =
@@ -260,6 +287,16 @@ export function AccountSettingsPage() {
   const openHandle = () => {
     setHandleValue(account.handle);
     setHandleOpen(true);
+  };
+
+  const openEmail = () => {
+    setEmailValue('');
+    setEmailOpen(true);
+  };
+
+  const closeEmail = () => {
+    setEmailOpen(false);
+    setEmailValue('');
   };
 
   const openPhone = () => {
@@ -329,15 +366,21 @@ export function AccountSettingsPage() {
                     : '未绑定'}
                 </span>
               </div>
-              {account.email && !account.email.verifiedAt ? (
-                <Button
-                  size="sm"
-                  loading={emailVerificationMutation.isPending}
-                  onClick={() => emailVerificationMutation.mutate()}
-                >
-                  发送验证邮件
+              <div className={styles.rowActions}>
+                {account.email && !account.email.verifiedAt ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    loading={currentEmailVerificationMutation.isPending}
+                    onClick={() => currentEmailVerificationMutation.mutate()}
+                  >
+                    验证当前邮箱
+                  </Button>
+                ) : null}
+                <Button size="sm" variant="secondary" onClick={openEmail}>
+                  {account.email ? '换绑邮箱' : '绑定邮箱'}
                 </Button>
-              ) : null}
+              </div>
             </div>
             <div>
               <div>
@@ -354,7 +397,7 @@ export function AccountSettingsPage() {
                 </span>
               </div>
               <Button size="sm" variant="secondary" onClick={openPhone}>
-                {account.phone ? '更换' : '绑定手机号'}
+                {account.phone ? '换绑手机号' : '绑定手机号'}
               </Button>
             </div>
           </div>
@@ -517,8 +560,41 @@ export function AccountSettingsPage() {
       </Modal>
 
       <Modal
+        open={emailOpen}
+        title={account.email ? '换绑邮箱' : '绑定邮箱'}
+        description="系统会向新邮箱发送确认链接；只有点击链接并通过后端令牌校验后，主邮箱才会更新。"
+        onClose={closeEmail}
+        footer={
+          <>
+            <Button variant="secondary" onClick={closeEmail}>
+              取消
+            </Button>
+            <Button
+              loading={emailIdentityVerificationMutation.isPending}
+              disabled={!emailValid || !emailChanged}
+              onClick={() => emailIdentityVerificationMutation.mutate(normalizedEmail)}
+            >
+              发送确认链接
+            </Button>
+          </>
+        }
+      >
+        <TextField
+          label={account.email ? '新邮箱' : '邮箱'}
+          type="email"
+          name="email"
+          autoComplete="email"
+          value={emailValue}
+          placeholder="name@example.com"
+          hint="确认链接有效期由认证服务返回，链接只能使用一次。"
+          error={emailValue.length > 0 && !emailValid ? '请输入有效的邮箱地址' : undefined}
+          onChange={(event) => setEmailValue(event.target.value)}
+        />
+      </Modal>
+
+      <Modal
         open={phoneOpen}
-        title={phoneMode === 'bind' ? '绑定手机号' : '更换主手机号'}
+        title={phoneMode === 'bind' ? '绑定手机号' : '换绑手机号'}
         description="手机号必须使用包含国家代码的 E.164 格式，并通过短信验证码确认归属。"
         onClose={closePhone}
         footer={
@@ -533,8 +609,7 @@ export function AccountSettingsPage() {
               onClick={() =>
                 phoneVerificationMutation.mutate({
                   phone: phoneValue.trim(),
-                  purpose:
-                    phoneMode === 'bind' ? 'BIND_PHONE_VERIFY' : 'CHANGE_PRIMARY_PHONE_VERIFY',
+                  purpose: 'CHANGE_PRIMARY_PHONE_VERIFY',
                 })
               }
             >
@@ -551,7 +626,7 @@ export function AccountSettingsPage() {
                 })
               }
             >
-              {phoneMode === 'bind' ? '确认绑定' : '确认更换'}
+              {phoneMode === 'bind' ? '确认绑定' : '确认换绑'}
             </Button>
           </>
         }

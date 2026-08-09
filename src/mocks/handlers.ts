@@ -1922,6 +1922,7 @@ let mockSearchSettings = {
 };
 
 let mockHandle = currentUser.handle;
+let mockEmailValue: string | null = 'mock-user@example.test';
 let mockEmailVerifiedAt: string | null = null;
 let mockPhone: {
   value: string;
@@ -2004,11 +2005,13 @@ export const handlers = [
       userId: currentUser.id,
       status: 'ACTIVE' as const,
       handle: mockHandle,
-      email: {
-        value: 'mock-user@example.test',
-        isLoginEnabled: true,
-        verifiedAt: mockEmailVerifiedAt,
-      },
+      email: mockEmailValue
+        ? {
+            value: mockEmailValue,
+            isLoginEnabled: true,
+            verifiedAt: mockEmailVerifiedAt,
+          }
+        : null,
       phone: mockPhone,
       password: {
         configured: true,
@@ -2052,6 +2055,18 @@ export const handlers = [
       verified: true as const,
       userId: currentUser.id,
       identityId: 'mock-email-identity',
+    });
+  }),
+  http.post('/api/auth/identities/email/change-primary', async ({ request }) => {
+    const body = (await request.json()) as { email: string; verificationToken: string };
+    const verifiedAtIso = new Date().toISOString();
+    mockEmailValue = body.email;
+    mockEmailVerifiedAt = verifiedAtIso;
+    return ok({
+      identityId: 'mock-email-primary-identity',
+      email: body.email,
+      isPrimary: true,
+      verifiedAtIso,
     });
   }),
   http.post('/api/auth/identities/phone/bind', async ({ request }) => {

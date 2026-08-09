@@ -93,6 +93,23 @@ describe('authApi default MSW contract', () => {
     const verified = await authApi.accountSecurity();
     expect(verified.email?.verifiedAt).not.toBeNull();
 
+    const replacementEmail = 'next@example.test';
+    await expect(authApi.requestEmailIdentityVerification(replacementEmail)).resolves.toMatchObject(
+      {
+        accepted: true,
+      },
+    );
+    await expect(
+      authApi.changePrimaryEmail({
+        email: replacementEmail,
+        verificationToken: 'a'.repeat(43),
+      }),
+    ).resolves.toMatchObject({
+      email: replacementEmail,
+      isPrimary: true,
+    });
+    expect((await authApi.accountSecurity()).email?.value).toBe(replacementEmail);
+
     const firstPhone = '+8613800138000';
     await expect(
       authApi.requestPhoneIdentityVerification({

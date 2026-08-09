@@ -34,7 +34,9 @@ export function SettingsPage({ title, description, children, aside }: SettingsPa
   return (
     <>
       <PageTitle title={title} description={description} />
-      <div className={styles.layout}>
+      <div
+        className={[styles.layout, !aside && styles.layoutWithoutAside].filter(Boolean).join(' ')}
+      >
         <aside className={styles.nav}>
           <div className={styles.navTitle}>
             <strong>设置</strong>
@@ -56,27 +58,8 @@ export function SettingsPage({ title, description, children, aside }: SettingsPa
           <p>保存成功的设置会通过账号同步到登录设备。</p>
         </aside>
         <main>{children}</main>
-        <aside className={styles.aside}>{aside ?? <DefaultAside />}</aside>
+        {aside ? <aside className={styles.aside}>{aside}</aside> : null}
       </div>
-    </>
-  );
-}
-
-function DefaultAside() {
-  return (
-    <>
-      <section>
-        <h2>设置提示</h2>
-        <ul>
-          <li>页面中的账号状态与开关均读取自服务端</li>
-          <li>重要更改可能要求当前密码或验证码</li>
-          <li>设备会话可以在账号安全页远程退出</li>
-        </ul>
-      </section>
-      <section>
-        <h2>数据说明</h2>
-        <p>加载失败时页面不会使用示例账号、示例设备或前端默认值替代服务端数据。</p>
-      </section>
     </>
   );
 }

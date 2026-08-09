@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, AlertTriangle, CheckCircle2, Clock3, LoaderCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useAuthStore } from '@/domains/auth';
@@ -18,9 +18,9 @@ import {
 import { isApiError } from '@/shared/api/errors';
 import { createAbortError, getErrorMessage, toError } from '@/shared/lib/error';
 import { trimToNull } from '@/shared/lib/text';
-import { Button, Card, Spinner, TextField, useToast } from '@/shared/ui';
+import { Button, Card, Modal, Spinner, TextField, useToast } from '@/shared/ui';
 import { PageLayout } from '@/widgets/layout/PageLayout';
-import { EmptyPanel, PageTitle, SaveFooter, SideCard } from '../_shared/PageParts';
+import { EmptyPanel, PageTitle, SaveFooter } from '../_shared/PageParts';
 import { useMediaImagePairSelection } from '../_shared/useMediaImagePairSelection';
 import { ProfileImageField } from './ProfileImageField';
 import {
@@ -43,19 +43,10 @@ interface ProfileEditEditorProps {
   onProfileMissing: () => void;
 }
 
-type SaveFeedbackKind = 'idle' | 'success' | 'error';
-
 interface SaveFeedback {
-  kind: SaveFeedbackKind;
   title: string;
   description: string;
 }
-
-const INITIAL_SAVE_FEEDBACK: SaveFeedback = {
-  kind: 'idle',
-  title: '尚未保存',
-  description: '修改资料后点击保存，结果会显示在这里。',
-};
 
 export function ProfileEditPage() {
   const profileQuery = useQuery({
@@ -113,7 +104,7 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
   const [removeAvatar, setRemoveAvatar] = useState(false);
   const [removeCover, setRemoveCover] = useState(false);
   const { avatar, cover } = useMediaImagePairSelection();
-  const [saveFeedback, setSaveFeedback] = useState<SaveFeedback>(INITIAL_SAVE_FEEDBACK);
+  const [saveFeedback, setSaveFeedback] = useState<SaveFeedback | null>(null);
   const activeRequestRef = useRef<AbortController | null>(null);
 
   const form = useForm<ProfileEditFormValues>({
@@ -185,6 +176,7 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
         if (activeRequestRef.current === abortController) activeRequestRef.current = null;
       }
     },
+    onMutate: () => setSaveFeedback(null),
     onSuccess: (profile) => {
       queryClient.setQueryData(userKeys.editableProfile, profile);
       resetToProfile(profile);
@@ -192,30 +184,19 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
       if (authUser?.handle) {
         void queryClient.invalidateQueries({ queryKey: userKeys.profile(authUser.handle) });
       }
-      showToast({
-        tone: 'success',
-        title: '个人资料已保存',
-        description: '公开资料与媒体引用已同步更新。',
-      });
       setSaveFeedback({
-        kind: 'success',
-        title: '资料已保存',
-        description: '服务端已返回最新资料与媒体状态。',
+        title: '个人资料已保存',
+        description: '公开资料与媒体引用已根据服务端返回结果同步更新。',
       });
     },
     onError: (error) => {
       const mediaError = isMediaUploadError(error);
       const networkError = isApiError(error) && error.code === 'NETWORK_ERROR';
       setSaveFeedback({
-        kind: 'error',
         title: mediaError ? '头像或封面上传失败' : networkError ? '网络连接失败' : '资料保存失败',
         description: getErrorMessage(error, '请检查资料内容、媒体状态和网络连接后重试。'),
       });
-      showToast({
-        tone: 'error',
-        title: mediaError ? '图片尚未准备完成' : '资料保存失败',
-        description: getErrorMessage(error, '请检查资料内容、媒体状态和网络连接后重试。'),
-      });
+
       if (isApiError(error) && error.code === 'USER_PROFILE_NOT_FOUND') {
         onProfileMissing();
       }
@@ -241,7 +222,6 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
     },
     () => {
       setSaveFeedback({
-        kind: 'error',
         title: '字段校验失败',
         description: '请修正表单中标记的内容后再保存。',
       });
@@ -250,7 +230,7 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
 
   const resetUnsavedChanges = () => {
     resetToProfile(profile);
-    setSaveFeedback(INITIAL_SAVE_FEEDBACK);
+    setSaveFeedback(null);
     showToast({ tone: 'info', title: '未保存更改已撤销' });
   };
 
@@ -258,48 +238,11 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
   const mediaDirty = Boolean(avatar.selection || cover.selection || removeAvatar || removeCover);
   const hasUnsavedChanges = form.formState.isDirty || mediaDirty;
   const saving = updateProfile.isPending;
-  const displayedFeedback = saving
-    ? {
-        kind: 'idle' as const,
-        title: '正在保存',
-        description: '正在上传图片并提交资料，请勿关闭当前页面。',
-      }
-    : saveFeedback.kind !== 'error' && hasUnsavedChanges
-      ? {
-          kind: 'idle' as const,
-          title: '存在未保存更改',
-          description: '保存后，公开主页会使用服务端返回的最新资料。',
-        }
-      : saveFeedback;
-  const feedbackIcon = saving ? (
-    <LoaderCircle className={styles.spinning} size={17} />
-  ) : displayedFeedback.kind === 'success' ? (
-    <CheckCircle2 size={17} />
-  ) : displayedFeedback.kind === 'error' ? (
-    <AlertTriangle size={17} />
-  ) : (
-    <Clock3 size={17} />
-  );
 
   return (
     <>
       <PageTitle title="编辑个人资料" />
-      <PageLayout
-        aside={
-          <SideCard title="保存结果">
-            <div className={styles.saveResult}>
-              <p>展示保存成功、字段校验错误、头像上传失败与网络失败。</p>
-              <div className={styles.saveStatus} data-tone={displayedFeedback.kind}>
-                {feedbackIcon}
-                <div>
-                  <strong>{displayedFeedback.title}</strong>
-                  <span>{displayedFeedback.description}</span>
-                </div>
-              </div>
-            </div>
-          </SideCard>
-        }
-      >
+      <PageLayout>
         <Card className={styles.form}>
           <form onSubmit={(event) => void submit(event)} noValidate>
             <section className={styles.media}>
@@ -384,7 +327,7 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
               </div>
               <SaveFooter
                 saving={saving}
-                disabled={!hasUnsavedChanges || !form.formState.isValid}
+                disabled={!hasUnsavedChanges}
                 message={
                   hasUnsavedChanges
                     ? '文本与媒体更改会在同一次资料更新中提交'
@@ -397,6 +340,13 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
           </form>
         </Card>
       </PageLayout>
+      <Modal
+        open={saveFeedback !== null}
+        title={saveFeedback?.title ?? ''}
+        description={saveFeedback?.description}
+        onClose={() => setSaveFeedback(null)}
+        footer={<Button onClick={() => setSaveFeedback(null)}>知道了</Button>}
+      />
     </>
   );
 }

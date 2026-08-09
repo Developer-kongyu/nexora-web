@@ -26,9 +26,60 @@ function renderAccountSettingsPage() {
 }
 
 describe('AccountSettingsPage', () => {
+  it('shows an email binding entry and requests a backend change-email challenge', async () => {
+    let verificationBody: unknown = null;
+
+    server.use(
+      http.get('/api/auth/account/security', () =>
+        apiSuccessResponse({
+          userId: 'user-current',
+          status: 'ACTIVE' as const,
+          handle: 'tester',
+          email: null,
+          phone: null,
+          password: {
+            configured: true,
+            setAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-08-01T00:00:00.000Z',
+          },
+        }),
+      ),
+      http.get('/api/auth/sessions', () =>
+        apiSuccessResponse({ list: [], total: 0, page: 1, pageSize: 100 }),
+      ),
+      http.post('/api/auth/verification/email/request', async ({ request }) => {
+        verificationBody = await request.json();
+        return apiSuccessResponse({
+          accepted: true as const,
+          expiresAt: '2026-08-09T10:30:00.000Z',
+        });
+      }),
+    );
+
+    window.localStorage.clear();
+    renderAccountSettingsPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: '绑定邮箱' }));
+    fireEvent.change(screen.getByPlaceholderText('name@example.com'), {
+      target: { value: 'new@example.com' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: '发送确认链接' }));
+
+    await waitFor(() =>
+      expect(verificationBody).toEqual({
+        purpose: 'CHANGE_EMAIL_VERIFY',
+        email: 'new@example.com',
+      }),
+    );
+    await waitFor(() =>
+      expect(window.localStorage.getItem('nexora.pending-primary-email')).toContain(
+        'new@example.com',
+      ),
+    );
+  });
   it('shows the phone binding entry and completes the verification flow', async () => {
     let verificationBody: unknown = null;
-    let bindBody: unknown = null;
+    let changePrimaryBody: unknown = null;
     let boundPhone: {
       value: string;
       isLoginEnabled: boolean;
@@ -64,8 +115,8 @@ describe('AccountSettingsPage', () => {
           expiresAt: '2026-08-09T10:10:00.000Z',
         });
       }),
-      http.post('/api/auth/identities/phone/bind', async ({ request }) => {
-        bindBody = await request.json();
+      http.post('/api/auth/identities/phone/change-primary', async ({ request }) => {
+        changePrimaryBody = await request.json();
         boundPhone = {
           value: '+8613800138000',
           isLoginEnabled: true,
@@ -74,7 +125,7 @@ describe('AccountSettingsPage', () => {
         return apiSuccessResponse({
           identityId: 'phone-identity',
           phone: boundPhone.value,
-          isPrimary: false,
+          isPrimary: true,
           verifiedAtIso: boundPhone.verifiedAt,
         });
       }),
@@ -82,6 +133,7 @@ describe('AccountSettingsPage', () => {
 
     renderAccountSettingsPage();
 
+    expect(await screen.findByRole('button', { name: '换绑邮箱' })).toBeInTheDocument();
     fireEvent.click(await screen.findByRole('button', { name: '绑定手机号' }));
 
     expect(screen.getByRole('dialog', { name: '绑定手机号' })).toBeInTheDocument();
@@ -95,7 +147,7 @@ describe('AccountSettingsPage', () => {
     await waitFor(() =>
       expect(verificationBody).toEqual({
         phone: '+8613800138000',
-        purpose: 'BIND_PHONE_VERIFY',
+        purpose: 'CHANGE_PRIMARY_PHONE_VERIFY',
       }),
     );
     await waitFor(() => expect(screen.getByLabelText('短信验证码')).not.toBeDisabled());
@@ -106,12 +158,12 @@ describe('AccountSettingsPage', () => {
     fireEvent.click(screen.getByRole('button', { name: '确认绑定' }));
 
     await waitFor(() =>
-      expect(bindBody).toEqual({
+      expect(changePrimaryBody).toEqual({
         phone: '+8613800138000',
         verificationCode: '123456',
       }),
     );
-    expect(await screen.findByRole('button', { name: '更换' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: '换绑手机号' })).toBeInTheDocument();
     expect(screen.getByText(/^\+8613800138000 · 已验证于/u)).toBeInTheDocument();
   });
 });

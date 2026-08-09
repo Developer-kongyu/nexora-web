@@ -263,24 +263,6 @@ export function SafetySettingsPage() {
     <SettingsPage
       title="屏蔽与静音"
       description="管理已静音和已屏蔽的账号；所有操作直接同步到账号关系服务。"
-      aside={
-        <>
-          <section>
-            <h2>影响范围</h2>
-            <ul>
-              <li>静音不会通知对方，可分别影响帖子和通知。</li>
-              <li>屏蔽会停止双方查看、关注和互动。</li>
-              <li>解除操作立即生效，并可能改变相关页面的关系状态。</li>
-            </ul>
-          </section>
-          <section>
-            <h2>资料占位</h2>
-            <p>
-              账号停用、资料不可见或策略限制时，列表仍保留管理条目，但不会伪造昵称、头像或 Handle。
-            </p>
-          </section>
-        </>
-      }
     >
       <div className={styles.stack}>
         <Card className={styles.safetySearchCard}>

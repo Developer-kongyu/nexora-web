@@ -213,6 +213,13 @@ const router = createBrowserRouter([
             }),
           },
           {
+            path: 'settings/account/email/verify',
+            lazy: async () => ({
+              Component: (await import('@/pages/settings/EmailIdentityVerificationPage'))
+                .EmailIdentityVerificationPage,
+            }),
+          },
+          {
             path: 'settings/privacy',
             lazy: async () => ({
               Component: (await import('@/pages/settings/PrivacySettingsPage')).PrivacySettingsPage,

@@ -3,6 +3,7 @@ export * from './api/onboardingApi';
 export * from './hooks/useAuth';
 export * from './model/authStore';
 export * from './model/onboardingRoute';
+export * from './model/pendingPrimaryEmail';
 export * from './model/phone';
 export * from './model/queryKeys';
 export * from './model/types';

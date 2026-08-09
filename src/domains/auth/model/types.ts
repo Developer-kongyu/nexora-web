@@ -118,6 +118,18 @@ export interface PhoneIdentityMutationResponse {
   verifiedAtIso: string;
 }
 
+export interface EmailIdentityVerificationResponse {
+  accepted: true;
+  expiresAt: string | null;
+}
+
+export interface EmailIdentityMutationResponse {
+  identityId: string;
+  email: string;
+  isPrimary: boolean;
+  verifiedAtIso: string;
+}
+
 export interface PasswordResetRequestInput {
   identifier: string;
 }

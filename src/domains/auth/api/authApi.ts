@@ -5,6 +5,8 @@ import type {
   AuthSessionResponse,
   AuthSessionListView,
   BackendAuthSessionResponse,
+  EmailIdentityMutationResponse,
+  EmailIdentityVerificationResponse,
   GoogleProfileInput,
   GoogleVerificationResult,
   LoginInput,
@@ -267,12 +269,34 @@ export const authApi = {
 
   requestEmailVerification: () =>
     apiClient.request<
-      { accepted: true; expiresAt: string },
+      EmailIdentityVerificationResponse,
       { purpose: 'REGISTER_EMAIL_VERIFY'; email: null }
     >({
       method: 'POST',
       path: '/api/auth/verification/email/request',
       body: { purpose: 'REGISTER_EMAIL_VERIFY', email: null },
+    }),
+
+  requestEmailIdentityVerification: (email: string) =>
+    apiClient.request<
+      EmailIdentityVerificationResponse,
+      { purpose: 'CHANGE_EMAIL_VERIFY'; email: string }
+    >({
+      method: 'POST',
+      path: '/api/auth/verification/email/request',
+      body: { purpose: 'CHANGE_EMAIL_VERIFY', email: email.trim() },
+    }),
+
+  changePrimaryEmail: (input: { email: string; verificationToken: string }) =>
+    apiClient.request<EmailIdentityMutationResponse, { email: string; verificationToken: string }>({
+      method: 'POST',
+      path: '/api/auth/identities/email/change-primary',
+      body: {
+        email: input.email.trim(),
+        verificationToken: input.verificationToken.trim(),
+      },
+      idempotencyKey: crypto.randomUUID(),
+      retry401: false,
     }),
 
   confirmEmailVerification: (token: string) =>

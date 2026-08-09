@@ -36,6 +36,7 @@ export const paths = {
   history: '/history',
   passwordReset: PASSWORD_RESET_PATH,
   emailVerification: '/auth/email/verify',
+  emailIdentityVerification: '/settings/account/email/verify',
   passwordResetFor: (identifier: string) =>
     `${PASSWORD_RESET_PATH}?identifier=${encodeURIComponent(identifier)}`,
   post: postPath,
