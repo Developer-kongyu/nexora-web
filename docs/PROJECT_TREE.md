@@ -248,8 +248,6 @@ lct-web/
 │   │   └── server.ts
 │   ├── pages/
 │   │   ├── _shared/
-│   │   │   ├── ContentPages.module.css
-│   │   │   ├── PageForms.module.css
 │   │   │   ├── PageParts.tsx
 │   │   │   ├── ProductPages.module.css
 │   │   │   ├── SettingsPage.module.css
@@ -280,7 +278,6 @@ lct-web/
 │   │   │   └── CommunityDetailPage.tsx
 │   │   ├── community-manage/
 │   │   │   ├── sections/
-│   │   │   │   ├── ContentAvailabilitySection.tsx
 │   │   │   │   ├── JoinRequestsSection.tsx
 │   │   │   │   ├── LogsSection.tsx
 │   │   │   │   ├── MembersSection.tsx
