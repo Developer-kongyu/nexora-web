@@ -1,3 +1,4 @@
+import homeStyles from './HomePage.module.css';
 import { Hash, RefreshCw, TrendingUp, UsersRound } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { CommunitySummary } from '@/domains/communities';
@@ -7,12 +8,13 @@ import { mergeCursorItems } from '@/shared/api/pagination';
 import { APP_BRAND } from '@/shared/config/brand';
 import { paths } from '@/shared/config/paths';
 import { Button, useToast } from '@/shared/ui';
-import { CommunityCard } from '@/widgets/community-card/CommunityCard';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { PostCard } from '@/widgets/post-card/PostCard';
-import { UserCard } from '@/widgets/user-card/UserCard';
-import { LoadingRows, Notice, QuickCompose, SideCard } from '../_shared/PageParts';
-import styles from '../_shared/ProductPages.module.css';
+import { CommunityCard } from '@/widgets/community-card';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { PostCard } from '@/widgets/post-card';
+import { UserCard } from '@/widgets/user-card';
+import { LoadingRows, Notice, SideCard } from '@/shared/ui';
+import { QuickCompose } from '@/widgets/quick-compose';
+import styles from '@/shared/ui/layout/ContentLayout.module.css';
 
 const SUGGESTED_USERS: UserSummary[] = [
   {
@@ -77,13 +79,13 @@ export function HomePage() {
 
   const aside = (
     <>
-      <SideCard title="推荐关注" action="换一批" to={paths.explore}>
+      <SideCard title="推荐关注" action={<Link to={paths.explore}>换一批</Link>}>
         {SUGGESTED_USERS.map((user) => (
           <UserCard key={user.id} user={user} compact />
         ))}
       </SideCard>
 
-      <SideCard title="热门话题" action="查看全部" to={paths.explore}>
+      <SideCard title="热门话题" action={<Link to={paths.explore}>查看全部</Link>}>
         <div style={{ display: 'grid', gap: 2 }}>
           {TRENDING_TOPICS.map(([name, count], index) => (
             <Link
@@ -114,7 +116,7 @@ export function HomePage() {
         </div>
       </SideCard>
 
-      <SideCard title="推荐社群" action="更多" to={paths.communities}>
+      <SideCard title="推荐社群" action={<Link to={paths.communities}>更多</Link>}>
         <CommunityCard community={SUGGESTED_COMMUNITY} />
       </SideCard>
 
@@ -167,7 +169,7 @@ export function HomePage() {
             >
               <RefreshCw
                 aria-hidden="true"
-                className={feed.isRefreshing ? styles.refreshIconSpinning : undefined}
+                className={feed.isRefreshing ? homeStyles.refreshIconSpinning : undefined}
                 size={13}
               />
               {feed.isRefreshing ? '刷新中' : '刷新'}

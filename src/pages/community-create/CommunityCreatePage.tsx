@@ -20,9 +20,9 @@ import { isApiError } from '@/shared/api/errors';
 import { createAbortError, getErrorMessage, toError } from '@/shared/lib/error';
 import { trimToNull } from '@/shared/lib/text';
 import { Button, Card, Select, SelectOptions, Switch, TextField, useToast } from '@/shared/ui';
-import { PageLayout } from '@/widgets/layout/PageLayout';
-import { PageTitle, SideCard } from '../_shared/PageParts';
-import { useMediaImagePairSelection } from '../_shared/useMediaImagePairSelection';
+import { PageLayout } from '@/shared/ui/layout';
+import { PageHeader, SideCard } from '@/shared/ui';
+import { useMediaImagePairSelection } from '@/domains/media';
 import { CommunityImageField } from './CommunityImageField';
 import {
   COMMUNITY_CREATE_DEFAULT_VALUES,
@@ -164,7 +164,7 @@ export function CommunityCreatePage() {
 
   return (
     <>
-      <PageTitle title="创建社群" description="建立清晰的主题、规则与成员加入方式。" />
+      <PageHeader title="创建社群" description="建立清晰的主题、规则与成员加入方式。" />
       <PageLayout
         aside={
           <>

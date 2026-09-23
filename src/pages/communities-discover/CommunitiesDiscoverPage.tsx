@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { communitiesApi, communityKeys } from '@/domains/communities';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
 import { Badge, Button, Card, Select } from '@/shared/ui';
-import { CommunityCard } from '@/widgets/community-card/CommunityCard';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { EmptyPanel, LoadingRows, SideCard } from '../_shared/PageParts';
+import { CommunityCard } from '@/widgets/community-card';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { EmptyPanel, LoadingRows, SideCard } from '@/shared/ui';
 import styles from './CommunitiesDiscoverPage.module.css';
 
 const categories = [

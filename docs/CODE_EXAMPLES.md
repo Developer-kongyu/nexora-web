@@ -7,7 +7,7 @@
 路径：`src/shared/api/client.ts`
 
 ```ts
-const result = await apiClient.request<PostViewModel>({
+const result = await apiClient.request<PostDetailDto>({
   path: `/api/posts/${postId}`,
   signal,
 });
@@ -16,7 +16,7 @@ const result = await apiClient.request<PostViewModel>({
 写请求携带幂等键：
 
 ```ts
-await apiClient.request<PostViewModel, PublishPostInput>({
+await apiClient.request<PublishPostDirectResult, PublishPostDirectInput>({
   method: 'POST',
   path: '/api/posts/publish',
   body: input,
@@ -35,7 +35,7 @@ Hook 路径：`src/domains/feed/hooks/useFeed.ts`
 页面只消费 hook：
 
 ```tsx
-const feed = useFollowingFeed();
+const feed = useFeed('following');
 const posts = feed.data ? mergeCursorItems(feed.data.pages) : [];
 
 return posts.map((post) => <PostCard key={post.id} post={post} />);
@@ -55,18 +55,18 @@ src/widgets/post-card/PostCard.module.css
 
 ## 4. 发布编辑器
 
-路径：`src/widgets/compose-editor/ComposeEditor.tsx`
+路径：`src/features/compose-post/ui/ComposeEditor.tsx`
 
 包括：
 
 - React Hook Form + Zod 校验。
-- 280 字计数。
+- 1000 字上限和计数。
 - 媒体上传队列。
 - 社群与可见范围。
-- 点赞、评论、转发、引用权限。
+- 评论、转发、引用权限。
 - 草稿和发布按钮。
 
-真实项目可在此基础上增加防抖自动保存、版本冲突和上传失败重试。
+`model/useComposer.ts` 组合表单与动作，`useDraftAutosave.ts` 处理防抖自动保存和版本冲突，`useComposeUploads.ts` 协调媒体领域上传/重试，`usePublishPost.ts` 统一发布及跨领域缓存失效。路由参数与成功导航留在 `pages/compose/ComposePage.tsx`。
 
 ## 5. 媒体查看器
 
@@ -99,8 +99,11 @@ src/app/providers/AuthBootstrap.tsx
 路径：
 
 ```text
-src/mocks/fixtures.ts
-src/mocks/handlers.ts
+src/mocks/fixtures.ts             # 测试/Stories 静态样例兼容出口
+src/mocks/fixtures/              # 分领域样例与工厂
+src/mocks/handlers.ts            # 稳定顺序组装
+src/mocks/handlers/              # 分领域接口
+src/mocks/state/index.ts         # resetMockState
 src/mocks/browser.ts
 src/mocks/server.ts
 ```
@@ -123,4 +126,4 @@ PostCard 测试会校验七个互动项，MediaViewer 测试会校验播放和�
 
 路径：`tests/e2e/smoke.spec.ts`
 
-示例覆盖 Mock 登录进入首页，以及帖子卡片七个互动项可见。正式阶段应继续增加发布、上传、收藏、社群加入和通知未读链路。
+原有冒烟测试覆盖 Mock 登录进入首页，以及帖子卡片七个互动项可见。`tests/e2e/architecture-migration.spec.ts` 另覆盖草稿保存/恢复/自动保存、发布导航、跨页面点赞/转发/收藏刷新及手机布局。上传、社群加入和通知未读可按后续需求扩展。

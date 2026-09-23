@@ -1,6 +1,7 @@
 import { apiClient } from '@/shared/api/client';
 import { buildCursorQuery, type CursorPageView } from '@/shared/api/pagination';
 import type {
+  UpdateOwnProfileRequest,
   ApproveFollowRequestResult,
   BlockedUserManagementListItemView,
   BlockUserResult,
@@ -22,15 +23,7 @@ import type {
 } from '../model/types';
 import type { UserRelationshipAction } from '../model/relationActions';
 
-export interface UpdateOwnProfileRequest {
-  displayName?: string;
-  bio?: string | null;
-  location?: string | null;
-  websiteUrl?: string | null;
-  birthday?: string | null;
-  avatarStorageKey?: string | null;
-  coverStorageKey?: string | null;
-}
+export type { UpdateOwnProfileRequest } from '../model/types';
 
 export const usersApi = {
   getCurrentUserCard: (signal?: AbortSignal) =>

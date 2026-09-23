@@ -1,2 +1,3 @@
-export * from './api/engagementApi';
-export * from './hooks/usePostImpression';
+export { engagementApi } from './api/engagementApi';
+export type { ImpressionScene, ImpressionRecordResult } from './api/engagementApi';
+export { usePostImpression } from './hooks/usePostImpression';

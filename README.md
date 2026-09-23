@@ -6,6 +6,22 @@
 
 Nexora Web 是开放兴趣社交网络 Nexora 的正式前端工程，覆盖认证、新手引导、信息流、搜索、内容创作、个人主页、用户关系、收藏、社群、通知、浏览历史和设置等完整页面。工程通过统一 API Client 连接 Nexora Backend，并提供 Mock、单元测试、E2E、Storybook 和 Docker/Nginx 生产构建能力。
 
+## 初学者教程
+
+如果你希望从基础开始系统理解本项目，请阅读 **[Nexora Web 初学者教程](./docs/tutorial/README.md)**。教程共 15 章，涵盖：
+
+- 浏览器、HTTP、SPA、React、Vite 与 TypeScript 基础；
+- 为什么目录拆成 `app / pages / widgets / features / domains / shared`；
+- 应用启动、Provider、路由、懒加载和认证守卫；
+- CSS Modules、设计令牌、组件和响应式布局；
+- API Client、TanStack Query、Zustand、Token/CSRF 与缓存；
+- React Hook Form、Zod、验证码和服务端错误；
+- 首页信息流、手机号注册等真实代码链路；
+- MSW、Vitest、Testing Library、Playwright、调试和 Docker/CI；
+- 从后端契约到页面与测试的新功能开发完整流程。
+
+建议第一次接触项目时按章节顺序阅读，并在 VS Code 中同步打开每章引用的源码。
+
 ## 技术栈
 
 | 技术                     | 当前版本 | 用途                           |
@@ -31,11 +47,12 @@ Nexora Web 是开放兴趣社交网络 Nexora 的正式前端工程，覆盖认�
 ```text
 src/
 ├─ app/          # Providers、Router、布局、错误边界和全局样式
-├─ pages/        # 路由级页面与业务编排
-├─ widgets/      # PostCard、ComposeEditor、AppShell 等复合组件
+├─ pages/        # 路由参数、页面布局与导航
+├─ widgets/      # PostCard、QuickCompose、AppShell 等复合组件
+├─ features/     # 发帖、草稿上传协调与帖子互动流程
 ├─ domains/      # 按业务域拆分的 API、hooks、types 和局部状态
 ├─ shared/       # API Client、环境配置、工具函数和基础 UI
-├─ mocks/        # MSW fixtures 与 handlers
+├─ mocks/        # 分领域 handlers、fixtures 与可重置 state
 └─ test/         # Vitest / Testing Library 测试初始化
 ```
 
@@ -45,11 +62,14 @@ src/
 flowchart LR
     app --> pages
     pages --> widgets
-    widgets --> domains
+    widgets --> features
+    features --> domains
     domains --> shared
 ```
 
 页面与组件通过 **shared/api/client.ts** 和 **domains/\*/api** 访问网络。TanStack Query 管理服务端事实，组件 state 管理页面临时交互，Zustand 只承载真正需要跨页面共享的客户端状态。
+
+迁移后的目录与规则见 [架构说明](./docs/ARCHITECTURE.md) 和 [架构迁移记录](./docs/ARCHITECTURE_MIGRATION.md)。`npm run check` 和 CI 均包含复用检查、架构边界及其验证用例。
 
 ## 环境要求
 

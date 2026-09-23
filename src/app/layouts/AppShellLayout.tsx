@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
-import { MobileNavigation, Sidebar } from '@/widgets/app-shell/Sidebar';
-import { Topbar } from '@/widgets/app-shell/Topbar';
+import { MobileNavigation, Sidebar } from '@/widgets/app-shell';
+import { Topbar } from '@/widgets/app-shell';
 import styles from './AppShellLayout.module.css';
 
 export function AppShellLayout() {

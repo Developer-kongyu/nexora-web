@@ -1,12 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { feedKeys } from '@/domains/feed/model/queryKeys';
 import { postsApi } from '../api/postsApi';
 import { postKeys } from '../model/queryKeys';
-import type {
-  PostComposeInput,
-  PublishPostDirectInput,
-  PublishPostFromDraftInput,
-} from '../model/types';
+import type { PostComposeInput } from '../model/types';
 
 export function usePost(postId: string) {
   return useQuery({
@@ -63,34 +58,5 @@ export function useSavePostDraft() {
     mutationFn: ({ draftId, draftVersion, compose }: SavePostDraftVariables) =>
       postsApi.saveDraft(draftId, draftVersion, compose),
     onSuccess: (result) => invalidateDraftQueries(result.draftId),
-  });
-}
-
-export function usePublishPostDraft() {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: ({ draftId, input }: { draftId: string; input?: PublishPostFromDraftInput }) =>
-      postsApi.publishDraft(draftId, input),
-    onSuccess: async (result) => {
-      await Promise.all([
-        client.invalidateQueries({ queryKey: feedKeys.all }),
-        client.invalidateQueries({ queryKey: postKeys.drafts }),
-        client.invalidateQueries({ queryKey: postKeys.draftDetail(result.draftId) }),
-      ]);
-    },
-  });
-}
-
-export function usePublishPost() {
-  const client = useQueryClient();
-
-  return useMutation({
-    mutationFn: (input: PublishPostDirectInput) => postsApi.publish(input),
-    onSuccess: async () => {
-      await Promise.all([
-        client.invalidateQueries({ queryKey: feedKeys.all }),
-        client.invalidateQueries({ queryKey: postKeys.drafts }),
-      ]);
-    },
   });
 }

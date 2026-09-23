@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { permissionKeys, permissionsApi, type PermissionPolicy } from '@/domains/permissions';
 import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { Button, Card, Modal, Select, Switch, useToast } from '@/shared/ui';
-import { SettingsPage } from '../_shared/SettingsPage';
+import { SettingsPage } from './ui/SettingsPage';
 import styles from './SettingsPages.module.css';
 
 const postVisibilityLabels: Record<PermissionPolicy['defaultPostVisibility'], string> = {

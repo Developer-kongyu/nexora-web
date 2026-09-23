@@ -3,12 +3,12 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSearch, type SearchSort, type SearchTab } from '@/domains/search';
 import { Button, Select, Switch } from '@/shared/ui';
-import { CommunityCard } from '@/widgets/community-card/CommunityCard';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { PostCard } from '@/widgets/post-card/PostCard';
-import { UserCard } from '@/widgets/user-card/UserCard';
-import { EmptyPanel, LoadingRows, SideCard } from '../_shared/PageParts';
-import styles from '../_shared/ProductPages.module.css';
+import { CommunityCard } from '@/widgets/community-card';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { PostCard } from '@/widgets/post-card';
+import { UserCard } from '@/widgets/user-card';
+import { EmptyPanel, LoadingRows, SideCard } from '@/shared/ui';
+import styles from '@/shared/ui/layout/ContentLayout.module.css';
 
 export function SearchPage() {
   const navigate = useNavigate();

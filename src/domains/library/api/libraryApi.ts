@@ -1,4 +1,4 @@
-import { hydratePostCardBrief } from '@/domains/posts';
+import { hydratePostCardBrief } from '@/domains/posts/api';
 import { apiClient } from '@/shared/api/client';
 import { createIdempotencyKey } from '@/shared/api/idempotency';
 import { buildCursorQuery, type CursorRequest } from '@/shared/api/pagination';

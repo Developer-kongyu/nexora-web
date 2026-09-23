@@ -28,9 +28,11 @@
     "storybook:build": "storybook build",
     "api:generate": "node scripts/generate-api.mjs",
     "env:check": "node scripts/check-env.mjs",
-    "check": "npm run reuse:check && npm run format:check && npm run typecheck && npm run lint && npm run lint:css && npm run test && npm run build",
+    "check": "npm run boundaries:test && npm run boundaries:check && npm run reuse:check && npm run format:check && npm run typecheck && npm run lint && npm run lint:css && npm run test && npm run build",
     "check:full": "npm run check && npm run storybook:build && npm run test:e2e",
-    "reuse:check": "node scripts/check-reuse.mjs"
+    "reuse:check": "node scripts/check-reuse.mjs",
+    "boundaries:check": "node scripts/check-boundaries.mjs",
+    "boundaries:test": "node --test scripts/check-boundaries.test.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "5.4.0",

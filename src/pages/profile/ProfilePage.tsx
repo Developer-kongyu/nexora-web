@@ -34,9 +34,9 @@ import { paths } from '@/shared/config/paths';
 import { useCopyTextFeedback } from '@/shared/hooks/useCopyTextFeedback';
 import { getUrlHostname } from '@/shared/lib/url';
 import { Avatar, Badge, Button, Card, IconButton, Modal, useToast } from '@/shared/ui';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { PostCard } from '@/widgets/post-card/PostCard';
-import { EmptyPanel, LoadingRows, SideCard } from '../_shared/PageParts';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { PostCard } from '@/widgets/post-card';
+import { EmptyPanel, LoadingRows, SideCard } from '@/shared/ui';
 import styles from './ProfilePage.module.css';
 
 const profileTabs = ['帖子', '媒体'] as const;

@@ -1,10 +1,10 @@
 import { apiClient } from '@/shared/api/client';
 import { appendQuery } from '@/shared/api/query';
-import { communityCardToSummary } from '@/domains/communities/lib/communityAdapter';
-import type { CommunityCardBriefView, UserPublicCardView } from '@/domains/communities/model/types';
-import { postsApi } from '@/domains/posts/api/postsApi';
-import { postCardBriefToViewModel } from '@/domains/posts/lib/postCardAdapter';
-import type { PostCardBriefView } from '@/domains/posts/model/types';
+import { communityCardToSummary } from '@/domains/communities/lib';
+import type { CommunityCardBriefView, UserPublicCardView } from '@/domains/communities/model';
+import { postsApi } from '@/domains/posts/api';
+import { postCardBriefToViewModel } from '@/domains/posts/lib';
+import type { PostCardBriefView } from '@/domains/posts/model';
 import type { CursorPage } from '@/shared/api/pagination';
 import type { SearchResult, SearchSort, SearchTab } from '../model/types';
 

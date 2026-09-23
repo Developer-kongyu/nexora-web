@@ -24,7 +24,7 @@ import {
   TextField,
   useToast,
 } from '@/shared/ui';
-import { EmptyPanel, LoadingRows } from '@/pages/_shared/PageParts';
+import { EmptyPanel, LoadingRows } from '@/shared/ui';
 import {
   formatCommunityManageDateTime,
   pageCount,

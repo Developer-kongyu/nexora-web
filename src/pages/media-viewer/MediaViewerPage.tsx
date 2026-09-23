@@ -2,7 +2,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { usePost } from '@/domains/posts';
 import { paths } from '@/shared/config/paths';
 import { Spinner } from '@/shared/ui';
-import { MediaViewer } from '@/widgets/media-viewer/MediaViewer';
+import { MediaViewer } from '@/widgets/media-viewer';
 
 export function MediaViewerPage() {
   const { postId = '', mediaIndex = '0' } = useParams();

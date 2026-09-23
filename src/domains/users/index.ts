@@ -1,2 +1,45 @@
-export * from './api/usersApi';
-export * from './model';
+export { performUserRelationshipAction, usersApi } from './api/usersApi';
+export type { UpdateOwnProfileRequest } from './api/usersApi';
+export {
+  getCurrentUserPresentation,
+  userKeys,
+  resolveUserRelationshipAction,
+  describeUserRelationshipActionResult,
+  USER_RELATIONSHIP_ACTIONS,
+} from './model';
+export type {
+  CurrentUserPresentation,
+  UserConnectionListKind,
+  UserRelationshipAction,
+  CurrentUserCardView,
+  UserSummary,
+  UserProfile,
+  UserProfileEditableView,
+  UserRelationSummary,
+  UserMuteFlagsView,
+  UserRelationSnapshotView,
+  UserProfileHeaderView,
+  UserListItemView,
+  UserManagementCardState,
+  UserManagementPlaceholderReason,
+  UserManagementListItemView,
+  BlockedUserManagementListItemView,
+  UserManagementCursorPage,
+  FollowUserActionResult,
+  UnfollowUserActionResult,
+  CancelFollowRequestActionResult,
+  UpsertUserMuteActionResult,
+  DeleteUserRelationActionResult,
+  BlockUserActionResult,
+  RelationshipWriteActionResultView,
+  FollowUserResult,
+  UnfollowUserResult,
+  CancelFollowRequestResult,
+  UserFollowRelationshipWriteResult,
+  UpsertUserMuteResult,
+  DeleteUserRelationResult,
+  BlockUserResult,
+  ApproveFollowRequestResult,
+  RejectFollowRequestResult,
+  FollowRequestReviewResult,
+} from './model';

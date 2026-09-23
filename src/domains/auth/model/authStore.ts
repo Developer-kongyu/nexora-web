@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { UserSummary } from '@/domains/users/model/types';
+import type { UserSummary } from '@/domains/users/model';
 import { authSession } from '@/shared/api/authSession';
 import type { AuthOnboardingStatus, AuthStatus } from './types';
 

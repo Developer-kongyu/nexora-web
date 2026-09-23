@@ -3,7 +3,7 @@
 以下目录树由当前阶段源码目录重新生成。`node_modules`、Git 元数据、构建产物、覆盖率和测试报告不进入源码压缩包。
 
 ```text
-lct-web/
+twitter-clone-web/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
@@ -48,6 +48,24 @@ lct-web/
 ├── docs/
 │   ├── adr/
 │   │   └── 0001-domain-modular-spa.md
+│   ├── tutorial/
+│   │   ├── 01-web-and-project-overview.md
+│   │   ├── 02-environment-and-first-run.md
+│   │   ├── 03-typescript-and-react-basics.md
+│   │   ├── 04-directory-architecture.md
+│   │   ├── 05-bootstrap-routing-and-providers.md
+│   │   ├── 06-components-css-and-design-system.md
+│   │   ├── 07-api-state-and-authentication.md
+│   │   ├── 08-forms-and-validation.md
+│   │   ├── 09-feature-flow-walkthrough.md
+│   │   ├── 10-mocks-and-testing.md
+│   │   ├── 11-debugging-guide.md
+│   │   ├── 12-build-deploy-and-ci.md
+│   │   ├── 13-how-to-add-a-feature.md
+│   │   ├── 14-glossary-and-faq.md
+│   │   ├── 15-practice-labs.md
+│   │   └── README.md
+│   ├── ARCHITECTURE_MIGRATION.md
 │   ├── ARCHITECTURE.md
 │   ├── BACKEND_MAPPING.md
 │   ├── CHANGELOG.md
@@ -61,7 +79,12 @@ lct-web/
 │   ├── REUSE_GUIDELINES.md
 │   ├── ROUTE_MAP.md
 │   ├── STARTUP_CHECKLIST.md
-│   └── VALIDATION_REPORT.md
+│   ├── VALIDATION_REPORT.md
+│   ├── 代码系统学习方案.md
+│   ├── 推荐项目目录与架构设计.md
+│   ├── 推荐项目目录与架构设计.pdf
+│   ├── 第二阶段独立学习指南.md
+│   └── 项目目录结构与文件职责详解.md
 ├── public/
 │   ├── media/
 │   │   ├── city.svg
@@ -73,6 +96,8 @@ lct-web/
 │   ├── mockServiceWorker.js
 │   └── robots.txt
 ├── scripts/
+│   ├── check-boundaries.mjs
+│   ├── check-boundaries.test.mjs
 │   ├── check-env.mjs
 │   ├── check-reuse.mjs
 │   └── generate-api.mjs
@@ -90,10 +115,13 @@ lct-web/
 │   │   │   └── PublicLayout.tsx
 │   │   ├── providers/
 │   │   │   ├── AppProviders.tsx
+│   │   │   ├── AuthBootstrap.test.tsx
 │   │   │   ├── AuthBootstrap.tsx
+│   │   │   ├── RealtimeProvider.test.tsx
 │   │   │   └── RealtimeProvider.tsx
 │   │   ├── router/
 │   │   │   ├── guards.module.css
+│   │   │   ├── guards.test.tsx
 │   │   │   ├── guards.tsx
 │   │   │   └── router.tsx
 │   │   ├── styles/
@@ -101,23 +129,46 @@ lct-web/
 │   │   │   ├── reset.css
 │   │   │   ├── tokens.css
 │   │   │   └── typography.css
-│   │   └── main.tsx
+│   │   ├── ApplicationRoot.tsx
+│   │   ├── bootstrapApplication.test.ts
+│   │   ├── bootstrapApplication.ts
+│   │   ├── bootstrapFailure.test.ts
+│   │   ├── bootstrapFailure.ts
+│   │   ├── main.ts
+│   │   └── mountApplication.ts
 │   ├── domains/
 │   │   ├── auth/
 │   │   │   ├── api/
-│   │   │   │   └── authApi.ts
+│   │   │   │   ├── authApi.test.ts
+│   │   │   │   ├── authApi.ts
+│   │   │   │   └── onboardingApi.ts
 │   │   │   ├── hooks/
 │   │   │   │   └── useAuth.ts
+│   │   │   ├── lib/
+│   │   │   │   └── googleIdentity.ts
 │   │   │   ├── model/
+│   │   │   │   ├── authStore.test.ts
 │   │   │   │   ├── authStore.ts
+│   │   │   │   ├── onboardingRoute.test.ts
+│   │   │   │   ├── onboardingRoute.ts
+│   │   │   │   ├── pendingPrimaryEmail.ts
+│   │   │   │   ├── phone.test.ts
+│   │   │   │   ├── phone.ts
+│   │   │   │   ├── queryKeys.ts
 │   │   │   │   ├── types.ts
 │   │   │   │   └── validation.ts
+│   │   │   ├── ui/
+│   │   │   │   ├── GoogleCredentialButton.module.css
+│   │   │   │   └── GoogleCredentialButton.tsx
 │   │   │   └── index.ts
 │   │   ├── communities/
 │   │   │   ├── api/
+│   │   │   │   ├── communitiesApi.defaultMock.test.ts
 │   │   │   │   ├── communitiesApi.test.ts
 │   │   │   │   └── communitiesApi.ts
 │   │   │   ├── lib/
+│   │   │   │   ├── communityAdapter.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   └── presentation.ts
 │   │   │   ├── model/
 │   │   │   │   ├── index.ts
@@ -126,7 +177,10 @@ lct-web/
 │   │   │   └── index.ts
 │   │   ├── engagement/
 │   │   │   ├── api/
+│   │   │   │   ├── engagementApi.test.ts
 │   │   │   │   └── engagementApi.ts
+│   │   │   ├── hooks/
+│   │   │   │   └── usePostImpression.ts
 │   │   │   └── index.ts
 │   │   ├── feed/
 │   │   │   ├── api/
@@ -134,7 +188,12 @@ lct-web/
 │   │   │   │   └── feedApi.ts
 │   │   │   ├── hooks/
 │   │   │   │   └── useFeed.ts
+│   │   │   ├── lib/
+│   │   │   │   ├── feedAdapter.ts
+│   │   │   │   ├── feedRefresh.test.ts
+│   │   │   │   └── feedRefresh.ts
 │   │   │   ├── model/
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── queryKeys.ts
 │   │   │   │   └── types.ts
 │   │   │   └── index.ts
@@ -145,6 +204,7 @@ lct-web/
 │   │   │   ├── model/
 │   │   │   │   ├── draftBatch.test.ts
 │   │   │   │   ├── draftBatch.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── presentation.test.ts
 │   │   │   │   ├── presentation.ts
 │   │   │   │   ├── queryKeys.ts
@@ -155,6 +215,7 @@ lct-web/
 │   │   │   │   ├── mediaApi.test.ts
 │   │   │   │   └── mediaApi.ts
 │   │   │   ├── hooks/
+│   │   │   │   ├── useMediaImagePairSelection.ts
 │   │   │   │   └── useMediaImageSelection.ts
 │   │   │   ├── lib/
 │   │   │   │   ├── imageSelection.test.ts
@@ -170,6 +231,7 @@ lct-web/
 │   │   │   │   └── uploadReadyMediaFile.ts
 │   │   │   ├── model/
 │   │   │   │   ├── constraints.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── types.ts
 │   │   │   │   └── uploadQueueStore.ts
 │   │   │   ├── ui/
@@ -181,6 +243,7 @@ lct-web/
 │   │   │   ├── hooks/
 │   │   │   │   └── useNotifications.ts
 │   │   │   ├── model/
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── queryKeys.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── realtime/
@@ -190,10 +253,13 @@ lct-web/
 │   │   │   ├── api/
 │   │   │   │   └── permissionsApi.ts
 │   │   │   ├── model/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── queryKeys.ts
 │   │   │   │   └── types.ts
 │   │   │   └── index.ts
 │   │   ├── posts/
 │   │   │   ├── api/
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── postsApi.drafts.test.ts
 │   │   │   │   ├── postsApi.repost.test.ts
 │   │   │   │   ├── postsApi.test.ts
@@ -205,8 +271,11 @@ lct-web/
 │   │   │   │   ├── compose.test.ts
 │   │   │   │   ├── compose.ts
 │   │   │   │   ├── draftPresentation.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── postCardAdapter.test.ts
-│   │   │   │   └── postCardAdapter.ts
+│   │   │   │   ├── postCardAdapter.ts
+│   │   │   │   ├── postText.test.ts
+│   │   │   │   └── postText.ts
 │   │   │   ├── model/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── queryKeys.ts
@@ -214,6 +283,7 @@ lct-web/
 │   │   │   └── index.ts
 │   │   ├── search/
 │   │   │   ├── api/
+│   │   │   │   ├── searchApi.test.ts
 │   │   │   │   └── searchApi.ts
 │   │   │   ├── hooks/
 │   │   │   │   └── useSearch.ts
@@ -223,6 +293,7 @@ lct-web/
 │   │   │   └── index.ts
 │   │   ├── settings/
 │   │   │   ├── api/
+│   │   │   │   ├── settingsApi.test.ts
 │   │   │   │   └── settingsApi.ts
 │   │   │   ├── model/
 │   │   │   │   ├── queryKeys.ts
@@ -230,6 +301,7 @@ lct-web/
 │   │   │   └── index.ts
 │   │   └── users/
 │   │       ├── api/
+│   │       │   ├── index.ts
 │   │       │   ├── usersApi.test.ts
 │   │       │   └── usersApi.ts
 │   │       ├── model/
@@ -240,27 +312,91 @@ lct-web/
 │   │       │   ├── relationActions.ts
 │   │       │   └── types.ts
 │   │       └── index.ts
+│   ├── features/
+│   │   ├── compose-post/
+│   │   │   ├── model/
+│   │   │   │   ├── compose.schema.ts
+│   │   │   │   ├── composeFlow.test.tsx
+│   │   │   │   ├── composeForm.test.ts
+│   │   │   │   ├── composeForm.ts
+│   │   │   │   ├── draftError.ts
+│   │   │   │   ├── types.ts
+│   │   │   │   ├── useComposer.ts
+│   │   │   │   ├── useComposeUploads.test.tsx
+│   │   │   │   ├── useComposeUploads.ts
+│   │   │   │   ├── useDraftAutosave.ts
+│   │   │   │   └── usePublishPost.ts
+│   │   │   ├── ui/
+│   │   │   │   ├── ComposeEditor.module.css
+│   │   │   │   ├── ComposeEditor.test.tsx
+│   │   │   │   ├── ComposeEditor.tsx
+│   │   │   │   └── MediaQueue.tsx
+│   │   │   └── index.ts
+│   │   └── post-interactions/
+│   │       ├── model/
+│   │       │   ├── interactionCache.ts
+│   │       │   ├── usePostInteractions.test.tsx
+│   │       │   └── usePostInteractions.ts
+│   │       └── index.ts
 │   ├── mocks/
+│   │   ├── fixtures/
+│   │   │   ├── communities.fixture.ts
+│   │   │   ├── factory.ts
+│   │   │   ├── notifications.fixture.ts
+│   │   │   ├── posts.fixture.ts
+│   │   │   └── users.fixture.ts
+│   │   ├── handlers/
+│   │   │   ├── auth.handlers.ts
+│   │   │   ├── communities.handlers.ts
+│   │   │   ├── engagement.handlers.ts
+│   │   │   ├── feed.handlers.ts
+│   │   │   ├── http.ts
+│   │   │   ├── library.handlers.ts
+│   │   │   ├── media.handlers.ts
+│   │   │   ├── notifications.handlers.ts
+│   │   │   ├── permissions.handlers.ts
+│   │   │   ├── posts.handlers.ts
+│   │   │   ├── posts.helpers.ts
+│   │   │   ├── search.handlers.ts
+│   │   │   ├── settings.handlers.ts
+│   │   │   └── users.handlers.ts
+│   │   ├── state/
+│   │   │   ├── auth.state.ts
+│   │   │   ├── communities.state.ts
+│   │   │   ├── engagement.state.ts
+│   │   │   ├── fixtures.state.ts
+│   │   │   ├── index.ts
+│   │   │   ├── library.state.ts
+│   │   │   ├── media.state.ts
+│   │   │   ├── notifications.state.ts
+│   │   │   ├── permissions.state.ts
+│   │   │   ├── posts.state.ts
+│   │   │   ├── settings.state.ts
+│   │   │   └── users.state.ts
 │   │   ├── browser.ts
 │   │   ├── fixtures.ts
 │   │   ├── handlers.compose.test.ts
+│   │   ├── handlers.interactions.test.ts
+│   │   ├── handlers.isolation.test.ts
 │   │   ├── handlers.ts
 │   │   └── server.ts
 │   ├── pages/
-│   │   ├── _shared/
-│   │   │   ├── PageParts.tsx
-│   │   │   ├── ProductPages.module.css
-│   │   │   ├── SettingsPage.module.css
-│   │   │   ├── SettingsPage.tsx
-│   │   │   └── useMediaImagePairSelection.ts
 │   │   ├── auth/
 │   │   │   ├── AuthFormShell.tsx
 │   │   │   ├── AuthPages.module.css
+│   │   │   ├── EmailVerificationPage.tsx
+│   │   │   ├── ForgotPasswordPage.test.tsx
 │   │   │   ├── ForgotPasswordPage.tsx
 │   │   │   ├── GoogleCompletePage.tsx
 │   │   │   ├── LoginPage.tsx
+│   │   │   ├── loginValidation.test.ts
+│   │   │   ├── loginValidation.ts
+│   │   │   ├── passwordResetFlow.test.ts
+│   │   │   ├── passwordResetFlow.ts
+│   │   │   ├── RegisterPage.test.tsx
 │   │   │   ├── RegisterPage.tsx
 │   │   │   ├── ResetPasswordPage.tsx
+│   │   │   ├── useVerificationCountdown.test.tsx
 │   │   │   └── useVerificationCountdown.ts
 │   │   ├── bookmarks/
 │   │   │   ├── BookmarksPage.module.css
@@ -285,6 +421,7 @@ lct-web/
 │   │   │   │   ├── PinnedPostsSection.tsx
 │   │   │   │   ├── RulesSection.tsx
 │   │   │   │   └── SettingsSection.tsx
+│   │   │   ├── communityManage.model.test.ts
 │   │   │   ├── communityManage.model.ts
 │   │   │   ├── CommunityManagePage.module.css
 │   │   │   ├── CommunityManagePage.tsx
@@ -292,6 +429,8 @@ lct-web/
 │   │   ├── compose/
 │   │   │   └── ComposePage.tsx
 │   │   ├── content-center/
+│   │   │   ├── contentCenter.model.test.ts
+│   │   │   ├── contentCenter.model.ts
 │   │   │   ├── ContentCenterPage.module.css
 │   │   │   └── ContentCenterPage.tsx
 │   │   ├── drafts/
@@ -306,8 +445,11 @@ lct-web/
 │   │   │   └── FollowListPage.tsx
 │   │   ├── history/
 │   │   │   ├── BrowsingHistoryPage.module.css
-│   │   │   └── BrowsingHistoryPage.tsx
+│   │   │   ├── BrowsingHistoryPage.tsx
+│   │   │   ├── historyDeleteFeedback.test.ts
+│   │   │   └── historyDeleteFeedback.ts
 │   │   ├── home/
+│   │   │   ├── HomePage.module.css
 │   │   │   └── HomePage.tsx
 │   │   ├── media-viewer/
 │   │   │   └── MediaViewerPage.tsx
@@ -316,29 +458,42 @@ lct-web/
 │   │   │   └── NotFoundPage.tsx
 │   │   ├── notifications/
 │   │   │   ├── NotificationsPage.module.css
+│   │   │   ├── NotificationsPage.test.tsx
 │   │   │   └── NotificationsPage.tsx
 │   │   ├── onboarding/
 │   │   │   ├── CommunitiesPage.tsx
+│   │   │   ├── FollowPage.test.tsx
 │   │   │   ├── FollowPage.tsx
 │   │   │   ├── InterestsPage.tsx
 │   │   │   ├── OnboardingSelection.module.css
 │   │   │   └── OnboardingSelection.tsx
 │   │   ├── post-detail/
 │   │   │   ├── PostDetailPage.module.css
+│   │   │   ├── PostDetailPage.test.tsx
 │   │   │   └── PostDetailPage.tsx
 │   │   ├── profile/
 │   │   │   ├── ProfilePage.module.css
 │   │   │   └── ProfilePage.tsx
 │   │   ├── profile-edit/
+│   │   │   ├── ui/
+│   │   │   │   ├── SaveFooter.module.css
+│   │   │   │   └── SaveFooter.tsx
 │   │   │   ├── profileEdit.model.test.ts
 │   │   │   ├── profileEdit.model.ts
 │   │   │   ├── ProfileEditPage.module.css
+│   │   │   ├── ProfileEditPage.test.tsx
 │   │   │   ├── ProfileEditPage.tsx
 │   │   │   └── ProfileImageField.tsx
 │   │   ├── search/
 │   │   │   └── SearchPage.tsx
 │   │   ├── settings/
+│   │   │   ├── ui/
+│   │   │   │   ├── SettingsPage.module.css
+│   │   │   │   └── SettingsPage.tsx
+│   │   │   ├── AccountSettingsPage.test.tsx
 │   │   │   ├── AccountSettingsPage.tsx
+│   │   │   ├── EmailIdentityVerificationPage.test.tsx
+│   │   │   ├── EmailIdentityVerificationPage.tsx
 │   │   │   ├── NotificationSettingsPage.tsx
 │   │   │   ├── PreferencesSettingsPage.tsx
 │   │   │   ├── PrivacySettingsPage.tsx
@@ -368,6 +523,7 @@ lct-web/
 │   │   │   ├── query.ts
 │   │   │   └── queryClient.ts
 │   │   ├── config/
+│   │   │   ├── brand.ts
 │   │   │   ├── env.ts
 │   │   │   ├── paths.test.ts
 │   │   │   └── paths.ts
@@ -384,6 +540,8 @@ lct-web/
 │   │   │   ├── cn.ts
 │   │   │   ├── date.test.ts
 │   │   │   ├── date.ts
+│   │   │   ├── error.test.ts
+│   │   │   ├── error.ts
 │   │   │   ├── format.ts
 │   │   │   ├── set.test.ts
 │   │   │   ├── set.ts
@@ -407,21 +565,39 @@ lct-web/
 │   │       ├── Badge/
 │   │       │   ├── Badge.module.css
 │   │       │   └── Badge.tsx
+│   │       ├── BrandMark/
+│   │       │   ├── BrandMark.module.css
+│   │       │   └── BrandMark.tsx
 │   │       ├── Button/
 │   │       │   ├── Button.module.css
 │   │       │   └── Button.tsx
 │   │       ├── Card/
 │   │       │   ├── Card.module.css
 │   │       │   └── Card.tsx
+│   │       ├── EmptyPanel/
+│   │       │   ├── EmptyPanel.module.css
+│   │       │   └── EmptyPanel.tsx
 │   │       ├── EmptyState/
 │   │       │   ├── EmptyState.module.css
 │   │       │   └── EmptyState.tsx
 │   │       ├── IconButton/
 │   │       │   ├── IconButton.module.css
 │   │       │   └── IconButton.tsx
+│   │       ├── layout/
+│   │       │   ├── ContentLayout.module.css
+│   │       │   ├── index.ts
+│   │       │   ├── PageLayout.module.css
+│   │       │   └── PageLayout.tsx
+│   │       ├── LoadingRows/
+│   │       │   ├── LoadingRows.module.css
+│   │       │   └── LoadingRows.tsx
 │   │       ├── Modal/
 │   │       │   ├── Modal.module.css
+│   │       │   ├── Modal.test.tsx
 │   │       │   └── Modal.tsx
+│   │       ├── Notice/
+│   │       │   ├── Notice.module.css
+│   │       │   └── Notice.tsx
 │   │       ├── PageHeader/
 │   │       │   ├── PageHeader.module.css
 │   │       │   └── PageHeader.tsx
@@ -429,6 +605,9 @@ lct-web/
 │   │       │   ├── Select.module.css
 │   │       │   ├── Select.tsx
 │   │       │   └── SelectOptions.tsx
+│   │       ├── SideCard/
+│   │       │   ├── SideCard.module.css
+│   │       │   └── SideCard.tsx
 │   │       ├── Spinner/
 │   │       │   ├── Spinner.module.css
 │   │       │   └── Spinner.tsx
@@ -441,6 +620,7 @@ lct-web/
 │   │       ├── Toast/
 │   │       │   ├── ToastContext.ts
 │   │       │   ├── ToastProvider.module.css
+│   │       │   ├── ToastProvider.test.tsx
 │   │       │   ├── ToastProvider.tsx
 │   │       │   └── useToast.ts
 │   │       ├── index.ts
@@ -450,39 +630,43 @@ lct-web/
 │   │   └── setup.ts
 │   ├── widgets/
 │   │   ├── app-shell/
+│   │   │   ├── index.ts
 │   │   │   ├── Sidebar.module.css
 │   │   │   ├── Sidebar.tsx
 │   │   │   ├── Topbar.module.css
 │   │   │   └── Topbar.tsx
 │   │   ├── community-card/
 │   │   │   ├── CommunityCard.module.css
-│   │   │   └── CommunityCard.tsx
-│   │   ├── compose-editor/
-│   │   │   ├── composeEditor.model.test.ts
-│   │   │   ├── composeEditor.model.ts
-│   │   │   ├── ComposeEditor.module.css
-│   │   │   └── ComposeEditor.tsx
-│   │   ├── layout/
-│   │   │   ├── PageLayout.module.css
-│   │   │   └── PageLayout.tsx
+│   │   │   ├── CommunityCard.tsx
+│   │   │   └── index.ts
 │   │   ├── media-viewer/
+│   │   │   ├── index.ts
 │   │   │   ├── MediaViewer.module.css
 │   │   │   ├── MediaViewer.test.tsx
 │   │   │   └── MediaViewer.tsx
 │   │   ├── post-card/
+│   │   │   ├── index.ts
 │   │   │   ├── PostActionBar.tsx
 │   │   │   ├── PostCard.module.css
 │   │   │   ├── PostCard.stories.tsx
 │   │   │   ├── PostCard.test.tsx
 │   │   │   ├── PostCard.tsx
+│   │   │   ├── PostRichText.module.css
+│   │   │   ├── PostRichText.tsx
 │   │   │   └── PostTagLinks.tsx
+│   │   ├── quick-compose/
+│   │   │   ├── index.ts
+│   │   │   ├── QuickCompose.module.css
+│   │   │   └── QuickCompose.tsx
 │   │   └── user-card/
+│   │       ├── index.ts
 │   │       ├── RelationUserCard.tsx
 │   │       ├── UserCard.module.css
 │   │       └── UserCard.tsx
 │   └── vite-env.d.ts
 ├── tests/
 │   └── e2e/
+│       ├── architecture-migration.spec.ts
 │       └── smoke.spec.ts
 ├── .dockerignore
 ├── .editorconfig
@@ -494,7 +678,6 @@ lct-web/
 ├── .nvmrc
 ├── .prettierignore
 ├── .prettierrc.json
-├── CONTRIBUTING.md
 ├── docker-compose.yml
 ├── Dockerfile
 ├── eslint.config.js

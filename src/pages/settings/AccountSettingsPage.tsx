@@ -12,9 +12,11 @@ import {
   useAuthStore,
   type AuthSessionItemView,
 } from '@/domains/auth';
+import { settingsKeys } from '@/domains/settings';
+import { userKeys } from '@/domains/users';
 import { formatDateTime, formatRelativeTime } from '@/shared/lib/format';
 import { Button, Card, Modal, TextField, useToast } from '@/shared/ui';
-import { SettingsPage } from '../_shared/SettingsPage';
+import { SettingsPage } from './ui/SettingsPage';
 import styles from './SettingsPages.module.css';
 
 const handlePattern = /^[A-Za-z][A-Za-z0-9_]{2,23}$/;
@@ -73,8 +75,8 @@ export function AccountSettingsPage() {
       queryClient.setQueryData(authKeys.accountSecurity, (current) =>
         current ? { ...current, handle: saved.handle } : current,
       );
-      void queryClient.invalidateQueries({ queryKey: ['settings', 'overview'] });
-      void queryClient.invalidateQueries({ queryKey: ['users'] });
+      void queryClient.invalidateQueries({ queryKey: settingsKeys.overview });
+      void queryClient.invalidateQueries({ queryKey: userKeys.all });
       updateUser({ handle: saved.handle });
       setHandleOpen(false);
       setHandleValue('');
@@ -125,10 +127,7 @@ export function AccountSettingsPage() {
   });
 
   const phoneVerificationMutation = useMutation({
-    mutationFn: (input: {
-      phone: string;
-      purpose: 'BIND_PHONE_VERIFY' | 'CHANGE_PRIMARY_PHONE_VERIFY';
-    }) => authApi.requestPhoneIdentityVerification(input),
+    mutationFn: authApi.requestPhoneIdentityVerification,
     onSuccess: (result) => {
       setPhoneCodeRequested(true);
       showToast({
@@ -167,7 +166,7 @@ export function AccountSettingsPage() {
           : current,
       );
       void queryClient.invalidateQueries({ queryKey: authKeys.accountSecurity });
-      void queryClient.invalidateQueries({ queryKey: ['settings', 'overview'] });
+      void queryClient.invalidateQueries({ queryKey: settingsKeys.overview });
       setPhoneOpen(false);
       setPhoneValue('');
       setPhoneCode('');
@@ -209,7 +208,7 @@ export function AccountSettingsPage() {
     mutationFn: (sessionId: string) => authApi.revokeSession(sessionId),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: authKeys.sessions });
-      void queryClient.invalidateQueries({ queryKey: ['settings', 'overview'] });
+      void queryClient.invalidateQueries({ queryKey: settingsKeys.overview });
       showToast({ tone: 'success', title: '设备会话已退出' });
     },
     onError: (error) =>

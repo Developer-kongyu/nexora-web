@@ -27,8 +27,8 @@ import { userKeys, usersApi, type FollowRequestReviewResult } from '@/domains/us
 import { formatRelativeTime } from '@/shared/lib/format';
 import type { ReviewDecision } from '@/shared/model/types';
 import { Avatar, Badge, Button, Card, useToast } from '@/shared/ui';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { LoadingRows, PageTitle, SideCard } from '../_shared/PageParts';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { LoadingRows, PageHeader, SideCard } from '@/shared/ui';
 import styles from './NotificationsPage.module.css';
 
 const tabs = [
@@ -202,7 +202,7 @@ export function NotificationsPage() {
 
   return (
     <>
-      <PageTitle
+      <PageHeader
         title="通知中心"
         description="查看互动、关注、提及、社群和系统动态。"
         actions={

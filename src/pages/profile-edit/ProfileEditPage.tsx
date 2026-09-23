@@ -19,9 +19,10 @@ import { isApiError } from '@/shared/api/errors';
 import { createAbortError, getErrorMessage, toError } from '@/shared/lib/error';
 import { trimToNull } from '@/shared/lib/text';
 import { Button, Card, Modal, Spinner, TextField, useToast } from '@/shared/ui';
-import { PageLayout } from '@/widgets/layout/PageLayout';
-import { EmptyPanel, PageTitle, SaveFooter } from '../_shared/PageParts';
-import { useMediaImagePairSelection } from '../_shared/useMediaImagePairSelection';
+import { PageLayout } from '@/shared/ui/layout';
+import { EmptyPanel, PageHeader } from '@/shared/ui';
+import { SaveFooter } from './ui/SaveFooter';
+import { useMediaImagePairSelection } from '@/domains/media';
 import { ProfileImageField } from './ProfileImageField';
 import {
   profileEditSchema,
@@ -59,7 +60,7 @@ export function ProfileEditPage() {
   if (profileQuery.isPending) {
     return (
       <>
-        <PageTitle title="编辑个人资料" description="正在读取可编辑资料与媒体状态。" />
+        <PageHeader title="编辑个人资料" description="正在读取可编辑资料与媒体状态。" />
         <PageLayout>
           <Card className={styles.stateCard}>
             <Spinner label="正在加载个人资料" />
@@ -72,7 +73,7 @@ export function ProfileEditPage() {
   if (profileQuery.isError || !profileQuery.data) {
     return (
       <>
-        <PageTitle title="编辑个人资料" description="暂时无法读取可编辑资料。" />
+        <PageHeader title="编辑个人资料" description="暂时无法读取可编辑资料。" />
         <PageLayout>
           <Card className={styles.stateCard}>
             <EmptyPanel
@@ -241,7 +242,7 @@ function ProfileEditEditor({ profile, onProfileMissing }: ProfileEditEditorProps
 
   return (
     <>
-      <PageTitle title="编辑个人资料" />
+      <PageHeader title="编辑个人资料" />
       <PageLayout>
         <Card className={styles.form}>
           <form onSubmit={(event) => void submit(event)} noValidate>

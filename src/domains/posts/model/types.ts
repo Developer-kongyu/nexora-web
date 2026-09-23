@@ -1,4 +1,4 @@
-import type { UserSummary } from '@/domains/users/model/types';
+import type { UserSummary } from '@/domains/users/model';
 import type { ResolvedMediaState } from '@/shared/model/media';
 import type { UserIdentityBriefView } from '@/shared/model/userIdentity';
 
@@ -130,6 +130,7 @@ export interface PostStats {
 }
 
 export interface PostPermissions {
+  canBookmark?: boolean;
   canComment: boolean;
   canLike: boolean;
   canRepost: boolean;

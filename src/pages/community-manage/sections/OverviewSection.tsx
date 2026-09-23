@@ -9,7 +9,7 @@ import {
   type CommunityOverviewWindowDays,
 } from '@/domains/communities';
 import { Button, Card, Select, SelectOptions } from '@/shared/ui';
-import { EmptyPanel, LoadingRows } from '@/pages/_shared/PageParts';
+import { EmptyPanel, LoadingRows } from '@/shared/ui';
 import {
   formatCommunityManageDateTime,
   type CommunityManageSection,

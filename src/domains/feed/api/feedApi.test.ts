@@ -39,7 +39,7 @@ describe('apiClient + MSW', () => {
               publishedAtIso: '2026-08-05T10:00:00.000Z',
               author: {
                 userId: 'reposter-1',
-                displayName: '×ª·¢Õß',
+                displayName: '×ªï¿½ï¿½ï¿½ï¿½',
                 handle: 'reposter',
                 avatarUrl: null,
               },
@@ -76,12 +76,12 @@ describe('apiClient + MSW', () => {
           quoteOfPostId: null,
           repostOfPostId: null,
           rootPostId: null,
-          bodyText: 'Ô­ÌûÕýÎÄ',
+          bodyText: 'Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',
           status: 'PUBLISHED' as const,
           author: {
             userId: 'source-author-1',
             handle: 'source_author',
-            displayName: 'Ô­Ìû×÷Õß',
+            displayName: 'Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',
             avatarUrl: null,
           },
           community: null,
@@ -116,7 +116,7 @@ describe('apiClient + MSW', () => {
       id: 'repost-1',
       contentPostId: 'source-1',
       postKind: 'REPOST',
-      content: 'Ô­ÌûÕýÎÄ',
+      content: 'Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',
       author: { handle: 'source_author' },
       relation: { kind: 'REPOST', actor: { handle: 'reposter' } },
       stats: { views: 9 },
@@ -189,5 +189,4 @@ describe('apiClient + MSW', () => {
     expect(requestedUrls[1]?.searchParams.get('bucketKind')).toBe('FEATURED_BY_INTEREST');
     expect(requestedUrls[1]?.searchParams.get('limit')).toBe('6');
   });
-
 });

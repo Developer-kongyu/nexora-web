@@ -1,3 +1,4 @@
+import noticeStyles from '@/shared/ui/Notice/Notice.module.css';
 import {
   useInfiniteQuery,
   useMutation,
@@ -34,10 +35,10 @@ import { paths } from '@/shared/config/paths';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
 import { formatDateTime } from '@/shared/lib/format';
 import { Badge, Button, Card, Modal, useToast } from '@/shared/ui';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { PostCard } from '@/widgets/post-card/PostCard';
-import { EmptyPanel, LoadingRows, SideCard } from '../_shared/PageParts';
-import productStyles from '../_shared/ProductPages.module.css';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { PostCard } from '@/widgets/post-card';
+import { EmptyPanel, LoadingRows, SideCard } from '@/shared/ui';
+import productStyles from '@/shared/ui/layout/ContentLayout.module.css';
 import styles from './ContentCenterPage.module.css';
 import { hydrateContentCenterPublishedPage } from './contentCenter.model';
 
@@ -258,7 +259,7 @@ export function ContentCenterPage() {
           publishedItems.length ? (
             <>
               {degradedPages.length ? (
-                <div className={productStyles.infoBanner}>
+                <div className={noticeStyles.infoBanner}>
                   <AlertCircle size={17} />
                   <p>
                     部分页面因权限或卡片聚合被缩短

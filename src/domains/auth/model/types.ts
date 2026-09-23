@@ -1,4 +1,4 @@
-import type { UserSummary } from '@/domains/users/model/types';
+import type { UserSummary } from '@/domains/users/model';
 
 export type AuthOnboardingStatus =
   | 'PENDING_HANDLE'

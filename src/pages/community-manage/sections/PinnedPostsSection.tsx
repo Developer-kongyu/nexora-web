@@ -10,7 +10,7 @@ import {
 } from '@/domains/communities';
 import { paths } from '@/shared/config/paths';
 import { Badge, Button, Card, IconButton, Modal, Select, TextField, useToast } from '@/shared/ui';
-import { EmptyPanel, LoadingRows, Notice } from '@/pages/_shared/PageParts';
+import { EmptyPanel, LoadingRows, Notice } from '@/shared/ui';
 import {
   formatCommunityManageDateTime,
   type CommunityManageSectionProps,

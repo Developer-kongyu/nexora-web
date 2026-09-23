@@ -10,7 +10,7 @@ import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { cn } from '@/shared/lib/cn';
 import { toggleArrayValue } from '@/shared/lib/set';
 import { Button, Card, Switch, TextField, useToast } from '@/shared/ui';
-import { SettingsPage } from '../_shared/SettingsPage';
+import { SettingsPage } from './ui/SettingsPage';
 import styles from './SettingsPages.module.css';
 
 interface EditablePreferences {

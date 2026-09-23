@@ -9,7 +9,7 @@ import {
   type CommunityModerationLogItemView,
 } from '@/domains/communities';
 import { Badge, Button, Card, Select } from '@/shared/ui';
-import { EmptyPanel, LoadingRows } from '@/pages/_shared/PageParts';
+import { EmptyPanel, LoadingRows } from '@/shared/ui';
 import {
   type CommunityManageSectionProps,
   formatCommunityManageDateTime,

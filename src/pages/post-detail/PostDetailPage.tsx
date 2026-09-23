@@ -3,7 +3,7 @@ import { ArrowLeft, MessageCircle, Send, ShieldCheck, Smile, Trash2 } from 'luci
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/domains/auth';
-import { engagementApi } from '@/domains/engagement';
+import { useCommentLike } from '@/features/post-interactions';
 import { libraryApi, libraryKeys } from '@/domains/library';
 import {
   createTextEngagementInput,
@@ -11,15 +11,21 @@ import {
   postsApi,
   type ReplyPostListItemView,
 } from '@/domains/posts';
-import { usePost } from '@/domains/posts/hooks/usePost';
-import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
+import { usePost } from '@/domains/posts';
 import { paths } from '@/shared/config/paths';
 import { formatRelativeTime } from '@/shared/lib/format';
-import { Avatar, Button, Card, IconButton, useToast } from '@/shared/ui';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { PostCard } from '@/widgets/post-card/PostCard';
-import { PostTagLinks } from '@/widgets/post-card/PostTagLinks';
-import { EmptyPanel, LoadingRows, SideCard } from '../_shared/PageParts';
+import {
+  Avatar,
+  Button,
+  Card,
+  IconButton,
+  EmptyPanel,
+  LoadingRows,
+  SideCard,
+  useToast,
+} from '@/shared/ui';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { PostCard, PostTagLinks } from '@/widgets/post-card';
 import styles from './PostDetailPage.module.css';
 
 interface ReplyTarget {
@@ -30,11 +36,6 @@ interface ReplyTarget {
 interface SubmitCommentVariables {
   bodyText: string;
   target: ReplyTarget | null;
-}
-
-interface CommentLikeState {
-  liked: boolean;
-  likeCount: number;
 }
 
 interface ReplyContextPlaceholderProps {
@@ -73,17 +74,7 @@ export function CommentRow({ item, rootPostId, parentName, onReply }: CommentRow
   const currentUser = useAuthStore((state) => state.user);
   const { showToast } = useToast();
   const card = item.postCard;
-  const initialLiked = Boolean(card?.interactionSummary?.viewerState?.liked);
-  const initialLikeCount = card?.interactionSummary?.likeCount ?? 0;
-  const likeSourceKey = [
-    card?.postId ?? item.relation.commentId,
-    initialLiked,
-    initialLikeCount,
-  ].join('\u001f');
-  const [likeState, setLikeState] = useSynchronizedState<string, CommentLikeState>(likeSourceKey, {
-    liked: initialLiked,
-    likeCount: initialLikeCount,
-  });
+  const { state: likeState, pending: likePending, canLike, toggleLike } = useCommentLike(item);
   const [repliesExpanded, setRepliesExpanded] = useState(false);
   const childReplies = useQuery({
     queryKey: postKeys.commentReplies(rootPostId, item.relation.commentId),
@@ -122,30 +113,6 @@ export function CommentRow({ item, rootPostId, parentName, onReply }: CommentRow
     if (target instanceof Element && target.closest('button, a')) return;
     openCommentDetail();
   };
-
-  const likeMutation = useMutation({
-    mutationFn: (nextLiked: boolean) => {
-      if (!card) throw new Error('COMMENT_POST_UNAVAILABLE');
-      return nextLiked ? engagementApi.like(card.postId) : engagementApi.unlike(card.postId);
-    },
-    onMutate: (nextLiked) => {
-      const previous = likeState;
-      setLikeState((current) => ({
-        liked: nextLiked,
-        likeCount: Math.max(0, current.likeCount + (nextLiked ? 1 : -1)),
-      }));
-      return previous;
-    },
-    onError: (_error, _nextLiked, previous) => {
-      if (previous) {
-        setLikeState(previous);
-      }
-      showToast({ tone: 'error', title: '点赞操作失败', description: '请稍后重试。' });
-    },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: postKeys.replies(rootPostId) });
-    },
-  });
 
   const deleteMutation = useMutation({
     mutationFn: () => postsApi.deleteComment(item.relation.commentId),
@@ -204,11 +171,11 @@ export function CommentRow({ item, rootPostId, parentName, onReply }: CommentRow
             </button>
             <button
               type="button"
-              disabled={likeMutation.isPending}
+              disabled={likePending || !canLike}
               aria-pressed={likeState.liked}
-              onClick={() => likeMutation.mutate(!likeState.liked)}
+              onClick={() => void toggleLike()}
             >
-              {likeState.liked ? '已赞' : '赞'} {likeState.likeCount}
+              {likeState.liked ? '已赞' : '赞'} {likeState.likes}
             </button>
             {childReplies.isLoading ? (
               <span className={styles.replyCount}>读取回复…</span>

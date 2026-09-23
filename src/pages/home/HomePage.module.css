@@ -1,0 +1,15 @@
+.refreshIconSpinning {
+  animation: refresh-spin 0.75s linear infinite;
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refreshIconSpinning {
+    animation: none;
+  }
+}

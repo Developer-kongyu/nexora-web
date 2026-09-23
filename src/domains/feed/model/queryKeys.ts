@@ -9,6 +9,8 @@ export const feedKeys = {
   all: FEED_QUERY_ROOT,
   list: (tab: FeedTab) => [...FEED_QUERY_ROOT, tab] as const,
   explore: (tab: ExplorePostTab) => [...FEED_QUERY_ROOT, 'explore', 'posts', tab] as const,
-  exploreTopics: (bucketKind: string) => [...FEED_QUERY_ROOT, 'explore', 'topics', bucketKind] as const,
-  exploreCommunities: (bucketKind: string) => [...FEED_QUERY_ROOT, 'explore', 'communities', bucketKind] as const,
+  exploreTopics: (bucketKind: string) =>
+    [...FEED_QUERY_ROOT, 'explore', 'topics', bucketKind] as const,
+  exploreCommunities: (bucketKind: string) =>
+    [...FEED_QUERY_ROOT, 'explore', 'communities', bucketKind] as const,
 };

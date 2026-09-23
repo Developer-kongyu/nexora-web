@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/client';
-import type { UserSummary } from '@/domains/users/model/types';
+import type { UserSummary } from '@/domains/users/model';
 import type {
   AuthAccountSecurityView,
   AuthSessionResponse,

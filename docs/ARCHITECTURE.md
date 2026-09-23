@@ -10,17 +10,19 @@
 app
 └─ pages
    └─ widgets
-      └─ domains
-         └─ shared
+      └─ features
+         └─ domains
+            └─ shared
 ```
 
-| 层        | 责任                                          | 不允许                |
-| --------- | --------------------------------------------- | --------------------- |
-| `app`     | 启动、Provider、Router、全局布局、错误边界    | 实现具体业务          |
-| `pages`   | 读取路由参数、组合查询、组织页面区域          | 裸 HTTP、复制领域规则 |
-| `widgets` | 组合多个领域的可复用业务 UI                   | 成为服务端数据仓库    |
-| `domains` | API、query/mutation hooks、领域类型、局部状态 | 依赖页面或应用壳      |
-| `shared`  | API client、设计系统、通用工具                | 引用任何业务领域      |
+| 层         | 责任                                          | 不允许                          |
+| ---------- | --------------------------------------------- | ------------------------------- |
+| `app`      | 启动、Provider、Router、全局布局、错误边界    | 实现具体业务                    |
+| `pages`    | 读取路由参数、组合查询、组织页面区域          | 裸 HTTP、复制领域规则           |
+| `widgets`  | 组合多个领域的可复用业务 UI                   | 成为服务端数据仓库              |
+| `features` | 发帖、草稿上传协调、互动与跨领域缓存失效      | 依赖页面或 widget、重复接口合同 |
+| `domains`  | API、query/mutation hooks、领域类型、局部状态 | 依赖页面或应用壳                |
+| `shared`   | API client、设计系统、通用工具                | 引用任何业务领域                |
 
 ## 3. 状态模型
 
@@ -96,7 +98,7 @@ src/widgets/post-card/PostCard.module.css
 
 ## 7. 发布与上传
 
-`ComposeEditor` 用 React Hook Form + Zod 管理正文和权限；帖子上传队列由 Zustand 保存本地文件、预览、进度、失败和媒体 asset ID。头像、封面和社群图片复用 `domains/media` 的单文件上传编排：
+`features/compose-post/ui/ComposeEditor` 用 React Hook Form + Zod 管理正文和权限；帖子上传队列由 Zustand 保存本地文件、预览、进度、失败和媒体 asset ID。头像、封面和社群图片复用 `domains/media` 的单文件上传编排：
 
 1. B05 创建上传会话，并校验返回项与 `clientUploadId / scene / assetKind` 精确对应。
 2. 根据后端 ticket 直传对象存储；未知 Region 不作为原始字符串传给 SDK。
@@ -141,4 +143,31 @@ src/widgets/post-card/PostCard.module.css
 - Playwright E2E。
 - Storybook + a11y addon。
 - `npm run reuse:check` 在其他门禁前扫描重复类型、枚举、常量、函数和公共能力绕过。
-- GitHub Actions 在 PR 上执行复用、format、typecheck、lint、test、build。
+- `npm run boundaries:check` 解析 TypeScript 别名、相对路径、重导出、动态导入及 CSS 依赖，检查分层、公开入口、跨域允许列表与循环。`npm run boundaries:test` 用违规样例验证检查本身。
+- GitHub Actions 在 PR 上执行边界检查及其测试、复用、format、typecheck、lint、test、build，继续保留 Storybook 与 E2E。
+
+## 12. 模块入口与允许的读取依赖
+
+模块内部使用相对路径；外部通过明确的公开入口访问。widget 与 feature 使用根 `index.ts`；领域可提供根、model、api、lib、queries 入口，按实际需要建立并显式导出。纯模型消费者与 Mock 使用 model；跨领域 API/adapter 读取使用 api/lib，避免经由包含 React Hook 的领域总出口。
+
+| 读取方      | 允许依赖                  | 公开入口与目的                                                         |
+| ----------- | ------------------------- | ---------------------------------------------------------------------- |
+| auth        | users                     | api/model，会话恢复读取当前用户                                        |
+| posts       | users                     | model，作者合同                                                        |
+| communities | posts、users              | posts model/lib，帖子卡片适配；users model，成员关系                   |
+| feed        | posts、media、communities | posts api/model/lib，补充原帖；media/communities model，媒体与社群合同 |
+| library     | posts                     | api/model，收藏及历史帖子读取                                          |
+| search      | posts、communities、users | posts api/model/lib、communities model/lib、users model，搜索读模型    |
+| settings    | permissions               | model，设置总览复用权限 owner 合同                                     |
+
+以上都是单向读取，允许列表由 `scripts/check-boundaries.mjs` 执行并检查循环。posts 不再引用 feed；发布后刷新 feed、草稿列表与对应草稿详情由 compose-post 的单一发布 mutation 负责。
+
+post-interactions 统一点赞、转发、收藏及评论点赞。按目标帖子与 QueryClient 共享提交锁，失败回滚；完成后刷新已挂载的相关帖子读模型并标记其他副本过期，覆盖详情、评论、时间线、搜索、收藏、历史、已发布内容、用户帖子、社群详情与置顶帖子。
+
+基础组件归 shared/ui，PageLayout/Stack 与无业务布局样式归 shared/ui/layout。QuickCompose 归 widgets；设置壳归 pages/settings/ui；资料保存页脚归 pages/profile-edit/ui；成对图片选择归 domains/media。
+
+## 13. Mock 与测试隔离
+
+`mocks/handlers.ts` 只按显式顺序组装领域 handlers；静态路由优先级不依赖文件名排序。`mocks/fixtures` 保存静态样例和深拷贝工厂，`mocks/state` 承担可变业务数据。`resetMockState()` 重建全部状态，测试 setup 在每例结束后同时执行它与 MSW resetHandlers。测试自建 QueryClient，并在结束后清理。
+
+业务模块不能导入测试/Mock 实现。测试和 Stories 可使用模拟数据；唯一生产入口例外是 mountApplication 中同时受开发/测试模式与 VITE_ENABLE_MOCK 开关控制的动态 browser 导入。路由仍使用 lazy，现有 QueryClient 和生成文件路径保持原位。查询配置、loader/action 只在确有新增消费者或性能需求时接入。

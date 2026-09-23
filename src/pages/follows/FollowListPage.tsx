@@ -8,9 +8,9 @@ import { mergeInfiniteDataItemsBy } from '@/shared/api/infiniteData';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
 import { cn } from '@/shared/lib/cn';
 import { Button, Card, Modal, Select } from '@/shared/ui';
-import { PageLayout } from '@/widgets/layout/PageLayout';
-import { RelationUserCard } from '@/widgets/user-card/RelationUserCard';
-import { EmptyPanel, LoadingRows, PageTitle, SideCard } from '../_shared/PageParts';
+import { PageLayout } from '@/shared/ui/layout';
+import { RelationUserCard } from '@/widgets/user-card';
+import { EmptyPanel, LoadingRows, PageHeader, SideCard } from '@/shared/ui';
 import {
   filterAndSortFollowList,
   type FollowListRelationFilter,
@@ -80,7 +80,7 @@ export function FollowListPage() {
 
   return (
     <>
-      <PageTitle
+      <PageHeader
         title={following ? '正在关注' : '关注者'}
         description={`查看 @${handle} 的${following ? '关注列表' : '关注者列表'}`}
       />

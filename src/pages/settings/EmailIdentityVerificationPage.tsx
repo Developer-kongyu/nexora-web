@@ -9,8 +9,9 @@ import {
   clearPendingPrimaryEmail,
   readPendingPrimaryEmail,
 } from '@/domains/auth';
+import { settingsKeys } from '@/domains/settings';
 import { Button, Card, TextField, useToast } from '@/shared/ui';
-import { SettingsPage } from '../_shared/SettingsPage';
+import { SettingsPage } from './ui/SettingsPage';
 import styles from './SettingsPages.module.css';
 
 const verificationTokenPattern = /^[A-Za-z0-9_-]{43}$/;
@@ -49,7 +50,7 @@ export function EmailIdentityVerificationPage() {
           : current,
       );
       void queryClient.invalidateQueries({ queryKey: authKeys.accountSecurity });
-      void queryClient.invalidateQueries({ queryKey: ['settings', 'overview'] });
+      void queryClient.invalidateQueries({ queryKey: settingsKeys.overview });
       showToast({
         tone: 'success',
         title: input.mode === 'change' ? '邮箱已换绑' : '邮箱已绑定',

@@ -8,7 +8,7 @@ import {
 } from '@/domains/communities';
 import { paths } from '@/shared/config/paths';
 import { Button, Card } from '@/shared/ui';
-import { EmptyPanel, LoadingRows, PageTitle } from '@/pages/_shared/PageParts';
+import { EmptyPanel, LoadingRows, PageHeader } from '@/shared/ui';
 import { CommunityManageSidebar } from './CommunityManageSidebar';
 import {
   getCommunityManageAccess,
@@ -107,7 +107,7 @@ export function CommunityManagePage() {
   if (detail.isLoading) {
     return (
       <>
-        <PageTitle title="社群管理台" description="正在读取社群权限与管理资料。" />
+        <PageHeader title="社群管理台" description="正在读取社群权限与管理资料。" />
         <LoadingRows count={5} />
       </>
     );
@@ -116,7 +116,7 @@ export function CommunityManagePage() {
   if (detail.isError || !detail.data) {
     return (
       <>
-        <PageTitle title="社群管理台" description="社群资料读取失败。" />
+        <PageHeader title="社群管理台" description="社群资料读取失败。" />
         <Card>
           <EmptyPanel
             title="无法加载管理台"
@@ -134,7 +134,7 @@ export function CommunityManagePage() {
   if (!context?.canManageCommunity) {
     return (
       <>
-        <PageTitle title={`${detailData.community.name} · 管理台`} />
+        <PageHeader title={`${detailData.community.name} · 管理台`} />
         <Card>
           <EmptyPanel
             icon={<ShieldAlert size={30} />}
@@ -165,7 +165,7 @@ export function CommunityManagePage() {
 
   return (
     <>
-      <PageTitle
+      <PageHeader
         title={`${community.name} · 管理台`}
         description="管理加入申请、成员角色、社群规则、置顶内容、权限设置与审计日志。"
         actions={

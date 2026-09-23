@@ -127,6 +127,7 @@ export function postCardBriefToViewModel(
     permissions: {
       canComment: published,
       canLike: published,
+      canBookmark: published,
       canRepost: published,
       canQuote: published,
     },
@@ -203,6 +204,7 @@ export function postDetailToViewModel(detail: PostDetailDto | PostViewModel): Po
     permissions: {
       canComment: detail.interactionPermission.canComment,
       canLike: detail.interactionPermission.canLike,
+      canBookmark: detail.interactionPermission.canBookmark,
       canRepost: detail.interactionPermission.canRepost,
       canQuote: detail.interactionPermission.canQuote,
     },

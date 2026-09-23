@@ -1,4 +1,4 @@
-import { postCardBriefToViewModel } from '@/domains/posts/lib/postCardAdapter';
+import { postCardBriefToViewModel } from '@/domains/posts/lib';
 import type {
   CommunityCardBriefView,
   CommunityDetail,

@@ -1,6 +1,6 @@
 import type { InfiniteData } from '@tanstack/react-query';
 import { describe, expect, it } from 'vitest';
-import type { PostViewModel } from '@/domains/posts/model/types';
+import type { PostViewModel } from '@/domains/posts/model';
 import { mergeRefreshedFeed } from './feedRefresh';
 import type { FeedPage } from '../model/types';
 

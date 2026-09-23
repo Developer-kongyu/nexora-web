@@ -22,8 +22,8 @@ import { useKeySelection } from '@/shared/hooks/useKeySelection';
 import { formatDateTime } from '@/shared/lib/format';
 import { settleBatch } from '@/shared/lib/settleBatch';
 import { Badge, Button, Modal, useToast } from '@/shared/ui';
-import { PageLayout } from '@/widgets/layout/PageLayout';
-import { EmptyPanel, LoadingRows, PageTitle, SideCard } from '../_shared/PageParts';
+import { PageLayout } from '@/shared/ui/layout';
+import { EmptyPanel, LoadingRows, PageHeader, SideCard } from '@/shared/ui';
 import { formatHistoryDeleteFailure } from './historyDeleteFeedback';
 import styles from './BrowsingHistoryPage.module.css';
 
@@ -149,7 +149,7 @@ export function BrowsingHistoryPage() {
 
   return (
     <>
-      <PageTitle title="浏览历史" description="管理最近查看过的帖子和社群，仅当前账号可见。" />
+      <PageHeader title="浏览历史" description="管理最近查看过的帖子和社群，仅当前账号可见。" />
       <PageLayout
         aside={
           <SideCard title="隐私与清理">

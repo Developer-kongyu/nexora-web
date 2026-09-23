@@ -12,7 +12,7 @@ import {
 } from '@/domains/communities';
 import type { ReviewDecision } from '@/shared/model/types';
 import { Avatar, Badge, Button, Card, IconButton, Select, useToast } from '@/shared/ui';
-import { EmptyPanel, LoadingRows } from '@/pages/_shared/PageParts';
+import { EmptyPanel, LoadingRows } from '@/shared/ui';
 import {
   type CommunityManageSectionProps,
   formatCommunityManageDateTime,

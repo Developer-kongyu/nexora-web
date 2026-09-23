@@ -1,0 +1,49 @@
+.infoBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  color: #4f46aa;
+  background: var(--color-primary-soft);
+  border: 1px solid #dce1ff;
+  border-radius: 12px;
+}
+
+.infoBanner p {
+  flex: 1;
+  font-size: 12px;
+}
+
+.infoBanner button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 800;
+  background: transparent;
+  cursor: pointer;
+}
+
+.infoBanner button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.successBanner {
+  color: #167347;
+  background: #ecfdf3;
+  border-color: #bbf7d0;
+}
+
+.warningBanner {
+  color: #a15c05;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.dangerBanner {
+  color: #b42318;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}

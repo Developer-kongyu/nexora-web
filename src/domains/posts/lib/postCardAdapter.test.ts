@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { PostCardBriefView } from '../model/types';
-import { mergeReplyTarget, mergeRepostSource, postCardBriefToViewModel } from './postCardAdapter';
+import type { PostCardBriefView, PostDetailDto } from '../model/types';
+import {
+  mergeReplyTarget,
+  mergeRepostSource,
+  postCardBriefToViewModel,
+  postDetailToViewModel,
+} from './postCardAdapter';
 
 const card: PostCardBriefView = {
   postId: 'post-1',
@@ -161,5 +166,42 @@ describe('postCardBriefToViewModel', () => {
       targetAuthor: { id: 'parent-user', handle: 'parent' },
       targetProfileAvailable: true,
     });
+  });
+});
+
+describe('post interaction permissions', () => {
+  it('preserves a denied bookmark permission when adapting a detail response', () => {
+    const detail: PostDetailDto = {
+      ...card,
+      bodyText: card.bodyTextPreview,
+      replyToPostId: null,
+      quoteOfPostId: null,
+      repostOfPostId: null,
+      rootPostId: null,
+      hashtags: [],
+      interactionSummary: {
+        likeCount: 0,
+        bookmarkCount: 0,
+        commentCount: 0,
+        quoteCount: 0,
+        repostCount: 0,
+        viewerState: null,
+      },
+      interactionPermission: {
+        canView: true,
+        canLike: true,
+        canBookmark: false,
+        canComment: true,
+        canQuote: true,
+        canRepost: true,
+      },
+    };
+    expect(postDetailToViewModel(detail).permissions.canBookmark).toBe(false);
+  });
+
+  it('disables bookmarking unpublished brief cards', () => {
+    expect(postCardBriefToViewModel({ ...card, status: 'DELETED' }).permissions.canBookmark).toBe(
+      false,
+    );
   });
 });

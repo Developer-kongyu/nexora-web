@@ -1,7 +1,9 @@
 import { CheckCircle2, FileText, ShieldCheck, Sparkles } from 'lucide-react';
-import { ComposeEditor } from '@/widgets/compose-editor/ComposeEditor';
-import { PageLayout } from '@/widgets/layout/PageLayout';
-import { PageTitle, SideCard } from '../_shared/PageParts';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ComposeEditor } from '@/features/compose-post';
+import { paths } from '@/shared/config/paths';
+import { PageLayout } from '@/shared/ui/layout';
+import { PageHeader, SideCard } from '@/shared/ui';
 
 const inlineIconStyle = {
   display: 'inline',
@@ -11,9 +13,12 @@ const inlineIconStyle = {
 } as const;
 
 export function ComposePage() {
+  const { draftId } = useParams<{ draftId?: string }>();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   return (
     <>
-      <PageTitle title="发布帖子" description="编辑正文、媒体、投递位置与互动权限。" />
+      <PageHeader title="发布帖子" description="编辑正文、媒体、投递位置与互动权限。" />
       <PageLayout
         aside={
           <>
@@ -58,7 +63,17 @@ export function ComposePage() {
           </>
         }
       >
-        <ComposeEditor />
+        <ComposeEditor
+          draftId={draftId}
+          initialCommunityId={searchParams.get('community') ?? ''}
+          initialQuotePostId={searchParams.get('quotePostId')}
+          onDraftSaved={(savedDraftId) => {
+            void navigate(paths.composeDraft(savedDraftId), { replace: true });
+          }}
+          onPublished={({ postId }) => {
+            void navigate(paths.post(postId));
+          }}
+        />
       </PageLayout>
     </>
   );

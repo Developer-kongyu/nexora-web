@@ -16,7 +16,7 @@ import {
   type UpdateCommunitySettingsInput,
 } from '@/domains/communities';
 import { Badge, Button, Card, Select, SelectOptions, Switch, useToast } from '@/shared/ui';
-import { Notice } from '@/pages/_shared/PageParts';
+import { Notice } from '@/shared/ui';
 import { type CommunityManageDetailSectionProps } from '../communityManage.model';
 import styles from '../CommunityManagePage.module.css';
 

@@ -39,8 +39,8 @@ import { useKeySelection } from '@/shared/hooks/useKeySelection';
 import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { formatDateTime } from '@/shared/lib/format';
 import { Button, Card, IconButton, Modal, Select, TextField, useToast } from '@/shared/ui';
-import { PostCard } from '@/widgets/post-card/PostCard';
-import { EmptyPanel, LoadingRows } from '../_shared/PageParts';
+import { PostCard } from '@/widgets/post-card';
+import { EmptyPanel, LoadingRows } from '@/shared/ui';
 import styles from './BookmarksPage.module.css';
 
 const PAGE_SIZE = 20;

@@ -3,7 +3,7 @@ import type {
   PostDeletedListItemView,
   PostDraftListItemView,
   PostDeleteOutcome,
-} from '@/domains/posts/model/types';
+} from '@/domains/posts/model';
 import type { CursorPageView } from '@/shared/api/pagination';
 
 export type BookmarkCollectionKind = 'DEFAULT' | 'CUSTOM';

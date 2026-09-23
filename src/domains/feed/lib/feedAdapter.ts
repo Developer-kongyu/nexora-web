@@ -1,4 +1,4 @@
-import type { MediaItem, PostViewModel } from '@/domains/posts/model/types';
+import type { MediaItem, PostViewModel } from '@/domains/posts/model';
 import type { FeedListItemDto, FeedPage, FeedResponseDto } from '../model/types';
 
 function mapMedia(item: FeedListItemDto): MediaItem[] {
@@ -28,8 +28,7 @@ function mapMedia(item: FeedListItemDto): MediaItem[] {
 export function feedListItemToViewModel(item: FeedListItemDto): PostViewModel {
   return {
     id: item.postId,
-    contentPostId:
-      item.postId !== item.dedupePostId ? item.dedupePostId : item.postId,
+    contentPostId: item.postId !== item.dedupePostId ? item.dedupePostId : item.postId,
     postKind: item.postId !== item.dedupePostId ? 'REPOST' : undefined,
     relation:
       item.postId !== item.dedupePostId

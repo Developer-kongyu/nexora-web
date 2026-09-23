@@ -1,0 +1,58 @@
+.sideCard {
+  padding: 18px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xs);
+}
+
+.sideCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.sideCardHeader h2 {
+  font-size: 15px;
+}
+
+.sideCardHeader a,
+.sideCardHeader button {
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 800;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sideCard p {
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.sideCard ul {
+  display: grid;
+  gap: 11px;
+}
+
+.sideCard li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sideCard li::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  margin-top: 6px;
+  background: #a5b4fc;
+  border-radius: 50%;
+}

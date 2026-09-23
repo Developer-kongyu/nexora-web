@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
-import { postCardBriefToViewModel } from '@/domains/posts/lib/postCardAdapter';
-import type { PostCardBriefView } from '@/domains/posts/model/types';
+import { postCardBriefToViewModel } from '@/domains/posts/lib';
+import type { PostCardBriefView } from '@/domains/posts/model';
 import { posts } from '@/mocks/fixtures';
 import { requireArrayItem } from '@/shared/lib/array';
 import { PostCard } from './PostCard';

@@ -1,5 +1,5 @@
-import type { PostCardBriefView, PostViewModel } from '@/domains/posts/model/types';
-import type { UserRelationSnapshotView } from '@/domains/users/model/types';
+import type { PostCardBriefView, PostViewModel } from '@/domains/posts/model';
+import type { UserRelationSnapshotView } from '@/domains/users/model';
 import type { PublicPrivateVisibility } from '@/shared/model/visibility';
 
 /**

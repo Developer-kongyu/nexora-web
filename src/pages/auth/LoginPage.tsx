@@ -15,11 +15,7 @@ import { APP_BRAND } from '@/shared/config/brand';
 import { Button, TextField, useToast } from '@/shared/ui';
 import { AuthFormShell } from './AuthFormShell';
 import styles from './AuthPages.module.css';
-import {
-  type LoginMode,
-  validateLoginIdentifier,
-  validateLoginSecret,
-} from './loginValidation';
+import { type LoginMode, validateLoginIdentifier, validateLoginSecret } from './loginValidation';
 import { useVerificationCountdown } from './useVerificationCountdown';
 
 interface LoginValues {
@@ -95,7 +91,11 @@ export function LoginPage() {
         return;
       }
 
-      showToast({ tone: 'success', title: 'Google 登录成功', description: `欢迎回到 ${APP_BRAND.name}` });
+      showToast({
+        tone: 'success',
+        title: 'Google 登录成功',
+        description: `欢迎回到 ${APP_BRAND.name}`,
+      });
       const from = (location.state as { from?: string } | null)?.from || '/home';
       const session = result.authSession;
       const destination = session.onboardingCompleted

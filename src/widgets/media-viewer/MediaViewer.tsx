@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight, Download, Expand, Pause, Play, Volume2, X } 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { PostViewModel } from '@/domains/posts';
 import { Avatar, IconButton, useToast } from '@/shared/ui';
-import { PostRichText } from '@/widgets/post-card/PostRichText';
+import { PostRichText } from '@/widgets/post-card';
 import styles from './MediaViewer.module.css';
 
 interface MediaViewerProps {

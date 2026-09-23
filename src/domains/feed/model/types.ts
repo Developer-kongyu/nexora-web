@@ -1,5 +1,6 @@
-import type { MediaAssetKind } from '@/domains/media';
-import type { PostViewModel } from '@/domains/posts/model/types';
+import type { CommunityVisibility, CommunityJoinPolicy } from '@/domains/communities/model';
+import type { MediaAssetKind } from '@/domains/media/model';
+import type { PostViewModel } from '@/domains/posts/model';
 import type { CursorPage } from '@/shared/api/pagination';
 
 export type FeedPage = CursorPage<PostViewModel>;
@@ -88,8 +89,8 @@ export interface ExploreCommunityCardDto {
   tags: string[];
   memberCount: number;
   postCount: number;
-  visibility: 'PUBLIC' | 'PRIVATE';
-  joinPolicy: 'OPEN' | 'APPROVAL' | 'INVITE_ONLY';
+  visibility: CommunityVisibility;
+  joinPolicy: CommunityJoinPolicy;
 }
 
 export interface ExploreCommunityItemDto {

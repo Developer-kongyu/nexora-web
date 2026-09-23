@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { settingsApi, settingsKeys } from '@/domains/settings';
 import { paths } from '@/shared/config/paths';
 import { Badge, Card } from '@/shared/ui';
-import { SettingsPage } from '../_shared/SettingsPage';
+import { SettingsPage } from './ui/SettingsPage';
 import styles from './SettingsPages.module.css';
 
 const SETTINGS_ITEMS = [

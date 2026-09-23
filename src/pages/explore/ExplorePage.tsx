@@ -1,3 +1,4 @@
+import emptyStyles from '@/shared/ui/EmptyPanel/EmptyPanel.module.css';
 import { useQuery } from '@tanstack/react-query';
 import { Compass, Flame, Globe2, Hash } from 'lucide-react';
 import { useState } from 'react';
@@ -9,11 +10,11 @@ import { mergeCursorItems } from '@/shared/api/pagination';
 import { useCopyTextFeedback } from '@/shared/hooks/useCopyTextFeedback';
 import { formatCount } from '@/shared/lib/format';
 import { Badge, Button } from '@/shared/ui';
-import { CommunityCard } from '@/widgets/community-card/CommunityCard';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { PostCard } from '@/widgets/post-card/PostCard';
-import { LoadingRows, SideCard } from '../_shared/PageParts';
-import styles from '../_shared/ProductPages.module.css';
+import { CommunityCard } from '@/widgets/community-card';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { PostCard } from '@/widgets/post-card';
+import { LoadingRows, SideCard } from '@/shared/ui';
+import styles from '@/shared/ui/layout/ContentLayout.module.css';
 
 const EXPLORE_TABS: ReadonlyArray<{ value: ExplorePostTab; label: string }> = [
   { value: 'HOT', label: '热门' },
@@ -121,7 +122,9 @@ export function ExplorePage() {
                       topics.data?.windowEndedAtIso ?? null,
                     )}
               </li>
-              <li>热门话题：{topics.isError ? '加载失败' : `${topics.data?.list.length ?? 0} 个`}</li>
+              <li>
+                热门话题：{topics.isError ? '加载失败' : `${topics.data?.list.length ?? 0} 个`}
+              </li>
               <li>
                 推荐社群：
                 {communities.isError ? '加载失败' : `${communities.data?.list.length ?? 0} 个`}
@@ -163,7 +166,7 @@ export function ExplorePage() {
             {topics.isLoading ? (
               <LoadingRows count={2} compact />
             ) : topics.isError ? (
-              <div className={styles.emptyPanel}>
+              <div className={emptyStyles.emptyPanel}>
                 <h2>热门话题加载失败</h2>
                 <p>后端话题快照暂时无法读取。</p>
                 <Button size="sm" variant="secondary" onClick={() => void topics.refetch()}>
@@ -171,8 +174,8 @@ export function ExplorePage() {
                 </Button>
               </div>
             ) : !topics.data || topics.data.list.length === 0 ? (
-              <div className={styles.emptyPanel}>
-                <span className={styles.emptyIcon}>
+              <div className={emptyStyles.emptyPanel}>
+                <span className={emptyStyles.emptyIcon}>
                   <Hash size={22} />
                 </span>
                 <h2>暂无热门话题</h2>
@@ -195,10 +198,7 @@ export function ExplorePage() {
                       {formatCount(topic.postCount24h)} 条帖子 ·{' '}
                       {formatCount(topic.contributorCount24h)} 位创作者
                     </p>
-                    <Badge
-                      tone="neutral"
-                      style={{ position: 'absolute', right: 14, bottom: 14 }}
-                    >
+                    <Badge tone="neutral" style={{ position: 'absolute', right: 14, bottom: 14 }}>
                       第 {topic.rankPosition} 位
                     </Badge>
                   </Link>
@@ -218,7 +218,7 @@ export function ExplorePage() {
           {feed.isLoading ? (
             <LoadingRows count={2} />
           ) : feed.isError ? (
-            <div className={styles.emptyPanel}>
+            <div className={emptyStyles.emptyPanel}>
               <h2>帖子加载失败</h2>
               <p>当前分类暂时无法从后端读取。</p>
               <Button size="sm" variant="secondary" onClick={() => void feed.refetch()}>
@@ -226,8 +226,8 @@ export function ExplorePage() {
               </Button>
             </div>
           ) : posts.length === 0 ? (
-            <div className={styles.emptyPanel}>
-              <span className={styles.emptyIcon}>
+            <div className={emptyStyles.emptyPanel}>
+              <span className={emptyStyles.emptyIcon}>
                 <Compass size={22} />
               </span>
               <h2>当前分类暂无内容</h2>
@@ -271,7 +271,7 @@ export function ExplorePage() {
             {communities.isLoading ? (
               <LoadingRows count={2} compact />
             ) : communities.isError ? (
-              <div className={styles.emptyPanel}>
+              <div className={emptyStyles.emptyPanel}>
                 <h2>推荐社群加载失败</h2>
                 <p>后端推荐榜单暂时无法读取。</p>
                 <Button size="sm" variant="secondary" onClick={() => void communities.refetch()}>
@@ -279,7 +279,7 @@ export function ExplorePage() {
                 </Button>
               </div>
             ) : !communities.data || communities.data.list.length === 0 ? (
-              <div className={styles.emptyPanel}>
+              <div className={emptyStyles.emptyPanel}>
                 <h2>暂无推荐社群</h2>
                 <p>后端当前没有可展示的推荐社群快照。</p>
               </div>

@@ -87,8 +87,7 @@ export const communitiesApi = {
     const membership = await getCommunityMembershipStates(
       page.list.map((community) => community.communityId),
       signal,
-    )
-      .catch(() => ({ list: page.list.map(() => null) }));
+    ).catch(() => ({ list: page.list.map(() => null) }));
     const hasMore = page.page * page.pageSize < page.total;
     return {
       list: page.list.map((community, index) =>

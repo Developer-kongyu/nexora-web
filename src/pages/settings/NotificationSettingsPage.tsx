@@ -9,7 +9,7 @@ import {
 } from '@/domains/settings';
 import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { Button, Card, Select, Switch, TextField, useToast } from '@/shared/ui';
-import { SettingsPage } from '../_shared/SettingsPage';
+import { SettingsPage } from './ui/SettingsPage';
 import styles from './SettingsPages.module.css';
 
 type NotificationBooleanField =

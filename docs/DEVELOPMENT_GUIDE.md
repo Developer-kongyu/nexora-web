@@ -6,9 +6,9 @@
 
 1. 在 `model/types.ts` 定义输入、服务端 DTO 或页面 ViewModel。
 2. 在 `api/postsApi.ts` 使用 `apiClient` 封装 HTTP。
-3. 在 `model/queryKeys.ts` 定义领域 query key factory，在 `hooks` 中定义 query/mutation 和缓存失效。
+3. 在 `model/queryKeys.ts` 定义领域 query key factory，在 `hooks` 中定义 query/mutation 和本领域缓存失效；跨领域写流程放在 `features`。
 4. 从领域 `index.ts` 只导出外部需要的公开 API。
-5. 在 `mocks/handlers.ts` 增加模拟接口。
+5. 在 `mocks/handlers/<domain>.handlers.ts` 增加模拟接口，保持组装顺序；可变数据提供状态重置。
 6. 编写 API、hook 或组件测试。
 
 禁止页面直接拼 URL 或调用 `fetch`。
@@ -16,7 +16,7 @@
 ## 2. 新增页面
 
 1. 在 `src/pages/<name>` 创建页面。
-2. 页面组合 `PageHeader`、`PageLayout`、widgets 和领域 hooks。
+2. 页面组合 `shared/ui` 的 `PageHeader`、`shared/ui/layout` 的 `PageLayout`、widgets、features 和领域 hooks。URL 解析及成功导航留在页面。
 3. 在 `src/app/router/router.tsx` 使用 `lazy` 增加路由。
 4. 如需侧栏入口，更新 `Sidebar.tsx`。
 5. 更新 `docs/ROUTE_MAP.md`。
@@ -47,6 +47,8 @@ Mutation 成功后只失效必要范围，避免无差别 `invalidateQueries()`�
 提交前单独执行：
 
 ```bash
+npm run boundaries:test
+npm run boundaries:check
 npm run reuse:check
 ```
 
@@ -56,7 +58,7 @@ npm run reuse:check
 
 ## 6. 表单规范
 
-- schema 放在页面或领域附近。
+- 编辑器 schema 和表单临时值归 feature/model；接口输入合同归 domains/model。
 - 服务端 `fieldErrors` 映射回 React Hook Form。
 - 提交期间禁用重复写按钮。
 - 破坏性操作必须有二次确认。

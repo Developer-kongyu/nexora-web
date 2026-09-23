@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { usersApi } from '@/domains/users';
+import { usersApi } from '@/domains/users/api';
 import { authSession } from '@/shared/api/authSession';
 import { authApi } from '../api/authApi';
 import { useAuthStore } from '../model/authStore';

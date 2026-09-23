@@ -39,9 +39,9 @@ import { requireArrayItem } from '@/shared/lib/array';
 import { formatDateTime } from '@/shared/lib/format';
 import { settleBatch, type SettledBatchItem } from '@/shared/lib/settleBatch';
 import { Badge, Button, Card, Modal, useToast } from '@/shared/ui';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { EmptyPanel, LoadingRows, PageTitle, SideCard } from '../_shared/PageParts';
-import productStyles from '../_shared/ProductPages.module.css';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { EmptyPanel, LoadingRows, PageHeader, SideCard } from '@/shared/ui';
+import productStyles from '@/shared/ui/layout/ContentLayout.module.css';
 import styles from './DraftsPage.module.css';
 
 const PAGE_SIZE = 20;
@@ -197,7 +197,7 @@ export function DraftsPage() {
 
   return (
     <>
-      <PageTitle
+      <PageHeader
         title="草稿箱"
         description="管理自动保存与手动保存的草稿，并按正式发布状态处理失败项。"
         actions={

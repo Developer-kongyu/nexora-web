@@ -18,7 +18,14 @@ export function BrandMark({ className }: BrandMarkProps) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id={gradientId} x1="8" y1="7" x2="56" y2="57" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id={gradientId}
+          x1="8"
+          y1="7"
+          x2="56"
+          y2="57"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#6D5DFB" />
           <stop offset="0.52" stopColor="#8B5CF6" />
           <stop offset="1" stopColor="#11BDE3" />

@@ -1,0 +1,55 @@
+.quickCompose {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xs);
+}
+
+.quickCompose button.prompt {
+  min-height: 40px;
+  padding: 0 14px;
+  text-align: left;
+  color: #98a2b3;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  cursor: text;
+}
+
+.quickTools {
+  display: flex;
+  gap: 4px;
+}
+
+.quickTools button {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  color: var(--color-muted);
+  background: transparent;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.quickTools button:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+@media (max-width: 700px) {
+  .quickCompose {
+    grid-template-columns: auto 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .quickTools {
+    grid-column: 2;
+  }
+}

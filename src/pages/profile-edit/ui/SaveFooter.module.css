@@ -1,0 +1,32 @@
+.formFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.formFooter > span {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.formFooter > div {
+  display: flex;
+  gap: 9px;
+}
+
+@media (max-width: 700px) {
+  .formFooter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 700px) {
+  .formFooter > div {
+    justify-content: flex-end;
+  }
+}

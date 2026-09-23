@@ -1,0 +1,22 @@
+.skeleton {
+  height: 112px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 42%, #f1f5f9 62%);
+  background-size: 400% 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  animation: shimmer 1.4s infinite;
+}
+
+.compactSkeleton {
+  height: 64px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}

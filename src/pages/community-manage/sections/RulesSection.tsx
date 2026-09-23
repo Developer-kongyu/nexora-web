@@ -8,7 +8,7 @@ import {
   communityManageKeys,
 } from '@/domains/communities';
 import { Badge, Button, Card, IconButton, useToast } from '@/shared/ui';
-import { EmptyPanel } from '@/pages/_shared/PageParts';
+import { EmptyPanel } from '@/shared/ui';
 import { type CommunityManageDetailSectionProps } from '../communityManage.model';
 import styles from '../CommunityManagePage.module.css';
 

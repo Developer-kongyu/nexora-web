@@ -10,14 +10,14 @@ import {
   communityKeys,
   communityManageKeys,
 } from '@/domains/communities';
-import { communityDetailToLegacy } from '@/domains/communities/lib/communityAdapter';
+import { communityDetailToLegacy } from '@/domains/communities/lib';
 import { paths } from '@/shared/config/paths';
 import { useCopyTextFeedback } from '@/shared/hooks/useCopyTextFeedback';
 import { formatDate } from '@/shared/lib/format';
 import { Avatar, Badge, Button, Card, IconButton, Modal, useToast } from '@/shared/ui';
-import { PageLayout, Stack } from '@/widgets/layout/PageLayout';
-import { PostCard } from '@/widgets/post-card/PostCard';
-import { EmptyPanel, LoadingRows, SideCard } from '../_shared/PageParts';
+import { PageLayout, Stack } from '@/shared/ui/layout';
+import { PostCard } from '@/widgets/post-card';
+import { EmptyPanel, LoadingRows, SideCard } from '@/shared/ui';
 import styles from './CommunityDetailPage.module.css';
 
 const MEMBER_PAGE_SIZE = 20;
@@ -136,7 +136,10 @@ export function CommunityDetailPage() {
                 </li>
               </ul>
             </SideCard>
-            <SideCard title="社群规则" action="查看全部" to={paths.communityAbout(slug)}>
+            <SideCard
+              title="社群规则"
+              action={<Link to={paths.communityAbout(slug)}>查看全部</Link>}
+            >
               {sortedRules.length ? (
                 <ol className={styles.rules}>
                   {sortedRules.map((rule) => (

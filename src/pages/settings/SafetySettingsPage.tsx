@@ -7,7 +7,7 @@ import { paths } from '@/shared/config/paths';
 import { mergeInfiniteDataItemsBy } from '@/shared/api/infiniteData';
 import { getNextCursorPageParam } from '@/shared/api/pagination';
 import { Avatar, Button, Card, useToast } from '@/shared/ui';
-import { SettingsPage } from '../_shared/SettingsPage';
+import { SettingsPage } from './ui/SettingsPage';
 import {
   canCancelSafetyEntry,
   filterSafetyItems,

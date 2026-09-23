@@ -189,3 +189,13 @@ export interface RejectFollowRequestResult {
 }
 
 export type FollowRequestReviewResult = ApproveFollowRequestResult | RejectFollowRequestResult;
+
+export interface UpdateOwnProfileRequest {
+  displayName?: string;
+  bio?: string | null;
+  location?: string | null;
+  websiteUrl?: string | null;
+  birthday?: string | null;
+  avatarStorageKey?: string | null;
+  coverStorageKey?: string | null;
+}

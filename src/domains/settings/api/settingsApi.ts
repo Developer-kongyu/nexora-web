@@ -1,3 +1,4 @@
+import type { PermissionPolicy } from '@/domains/permissions/model';
 import { apiClient } from '@/shared/api/client';
 import type {
   InterestTagCatalogView,
@@ -25,14 +26,15 @@ export interface SettingsOverview {
     status: 'ACTIVE';
     activeSessionCount: number;
   };
-  privacy: {
-    accountVisibility: 'PUBLIC' | 'PRIVATE';
-    allowSearchIndex: boolean;
-    defaultPostVisibility: 'PUBLIC' | 'FOLLOWERS' | 'PRIVATE' | 'UNLISTED';
-    defaultCommentPermission: 'EVERYONE' | 'FOLLOWING' | 'MUTUALS' | 'NO_ONE';
-    defaultQuotePermission: 'EVERYONE' | 'FOLLOWING' | 'NO_ONE';
-    mentionPermission: 'EVERYONE' | 'FOLLOWING' | 'NO_ONE';
-  };
+  privacy: Pick<
+    PermissionPolicy,
+    | 'accountVisibility'
+    | 'allowSearchIndex'
+    | 'defaultPostVisibility'
+    | 'defaultCommentPermission'
+    | 'defaultQuotePermission'
+    | 'mentionPermission'
+  >;
   notification: Pick<
     NotificationSettingsView,
     | 'userId'

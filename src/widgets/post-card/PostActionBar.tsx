@@ -1,12 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { Bookmark, Eye, Heart, MessageCircle, Repeat2, Share2 } from 'lucide-react';
 import { useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { engagementApi } from '@/domains/engagement';
-import { libraryApi, libraryKeys, type BookmarkSourceScene } from '@/domains/library';
-import { postsApi, type PostViewModel } from '@/domains/posts';
+import type { PostViewModel } from '@/domains/posts';
+import { usePostInteractions } from '@/features/post-interactions';
 import { paths } from '@/shared/config/paths';
-import { useSynchronizedState } from '@/shared/hooks/useSynchronizedState';
 import { copyTextToClipboard } from '@/shared/lib/clipboard';
 import { formatCount } from '@/shared/lib/format';
 import { useToast } from '@/shared/ui';
@@ -24,160 +21,22 @@ interface ActionItem {
   action: () => void;
 }
 
-interface PostActionState {
-  liked: boolean;
-  bookmarked: boolean;
-  reposted: boolean;
-  likes: number;
-  bookmarks: number;
-  reposts: number;
-}
-
-function resolveBookmarkSourceScene(post: PostViewModel): BookmarkSourceScene {
-  switch (post.variant) {
-    case 'detail':
-      return 'POST_DETAIL';
-    case 'search':
-      return 'SEARCH_RESULT';
-    case 'profile':
-      return 'PROFILE_POST';
-    case 'community':
-    case 'announcement':
-      return 'COMMUNITY_POST';
-    default:
-      return 'FEED_CARD';
-  }
-}
-
-function createPostActionState(post: PostViewModel): PostActionState {
-  return {
-    liked: post.viewer.liked,
-    bookmarked: post.viewer.bookmarked,
-    reposted: post.viewer.reposted,
-    likes: post.stats.likes,
-    bookmarks: post.stats.bookmarks,
-    reposts: post.stats.reposts,
-  };
-}
-
-function getPostActionSourceKey(post: PostViewModel): string {
-  return [
-    post.id,
-    post.contentPostId ?? post.id,
-    post.viewer.liked,
-    post.viewer.bookmarked,
-    post.viewer.reposted,
-    post.stats.likes,
-    post.stats.bookmarks,
-    post.stats.reposts,
-  ].join('\u001f');
-}
-
-function adjustCount(value: number, active: boolean): number {
-  return Math.max(0, value + (active ? 1 : -1));
-}
-
 export function PostActionBar({ post }: { post: PostViewModel }) {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [actionState, setActionState] = useSynchronizedState(
-    getPostActionSourceKey(post),
-    createPostActionState(post),
-  );
-  const [pendingAction, setPendingAction] = useState<ActionKey | null>(null);
-  const contentPostId = post.contentPostId ?? post.id;
-
-  const toggleLike = async () => {
-    if (pendingAction || !post.permissions.canLike) return;
-    const next = !actionState.liked;
-    setPendingAction('like');
-    setActionState((current) => ({
-      ...current,
-      liked: next,
-      likes: adjustCount(current.likes, next),
-    }));
-    try {
-      await (next ? engagementApi.like(contentPostId) : engagementApi.unlike(contentPostId));
-    } catch {
-      setActionState((current) => ({
-        ...current,
-        liked: !next,
-        likes: adjustCount(current.likes, !next),
-      }));
-      showToast({
-        tone: 'error',
-        title: '点赞操作失败',
-        description: '状态已回滚，请检查网络后重试。',
-      });
-    } finally {
-      setPendingAction(null);
-    }
-  };
-
-  const toggleRepost = async () => {
-    if (pendingAction || !post.permissions.canRepost) return;
-    const next = !actionState.reposted;
-    setPendingAction('repost');
-    setActionState((current) => ({
-      ...current,
-      reposted: next,
-      reposts: adjustCount(current.reposts, next),
-    }));
-    try {
-      await (next ? postsApi.createRepost(contentPostId) : postsApi.cancelRepost(contentPostId));
-      showToast({ tone: 'success', title: next ? '已转发到你的主页' : '已取消转发' });
-    } catch {
-      setActionState((current) => ({
-        ...current,
-        reposted: !next,
-        reposts: adjustCount(current.reposts, !next),
-      }));
-      showToast({
-        tone: 'error',
-        title: '转发操作失败',
-        description: '状态已回滚，请稍后重试。',
-      });
-    } finally {
-      setPendingAction(null);
-    }
-  };
-
-  const toggleBookmark = async () => {
-    if (pendingAction) return;
-    const next = !actionState.bookmarked;
-    setPendingAction('bookmark');
-    setActionState((current) => ({
-      ...current,
-      bookmarked: next,
-      bookmarks: adjustCount(current.bookmarks, next),
-    }));
-    try {
-      if (next) {
-        await libraryApi.savePostBookmark(contentPostId, {
-          targetCollectionId: null,
-          sourceScene: resolveBookmarkSourceScene(post),
-        });
-      } else {
-        await libraryApi.removePostBookmark(contentPostId);
-      }
-      showToast({ tone: 'success', title: next ? '已保存到默认收藏夹' : '已取消收藏' });
-      void queryClient.invalidateQueries({ queryKey: libraryKeys.bookmarks });
-    } catch {
-      setActionState((current) => ({
-        ...current,
-        bookmarked: !next,
-        bookmarks: adjustCount(current.bookmarks, !next),
-      }));
-      showToast({
-        tone: 'error',
-        title: '收藏操作失败',
-        description: '状态已回滚，请稍后重试。',
-      });
-    } finally {
-      setPendingAction(null);
-    }
-  };
+  const {
+    state: actionState,
+    pending,
+    targetPostId: contentPostId,
+    canLike,
+    canRepost,
+    canBookmark,
+    toggleLike,
+    toggleRepost,
+    toggleBookmark,
+  } = usePostInteractions(post);
+  const [sharing, setSharing] = useState(false);
+  const busy = pending || sharing;
 
   const copyPostLink = async (url: string) => {
     await copyTextToClipboard(url);
@@ -185,9 +44,9 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
   };
 
   const share = async () => {
-    if (pendingAction) return;
+    if (busy) return;
     const url = `${window.location.origin}/posts/${encodeURIComponent(contentPostId)}`;
-    setPendingAction('share');
+    setSharing(true);
     try {
       const shareWithNavigator = navigator.share?.bind(navigator);
       if (shareWithNavigator) {
@@ -208,7 +67,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
         });
       }
     } finally {
-      setPendingAction(null);
+      setSharing(false);
     }
   };
 
@@ -229,7 +88,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
       count: actionState.likes,
       icon: Heart,
       active: actionState.liked,
-      disabled: !post.permissions.canLike,
+      disabled: !canLike,
       action: () => void toggleLike(),
     },
     {
@@ -238,7 +97,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
       count: actionState.reposts,
       icon: Repeat2,
       active: actionState.reposted,
-      disabled: !post.permissions.canRepost,
+      disabled: !canRepost,
       action: () => void toggleRepost(),
     },
     {
@@ -247,6 +106,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
       count: actionState.bookmarks,
       icon: Bookmark,
       active: actionState.bookmarked,
+      disabled: !canBookmark,
       action: () => void toggleBookmark(),
     },
     {
@@ -267,7 +127,7 @@ export function PostActionBar({ post }: { post: PostViewModel }) {
             type="button"
             className={active ? styles.actionActive : styles.actionItem}
             onClick={action}
-            disabled={disabled || pendingAction !== null}
+            disabled={disabled || busy}
             aria-pressed={active}
             aria-label={`${label} ${formatCount(count)}`}
           >

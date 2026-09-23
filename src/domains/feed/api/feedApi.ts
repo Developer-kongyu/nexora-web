@@ -1,6 +1,6 @@
-import { postsApi } from '@/domains/posts';
-import { mergeRepostSource } from '@/domains/posts/lib/postCardAdapter';
-import type { PostViewModel } from '@/domains/posts/model/types';
+import { postsApi } from '@/domains/posts/api';
+import { mergeRepostSource } from '@/domains/posts/lib';
+import type { PostViewModel } from '@/domains/posts/model';
 import type { FeedPage } from '../model/types';
 import { apiClient } from '@/shared/api/client';
 import { appendQuery } from '@/shared/api/query';
@@ -72,11 +72,7 @@ export const feedApi = {
     });
     return hydrateFeedReposts(response, signal);
   },
-  explore: async (
-    cursor?: string,
-    signal?: AbortSignal,
-    tab: ExplorePostTab = 'HOT',
-  ) => {
+  explore: async (cursor?: string, signal?: AbortSignal, tab: ExplorePostTab = 'HOT') => {
     const response = await apiClient.request<FeedResponseDto>({
       path: appendQuery('/api/feeds/explore/posts', { cursor, pageSize: 20, tab }),
       signal,
